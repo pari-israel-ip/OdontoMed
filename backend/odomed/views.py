@@ -16,7 +16,7 @@ def home(request):
 @csrf_exempt
 def rol_list(request):
     if request.method == 'GET':
-        roles = list(Roles.objects.values())
+        roles = list(Roles.objects.filter(activo=True).values())
         return JsonResponse(roles, safe=False)
 
 @csrf_exempt
@@ -33,8 +33,9 @@ def rol_detail(request, id_rol):
         return JsonResponse({'message': 'Rol actualizado'})
 
     elif request.method == 'DELETE':
-        rol.delete()
-        return JsonResponse({'message': 'Rol eliminado'})
+        rol.activo = False
+        rol.save()
+        return JsonResponse({'message': 'Rol eliminado lógicamente'})
 
 @csrf_exempt
 def rol_create(request):
@@ -48,7 +49,7 @@ def rol_create(request):
 @csrf_exempt
 def usuario_list(request):
     if request.method == 'GET':
-        usuarios = list(Usuario.objects.values())
+        usuarios = list(Usuario.objects.filter(activo=True).values())
         return JsonResponse(usuarios, safe=False)
 
 @csrf_exempt
@@ -73,8 +74,9 @@ def usuario_detail(request, id_usuario):
         return JsonResponse({'message': 'Usuario actualizado'})
 
     elif request.method == 'DELETE':
-        usuario.delete()
-        return JsonResponse({'message': 'Usuario eliminado'})
+        usuario.activo = False
+        usuario.save()
+        return JsonResponse({'message': 'Usuario eliminado lógicamente'})
 
 @csrf_exempt
 def usuario_create(request):
