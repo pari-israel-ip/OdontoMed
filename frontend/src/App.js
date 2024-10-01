@@ -3,6 +3,8 @@ import './App.css';
 import React from 'react';
 import RolesComponent from './components/RolesComponent';  // Ajusta la ruta si es necesario
 import UsuariosComponent from './components/UsuarioComponent';
+import LoginComponent from './components/LoginComponent';  // Importa el componente de login
+
 
 function App() {
     return (
@@ -11,6 +13,8 @@ function App() {
             <RolesComponent />
             <h1>Gestion Usuarios</h1>
             <UsuariosComponent/>
+            <h1>Login</h1>
+            <LoginComponent/>
         </div>
     );
 }

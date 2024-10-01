@@ -5,9 +5,11 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import Roles,Usuario
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate
 import json
 
 from django.http import HttpResponse
+
 
 def home(request):
     return HttpResponse("Bienvenido a la API de Odomed.")
@@ -94,3 +96,17 @@ def usuario_create(request):
             contrasenia=data.get('contrasenia')
         )
         return JsonResponse({'id_usuario': usuario.id_usuario, 'nombres': usuario.nombres, 'apellidos': usuario.apellidos}, status=201)   
+
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('email')
+        contrasenia = data.get('contrasenia')
+
+        try:
+            usuario = Usuario.objects.get(email=email, contrasenia=contrasenia)
+            return JsonResponse({'message': 'Login exitoso', 'usuario_id': usuario.id_usuario}, status=200)
+        except Usuario.DoesNotExist:
+            return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
+    return JsonResponse({'message': 'Método no permitido'}, status=405)

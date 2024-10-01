@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import rol_list, rol_detail, rol_create,usuario_list,usuario_detail,usuario_create
+from .views import login, rol_list, rol_detail, rol_create,usuario_list,usuario_detail,usuario_create
 from django.http import HttpResponse
+
+
 
 
 def odomed_home(request):
@@ -14,6 +16,5 @@ urlpatterns = [
     path('usuario/', usuario_list, name='usuario_list'),  
     path('usuario/<int:id_usuario>/', usuario_detail, name='usuario_detail'),  
     path('usuario/create/', usuario_create, name='usuario_create'),  
-
-
+    path('login/', login, name='login'),  # Ruta para el login
 ]
