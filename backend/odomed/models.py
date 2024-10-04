@@ -3,7 +3,7 @@ from django.db import models
 #modelos de roles
 class Roles(models.Model):
     id_rol = models.AutoField(primary_key=True)
-    nombre_rol = models.CharField(max_length=50)
+    nombre_rol = models.CharField(max_length=50, unique=True)
     permisos = models.CharField(max_length=200)
     activo = models.BooleanField(default=True) 
     
