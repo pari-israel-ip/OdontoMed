@@ -54,6 +54,8 @@ const RolesComponent = () => {
             loadRoles();
         } catch (error) {
             console.error('Error creating role:', error);
+        } finally{
+            loadRoles();
         }
     };
 
