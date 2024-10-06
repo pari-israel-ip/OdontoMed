@@ -7,7 +7,7 @@ from .models import Roles,Usuario
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
-
+import re
 from django.http import HttpResponse
 
 
@@ -23,6 +23,49 @@ def rol_list(request):
 
 @csrf_exempt
 def rol_detail(request, id_rol):
+    try:
+        rol = Roles.objects.get(id_rol=id_rol)
+    except Roles.DoesNotExist:
+        return JsonResponse({'error': 'Rol no encontrado'}, status=404)
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        errors = {}
+
+        # Validar y convertir nombre_rol a mayúsculas
+        nombre_rol = data.get('nombre_rol', rol.nombre_rol).strip().upper()
+
+        # Expresión regular para validar solo letras y espacios
+        nombre_rol_regex = re.compile(r'^[A-Z\s]+$')
+
+        # Validar nombre_rol
+        if not nombre_rol:
+            errors['nombre_rol'] = 'El nombre del rol es obligatorio.'
+        elif len(nombre_rol) < 4 or len(nombre_rol) > 50:
+            errors['nombre_rol'] = 'El nombre del rol debe tener entre 4 y 50 caracteres.'
+        elif not nombre_rol_regex.match(nombre_rol):
+            errors['nombre_rol'] = 'El nombre del rol solo puede contener letras y espacios.'
+        elif Roles.objects.filter(nombre_rol=nombre_rol).exclude(id_rol=rol.id_rol).exists():
+            errors['nombre_rol'] = 'El nombre del rol ya está en uso.'
+
+        # Validar permisos
+        permisos = data.get('permisos', rol.permisos).strip()
+        if not permisos:
+            errors['permisos'] = 'Debe seleccionar al menos un permiso.'
+
+        # Si hay errores, devolverlos
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+
+        # Actualizar el rol si no hay errores
+        rol.nombre_rol = nombre_rol
+        rol.permisos = permisos
+        rol.save()
+
+        return JsonResponse({'message': 'Rol actualizado con éxito'})
+
+    # Si no es PUT, devolver un error de método no permitido
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
     rol = get_object_or_404(Roles, id_rol=id_rol)
     if request.method == 'GET':
         return JsonResponse(rol)
@@ -45,10 +88,19 @@ def rol_create(request):
         data = json.loads(request.body)
         errors = {}
 
-        # Validar nombre_rol
-        nombre_rol = data.get('nombre_rol', '').strip()
+        # Validar y convertir nombre_rol a mayúsculas
+        nombre_rol = data.get('nombre_rol', '').strip().upper()
+
+        # Expresión regular para validar solo letras y espacios
+        nombre_rol_regex = re.compile(r'^[A-Z\s]+$')
+
+        # Validar que el nombre_rol no esté vacío, tenga la longitud adecuada y contenga solo letras y espacios
         if not nombre_rol:
             errors['nombre_rol'] = 'El nombre del rol es obligatorio.'
+        elif len(nombre_rol) < 4 or len(nombre_rol) > 50:
+            errors['nombre_rol'] = 'El nombre del rol debe tener entre 4 y 50 caracteres.'
+        elif not nombre_rol_regex.match(nombre_rol):
+            errors['nombre_rol'] = 'El nombre del rol solo puede contener letras y espacios.'
         elif Roles.objects.filter(nombre_rol=nombre_rol).exists():
             errors['nombre_rol'] = 'El nombre del rol ya está en uso.'
 
@@ -57,16 +109,18 @@ def rol_create(request):
         if not permisos:
             errors['permisos'] = 'Debe seleccionar al menos un permiso.'
 
-        # Si hay errores, devolvemos el diccionario de errores
+        # Si hay errores, devolver el diccionario de errores
         if errors:
             return JsonResponse({'errors': errors}, status=400)
 
-        # Si no hay errores, creamos el rol
+        # Si no hay errores, crear el rol con el nombre en mayúsculas
         rol = Roles.objects.create(
-            nombre_rol=nombre_rol,
+            nombre_rol=nombre_rol,  # El nombre se guarda en mayúsculas
             permisos=permisos
         )
+
         return JsonResponse({'id_rol': rol.id_rol, 'nombre_rol': rol.nombre_rol, 'permisos': rol.permisos}, status=201)
+
 
 @csrf_exempt
 def usuario_list(request):

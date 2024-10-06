@@ -42,16 +42,16 @@ const RolesComponent = () => {
                 nombre_rol: updatedRole.nombre_rol,
                 permisos: updatedRole.permisos
             });
-            loadRoles();
         } catch (error) {
             console.error('Error updating role:', error);
+        } finally{
+            loadRoles();
         }
     };
 
     const handleCreate = async (newRole) => {
         try {
             await roleService.createRole(newRole);  // Asegúrate de tener esta función en roleService
-            loadRoles();
         } catch (error) {
             console.error('Error creating role:', error);
         } finally{
