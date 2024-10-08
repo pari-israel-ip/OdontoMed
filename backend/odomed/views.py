@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario
+from .models import Roles,Usuario, Odontologo,Practicante,Recepcionista,Paciente
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
@@ -170,7 +170,192 @@ def usuario_create(request):
             contrasenia=data.get('contrasenia')
         )
         return JsonResponse({'id_usuario': usuario.id_usuario, 'nombres': usuario.nombres, 'apellidos': usuario.apellidos}, status=201)   
+@csrf_exempt
+def paciente_list(request):
+    if request.method == 'GET':
+        pacientes = list(Paciente.objects.filter(activo=True).values())
+        return JsonResponse(pacientes, safe=False)
 
+@csrf_exempt
+def paciente_detail(request, id_paciente):
+    paciente = get_object_or_404(Paciente, usuario_id=id_paciente)
+    
+    if request.method == 'GET':
+        return JsonResponse(paciente)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        paciente.seguro_medico = data.get('seguro_medico', paciente.seguro_medico)
+        paciente.alergias = data.get('alergias', paciente.alergias)
+        paciente.antecedentes_medicos = data.get('antecedentes_medicos', paciente.antecedentes_medicos)
+        paciente.save()
+        return JsonResponse({'message': 'Paciente actualizado'})
+
+    elif request.method == 'DELETE':
+        paciente.activo = False
+        paciente.save()
+        return JsonResponse({'message': 'Paciente eliminado lógicamente'})
+
+@csrf_exempt
+def paciente_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        usuario = Usuario.objects.create(
+            nombres=data.get('nombres'),
+            apellidos=data.get('apellidos'),
+            ci=data.get('ci'),
+            email=data.get('email'),
+            telefono=data.get('telefono'),
+            fecha_nacimiento=data.get('fecha_nacimiento'),
+            rol_id=data.get('rol'),  # Asegúrate de que se pasa el ID del rol
+            direccion=data.get('direccion'),
+            contrasenia=data.get('contrasenia')
+        )
+        paciente = Paciente.objects.create(
+            usuario=usuario,
+            seguro_medico=data.get('seguro_medico'),
+            alergias=data.get('alergias'),
+            antecedentes_medicos=data.get('antecedentes_medicos')
+        )
+        return JsonResponse({'id_paciente': paciente.usuario.id_usuario, 'nombres': paciente.usuario.nombres, 'apellidos': paciente.usuario.apellidos}, status=201)
+
+@csrf_exempt
+def odontologo_list(request):
+    if request.method == 'GET':
+        odontologos = list(Odontologo.objects.filter(activo=True).values())
+        return JsonResponse(odontologos, safe=False)
+
+@csrf_exempt
+def odontologo_detail(request, id_odontologo):
+    odontologo = get_object_or_404(Odontologo, usuario_id=id_odontologo)
+
+    if request.method == 'GET':
+        return JsonResponse(odontologo)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        odontologo.numero_licencia = data.get('numero_licencia', odontologo.numero_licencia)
+        odontologo.especializacion = data.get('especializacion', odontologo.especializacion)
+        odontologo.save()
+        return JsonResponse({'message': 'Odontólogo actualizado'})
+
+    elif request.method == 'DELETE':
+        odontologo.activo = False
+        odontologo.save()
+        return JsonResponse({'message': 'Odontólogo eliminado lógicamente'})
+
+@csrf_exempt
+def odontologo_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        usuario = Usuario.objects.create(
+            nombres=data.get('nombres'),
+            apellidos=data.get('apellidos'),
+            ci=data.get('ci'),
+            email=data.get('email'),
+            telefono=data.get('telefono'),
+            fecha_nacimiento=data.get('fecha_nacimiento'),
+            rol_id=data.get('rol'),  # Asegúrate de que se pasa el ID del rol
+            direccion=data.get('direccion'),
+            contrasenia=data.get('contrasenia')
+        )
+        odontologo = Odontologo.objects.create(
+            usuario=usuario,
+            numero_licencia=data.get('numero_licencia'),
+            especializacion=data.get('especializacion')
+        )
+        return JsonResponse({'id_odontologo': odontologo.usuario.id_usuario, 'nombres': odontologo.usuario.nombres, 'apellidos': odontologo.usuario.apellidos}, status=201)
+
+@csrf_exempt
+def recepcionista_list(request):
+    if request.method == 'GET':
+        recepcionistas = list(Recepcionista.objects.filter(activo=True).values())
+        return JsonResponse(Recepcionista, safe=False)
+
+@csrf_exempt
+def recepcionista_detail(request, id_recepcionista):
+    recepcionista = get_object_or_404(Recepcionista, usuario_id=id_recepcionista)
+
+    if request.method == 'GET':
+        return JsonResponse(recepcionista)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        recepcionista.activo = data.get('activo', recepcionista.activo)
+        recepcionista.save()
+        return JsonResponse({'message': 'Recepcionista actualizado'})
+
+    elif request.method == 'DELETE':
+        recepcionista.activo = False
+        recepcionista.save()
+        return JsonResponse({'message': 'Recepcionista eliminado lógicamente'})
+
+@csrf_exempt
+def recepcionista_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        usuario = Usuario.objects.create(
+            nombres=data.get('nombres'),
+            apellidos=data.get('apellidos'),
+            ci=data.get('ci'),
+            email=data.get('email'),
+            telefono=data.get('telefono'),
+            fecha_nacimiento=data.get('fecha_nacimiento'),
+            rol_id=data.get('rol'),  # Asegúrate de que se pasa el ID del rol
+            direccion=data.get('direccion'),
+            contrasenia=data.get('contrasenia')
+        )
+        recepcionista = Recepcionista.objects.create(usuario=usuario)
+        return JsonResponse({'id_recepcionista': recepcionista.usuario.id_usuario, 'nombres': recepcionista.usuario.nombres, 'apellidos': recepcionista.usuario.apellidos}, status=201)
+
+@csrf_exempt
+def practicante_list(request):
+    if request.method == 'GET':
+        practicantes = list(Practicante.objects.filter(activo=True).values())
+        return JsonResponse(practicantes, safe=False)
+
+@csrf_exempt
+def practicante_detail(request, id_practicante):
+    practicante = get_object_or_404(Practicante, usuario_id=id_practicante)
+
+    if request.method == 'GET':
+        return JsonResponse(practicante)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        practicante.universidad = data.get('universidad', practicante.universidad)
+        practicante.fecha_inicio_practicas = data.get('fecha_inicio_practicas', practicante.fecha_inicio_practicas)
+        practicante.fecha_fin_practicas = data.get('fecha_fin_practicas', practicante.fecha_fin_practicas)
+        practicante.save()
+        return JsonResponse({'message': 'Practicante actualizado'})
+
+    elif request.method == 'DELETE':
+        practicante.activo = False
+        practicante.save()
+        return JsonResponse({'message': 'Practicante eliminado lógicamente'})
+
+@csrf_exempt
+def practicante_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        usuario = Usuario.objects.create(
+            nombres=data.get('nombres'),
+            apellidos=data.get('apellidos'),
+            ci=data.get('ci'),
+            email=data.get('email'),
+            telefono=data.get('telefono'),
+            fecha_nacimiento=data.get('fecha_nacimiento'),
+            rol_id=data.get('rol'),  # Asegúrate de que se pasa el ID del rol
+            direccion=data.get('direccion'),
+            contrasenia=data.get('contrasenia')
+        )
+        practicante = Practicante.objects.create(
+            usuario=usuario,
+            universidad=data.get('universidad'),
+            fecha_inicio_practicas=data.get('fecha_inicio_practicas'),
+            fecha_fin_practicas=data.get('fecha_fin_practicas')
+        )
+        return JsonResponse({'id_practicante': practicante.usuario.id_usuario, 'nombres': practicante.usuario.nombres, 'apellidos': practicante.usuario.apellidos}, status=201)
 @csrf_exempt
 def login(request):
     if request.method == 'POST':

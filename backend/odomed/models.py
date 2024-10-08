@@ -29,3 +29,46 @@ class Usuario(models.Model):
     class Meta:
         managed = False  # No queremos que Django gestione esta tabla
         db_table = 'usuarios'
+class Paciente(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
+    seguro_medico = models.CharField(max_length=100, blank=True, null=True)
+    alergias = models.TextField(blank=True, null=True)
+    antecedentes_medicos = models.TextField(blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    class Meta:
+        managed = False
+        db_table= 'pacientes'
+    def __str__(self):
+        return f"Paciente: {self.usuario.nombres} {self.usuario.apellidos}"
+
+class Odontologo(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
+    numero_licencia = models.CharField(max_length=50)
+    especializacion = models.CharField(max_length=100, blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    class Meta:
+        managed = False
+        db_table= 'odontologo'
+    def __str__(self):
+        return f"Odontólogo: {self.usuario.nombres} {self.usuario.apellidos}"
+
+class Recepcionista(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
+    activo = models.BooleanField(default=True)
+    class Meta:
+        managed = False
+        db_table= 'recepcionista'
+    def __str__(self):
+        return f"Recepcionista: {self.usuario.nombres} {self.usuario.apellidos}"
+
+class Practicante(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
+    universidad = models.CharField(max_length=100, blank=True, null=True)
+    fecha_inicio_practicas = models.DateField(blank=True, null=True)
+    fecha_fin_practicas = models.DateField(blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    class Meta:
+        managed = False
+        db_table= 'practicante'
+    def __str__(self):
+        return f"Practicante: {self.usuario.nombres} {self.usuario.apellidos}"
