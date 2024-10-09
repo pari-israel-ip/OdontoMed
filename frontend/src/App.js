@@ -1,25 +1,22 @@
 import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import RolesComponent from './components/RolesComponent';  // Ajusta la ruta si es necesario
+import UsuariosComponent from './components/UsuarioComponent';
+import LoginComponent from './components/LoginComponent';  // Importa el componente de login
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <h1>Gestión de Roles</h1>
+            <RolesComponent />
+            <h1>Gestion Usuarios</h1>
+            <UsuariosComponent/>
+            <LoginComponent/>
+           
+        </div>
+    );
 }
 
 export default App;
