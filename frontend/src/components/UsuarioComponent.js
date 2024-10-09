@@ -1,5 +1,6 @@
-// src/components/UsuariosComponent.js
 import React, { useEffect, useState } from 'react';
+import { Box, Button, Heading, List, ListItem, IconButton, Flex } from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import usuarioService from '../services/usuarioService';  // Asegúrate de que la ruta sea correcta
 import EditUsuarioModal from './EditUsuarioModal';  // Ruta al modal de edición
 import CreateUsuarioModal from './CreateUsuarioModal';  // Ruta al modal de creación
@@ -51,6 +52,7 @@ const UsuariosComponent = () => {
                 contrasenia: updatedUsuario.contrasenia,
             });
             loadUsuarios();
+            setIsEditModalOpen(false);  // Cerrar modal después de guardar
         } catch (error) {
             console.error('Error updating usuario:', error);
         }
@@ -60,25 +62,46 @@ const UsuariosComponent = () => {
         try {
             await usuarioService.createUsuario(newUsuario);  // Asegúrate de tener esta función en usuarioService
             loadUsuarios();
+            setIsCreateModalOpen(false);  // Cerrar modal después de crear
         } catch (error) {
             console.error('Error creating usuario:', error);
         }
     };
 
     return (
-        <div>
-            <h2>Usuarios</h2>
-            <button onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Usuario</button>
-            <ul>
-                {usuarios.map(usuario => (
-                    <li key={usuario.id_usuario}>
-                        {`${usuario.nombres} ${usuario.apellidos}`}
-                        <button onClick={() => handleEdit(usuario)}>Edit</button>
-                        <button onClick={() => handleDelete(usuario.id_usuario)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+        <Box p={4}>
+            <Heading as="h2" size="lg" mb={4}>Usuarios</Heading>
 
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
+                Crear Nuevo Usuario
+            </Button>
+
+            <List spacing={3}>
+                {usuarios.map((usuario) => (
+                    <ListItem key={usuario.id_usuario}>
+                        <Flex justify="space-between" align="center">
+                            {`${usuario.nombres} ${usuario.apellidos}`}
+                            <Box>
+                                <IconButton
+                                    icon={<EditIcon />}
+                                    colorScheme="blue"
+                                    size="sm"
+                                    onClick={() => handleEdit(usuario)}
+                                    mr={2}
+                                />
+                                <IconButton
+                                    icon={<DeleteIcon />}
+                                    colorScheme="red"
+                                    size="sm"
+                                    onClick={() => handleDelete(usuario.id_usuario)}
+                                />
+                            </Box>
+                        </Flex>
+                    </ListItem>
+                ))}
+            </List>
+
+            {/* Modal de edición */}
             {isEditModalOpen && (
                 <EditUsuarioModal
                     usuario={currentUsuario}
@@ -87,13 +110,14 @@ const UsuariosComponent = () => {
                 />
             )}
 
+            {/* Modal de creación */}
             {isCreateModalOpen && (
                 <CreateUsuarioModal
                     onClose={() => setIsCreateModalOpen(false)}
                     onCreate={handleCreate}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 

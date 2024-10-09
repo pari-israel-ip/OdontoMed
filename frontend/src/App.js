@@ -13,8 +13,8 @@ function App() {
             <RolesComponent />
             <h1>Gestion Usuarios</h1>
             <UsuariosComponent/>
-            <h1>Login</h1>
             <LoginComponent/>
+           
         </div>
     );
 }

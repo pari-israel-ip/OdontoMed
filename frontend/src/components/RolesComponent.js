@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Button, Heading, List, ListItem, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
 import roleService from '../services/roleService';
 import EditRoleModal from './EditRoleModal';
-import CreateRoleModal from './CreateRoleModal';  // Asegúrate de que la ruta sea correcta
+import CreateRoleModal from './CreateRoleModal';
 
 const RolesComponent = () => {
     const [roles, setRoles] = useState([]);
@@ -44,34 +45,36 @@ const RolesComponent = () => {
             });
         } catch (error) {
             console.error('Error updating role:', error);
-        } finally{
+        } finally {
             loadRoles();
         }
     };
 
     const handleCreate = async (newRole) => {
         try {
-            await roleService.createRole(newRole);  // Asegúrate de tener esta función en roleService
+            await roleService.createRole(newRole);
         } catch (error) {
             console.error('Error creating role:', error);
-        } finally{
+        } finally {
             loadRoles();
         }
     };
 
     return (
         <div>
-            <h2>Roles</h2>
-            <button onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Rol</button>
-            <ul>
+            <Heading as="h2" size="lg" mb={4}>Roles</Heading>
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Rol</Button>
+            <List spacing={3} mt={4}>
                 {roles.map(role => (
-                    <li key={role.id_rol}>
+                    <ListItem key={role.id_rol} display="flex" justifyContent="space-between" alignItems="center">
                         {role.nombre_rol}
-                        <button onClick={() => handleEdit(role)}>Edit</button>
-                        <button onClick={() => handleDelete(role.id_rol)}>Delete</button>
-                    </li>
+                        <div>
+                            <Button size="sm" colorScheme="blue" onClick={() => handleEdit(role)}>Edit</Button>
+                            <Button size="sm" colorScheme="red" onClick={() => handleDelete(role.id_rol)}>Delete</Button>
+                        </div>
+                    </ListItem>
                 ))}
-            </ul>
+            </List>
 
             {isEditModalOpen && (
                 <EditRoleModal
