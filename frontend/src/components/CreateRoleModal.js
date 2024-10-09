@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from '@chakra-ui/react';
+import { Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box } from '@chakra-ui/react';
 import axios from 'axios';
 
 const CreateRoleModal = ({ onClose, onCreate }) => {
@@ -105,26 +105,36 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
                             {errors.nombre_rol && <FormErrorMessage>{errors.nombre_rol}</FormErrorMessage>}
                         </FormControl>
 
-                        {modulos.map(modulo => (
-                            <FormControl key={modulo.nombre} mt={4}>
-                                <FormLabel>{modulo.nombre}:</FormLabel>
-                                <Checkbox
-                                    isChecked={isAllSelected(modulo.nombre)}
-                                    onChange={(e) => handleSelectAllChange(modulo.nombre, e.target.checked)}
-                                >
-                                    Seleccionar todos
-                                </Checkbox>
-                                {modulo.permisosOpciones.map(permiso => (
-                                    <Checkbox
-                                        key={permiso.id}
-                                        isChecked={(permisos[modulo.nombre] || []).includes(permiso.id)}
-                                        onChange={(e) => handlePermisoChange(modulo.nombre, permiso.id, e.target.checked)}
-                                    >
-                                        {permiso.label}
-                                    </Checkbox>
-                                ))}
-                            </FormControl>
-                        ))}
+                        {/* Accordion para mostrar permisos */}
+                        <Accordion allowToggle mt={4}>
+                            {modulos.map(modulo => (
+                                <AccordionItem key={modulo.nombre}>
+                                    <AccordionButton>
+                                        <Box flex="1" textAlign="left">
+                                            {modulo.nombre}
+                                        </Box>
+                                        <Checkbox
+                                            isChecked={isAllSelected(modulo.nombre)}
+                                            onChange={(e) => handleSelectAllChange(modulo.nombre, e.target.checked)}
+                                            ml="auto"
+                                        >
+                                            Seleccionar todos
+                                        </Checkbox>
+                                    </AccordionButton>
+                                    <AccordionPanel pb={4}>
+                                        {modulo.permisosOpciones.map(permiso => (
+                                            <Checkbox
+                                                key={permiso.id}
+                                                isChecked={(permisos[modulo.nombre] || []).includes(permiso.id)}
+                                                onChange={(e) => handlePermisoChange(modulo.nombre, permiso.id, e.target.checked)}
+                                            >
+                                                {permiso.label}
+                                            </Checkbox>
+                                        ))}
+                                    </AccordionPanel>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
 
                         {errors.permisos && <FormErrorMessage>{errors.permisos}</FormErrorMessage>}
                         {errors.general && <FormErrorMessage>{errors.general}</FormErrorMessage>}
