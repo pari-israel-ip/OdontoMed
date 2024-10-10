@@ -1,21 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
 import React from 'react';
-import RolesComponent from './components/RolesComponent';  // Ajusta la ruta si es necesario
-import UsuariosComponent from './components/UsuarioComponent';
-import LoginComponent from './components/LoginComponent';  // Importa el componente de login
+import './App.css';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import NavComponent from './components/NavComponent';
+import LoginComponent from './components/LoginComponent';
+import UsuariosComponent from './components/UsuarioComponent';  // Otros componentes que necesites
 
+// Componente para manejar la estructura de la aplicación
+function Layout({ children }) {
+    const location = useLocation();  // Hook para obtener la ruta actual
+
+    // Condicionamos que el NavComponent no se renderice en la ruta "/login"
+    return (
+        <>
+            {location.pathname !== '/login' && <NavComponent />}
+            {children}  {/* Aquí se renderizan las rutas hijas */}
+        </>
+    );
+}
 
 function App() {
     return (
-        <div className="App">
-            <h1>Gestión de Roles</h1>
-            <RolesComponent />
-            <h1>Gestion Usuarios</h1>
-            <UsuariosComponent/>
-            <LoginComponent/>
-           
-        </div>
+        <Router>
+            <div className="App">
+                <Layout>
+                    <Routes>
+                        <Route path="/login" element={<LoginComponent />} />
+                        <Route path="/usuarios" element={<UsuariosComponent />} />
+                        {/* Agrega más rutas si es necesario */}
+                    </Routes>
+                </Layout>
+            </div>
+        </Router>
     );
 }
 
