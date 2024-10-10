@@ -64,8 +64,6 @@ def rol_detail(request, id_rol):
 
         return JsonResponse({'message': 'Rol actualizado con éxito'})
 
-    # Si no es PUT, devolver un error de método no permitido
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
     rol = get_object_or_404(Roles, id_rol=id_rol)
     if request.method == 'GET':
         return JsonResponse(rol)
@@ -81,6 +79,9 @@ def rol_detail(request, id_rol):
         rol.activo = False
         rol.save()
         return JsonResponse({'message': 'Rol eliminado lógicamente'})
+
+    # Si no es PUT, devolver un error de método no permitido
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 @csrf_exempt
 def rol_create(request):
