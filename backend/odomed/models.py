@@ -48,7 +48,7 @@ class Odontologo(models.Model):
     activo = models.BooleanField(default=True)
     class Meta:
         managed = False
-        db_table= 'odontologo'
+        db_table= 'odontologos'
     def __str__(self):
         return f"Odontólogo: {self.usuario.nombres} {self.usuario.apellidos}"
 
@@ -57,7 +57,7 @@ class Recepcionista(models.Model):
     activo = models.BooleanField(default=True)
     class Meta:
         managed = False
-        db_table= 'recepcionista'
+        db_table= 'recepcionistas'
     def __str__(self):
         return f"Recepcionista: {self.usuario.nombres} {self.usuario.apellidos}"
 
@@ -69,6 +69,6 @@ class Practicante(models.Model):
     activo = models.BooleanField(default=True)
     class Meta:
         managed = False
-        db_table= 'practicante'
+        db_table= 'practicantes'
     def __str__(self):
         return f"Practicante: {self.usuario.nombres} {self.usuario.apellidos}"
