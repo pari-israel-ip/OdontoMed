@@ -14,7 +14,8 @@ import {
     Button,
     Grid,
     GridItem,
-    useToast
+    useToast,
+    FormErrorMessage
 } from '@chakra-ui/react';
 import roleService from '../services/roleService'; // Asegúrate de que la ruta sea correcta
 import axios from 'axios';
@@ -31,6 +32,8 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     const [contrasenia, setContrasenia] = useState(usuario.contrasenia || '');
     const [roles, setRoles] = useState([]);
     const [errorMessages, setErrorMessages] = useState({});
+    const [errors, setErrors] = useState({});
+
     const [loading, setLoading] = useState(false);
     const toast = useToast(); // Para mostrar notificaciones
 
@@ -69,7 +72,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     
             // Si hay errores específicos en la respuesta
             if (response.data.errors) {
-                setErrorMessages(response.data.errors);
+                setErrors(response.data.errors);
             } else {
                 // Si la actualización fue exitosa
                 onSave(response.data);
@@ -92,7 +95,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
-                        <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                             <GridItem>
                                 <FormControl isRequired isInvalid={!!errorMessages.nombres}>
                                     <FormLabel>Nombres</FormLabel>
@@ -101,7 +104,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={nombres}
                                         onChange={(e) => setNombres(e.target.value)}
                                     />
-                                    {errorMessages.nombres && <p>{errorMessages.nombres[0]}</p>}
+                                    {errors.nombres && <FormErrorMessage>{errors.nombres}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -113,7 +116,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={apellidos}
                                         onChange={(e) => setApellidos(e.target.value)}
                                     />
-                                    {errorMessages.apellidos && <p>{errorMessages.apellidos[0]}</p>}
+                                    {errors.apellidos && <FormErrorMessage>{errors.apellidos}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -125,7 +128,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={ci}
                                         onChange={(e) => setCi(e.target.value)}
                                     />
-                                    {errorMessages.ci && <p>{errorMessages.ci[0]}</p>}
+                                    {errors.ci && <FormErrorMessage>{errors.ci}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -137,7 +140,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
-                                    {errorMessages.email && <p>{errorMessages.email[0]}</p>}
+                                    {errors.email && <FormErrorMessage>{errors.email}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -149,7 +152,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={telefono}
                                         onChange={(e) => setTelefono(e.target.value)}
                                     />
-                                    {errorMessages.telefono && <p>{errorMessages.telefono[0]}</p>}
+                                    {errors.telefono && <FormErrorMessage>{errors.telefono}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -161,6 +164,8 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={fecha_nacimiento}
                                         onChange={(e) => setFechaNacimiento(e.target.value)}
                                     />
+                                    {errors.fecha_nacimiento && <FormErrorMessage>{errors.fecha_nacimiento}</FormErrorMessage>}
+
                                 </FormControl>
                             </GridItem>
 
@@ -175,7 +180,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                             </option>
                                         ))}
                                     </Select>
-                                    {errorMessages.rol && <p>{errorMessages.rol[0]}</p>}
+                                    {errors.rol && <FormErrorMessage>{errors.rol}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -187,7 +192,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={direccion}
                                         onChange={(e) => setDireccion(e.target.value)}
                                     />
-                                    {errorMessages.direccion && <p>{errorMessages.direccion[0]}</p>}
+                                    {errors.direccion && <FormErrorMessage>{errors.direccion}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
 
@@ -199,7 +204,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                         value={contrasenia}
                                         onChange={(e) => setContrasenia(e.target.value)}
                                     />
-                                    {errorMessages.contrasenia && <p>{errorMessages.contrasenia[0]}</p>}
+                                    {errors.contrasenia && <FormErrorMessage>{errors.contrasenia}</FormErrorMessage>}
                                 </FormControl>
                             </GridItem>
                         </Grid>

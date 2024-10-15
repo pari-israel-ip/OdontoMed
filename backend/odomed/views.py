@@ -156,25 +156,61 @@ def usuario_detail(request, id_usuario):
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
-        
-        # Validación de campos
-        if 'nombres' in data and not data['nombres']:
-            return JsonResponse({'error': 'NOMBRES NO PUEDE ESTAR VACÍO'}, status=400)
-        if 'apellidos' in data and not data['apellidos']:
-            return JsonResponse({'error': 'APELLIDOS NO PUEDE ESTAR VACÍO'}, status=400)
-        if 'ci' in data and not data['ci']:
-            return JsonResponse({'error': 'CARNET DE IDENTIDAD NO PUEDE ESTAR VACÍO'}, status=400)
-        if 'email' in data and not data['email']:
-            return JsonResponse({'error': 'EMAIL NO PUEDE ESTAR VACÍO'}, status=400)
-        if 'telefono' in data and not data['telefono']:
-            return JsonResponse({'error': 'TELÉFONO NO PUEDE ESTAR VACÍO'}, status=400)
-        if 'fecha_nacimiento' in data and not data['fecha_nacimiento']:
-            return JsonResponse({'error': 'FECHA DE NACIMIENTO NO PUEDE ESTAR VACÍA'}, status=400)
-        if 'direccion' in data and not data['direccion']:
-            return JsonResponse({'error': 'DIRECCIÓN NO PUEDE ESTAR VACÍA'}, status=400)
-        if 'contrasenia' in data and not data['contrasenia']:
-            return JsonResponse({'error': 'CONTRASEÑA NO PUEDE ESTAR VACÍA'}, status=400)
-        
+        errors = {}
+        # Validación de nombres
+        nombres = data.get('nombres', '').strip().upper()  # Convertir a mayúsculas
+        nombres_regex = re.compile(r'^[A-Z\s]+$')  # Regex modificado para letras mayúsculas
+        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
+            errors['nombres'] = 'Los nombres deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
+
+        # Validación de apellidos
+        apellidos = data.get('apellidos', '').strip().upper()  # Convertir a mayúsculas
+        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
+            errors['apellidos'] = 'Los apellidos deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
+
+        # Validación de CI (Cédula de Identidad)
+        ci = data.get('ci', '').strip()
+        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exclude(id_usuario=id_usuario).exists():
+            errors['ci'] = 'La cédula de identidad debe ser única y contener entre 6 y 12 dígitos.'
+
+        # Validación de email
+        email = data.get('email', '').strip().upper()  # Convertir a mayúsculas
+        if email and Usuario.objects.filter(email=email).exclude(id_usuario=id_usuario).exists():
+            errors['email'] = 'El email ya está en uso por otro usuario.'
+        # Validación de teléfono
+        telefono = data.get('telefono', '').strip()
+        if not re.match(r'^\d{8}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+
+        # Validación de fecha de nacimiento
+        fecha_nacimiento = data.get('fecha_nacimiento')
+        if fecha_nacimiento:
+            try:
+                fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 3):
+                    errors['fecha_nacimiento'] = 'La fecha de nacimiento debe ser entre 80 años atrás y 3 años atrás.'
+            except ValueError:
+                errors['fecha_nacimiento'] = 'La fecha de nacimiento debe tener el formato correcto (YYYY-MM-DD).'
+
+        # Validación de dirección
+        direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
+        direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
+        if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
+            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
+
+        # Validación de rol
+        rol_id = data.get('rol')
+        if not Roles.objects.filter(id_rol=rol_id).exists():
+            errors['rol'] = 'El rol seleccionado no existe.'
+
+        # Validación de contraseña
+        contrasenia = data.get('contrasenia', '')
+        password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
+        if not password_regex.match(contrasenia):
+            errors['contrasenia'] = 'La contraseña debe tener entre 8 y 250 caracteres y contener al menos una letra, un número y un carácter especial.'
+
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
         # Actualizar atributos
         usuario.nombres = data.get('nombres', usuario.nombres).upper()
         usuario.apellidos = data.get('apellidos', usuario.apellidos).upper()
