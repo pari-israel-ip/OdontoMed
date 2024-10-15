@@ -11,6 +11,8 @@ Ultima version de la basa de datos
 https://univalleedu-my.sharepoint.com/:u:/g/personal/gaa2025817_est_univalle_edu/EW_fpYpNZWFIgSJANd71HIgBZ1LjSU7jITNZUc_DS5fKdQ?e=dv4d9K
 
 
+El proyecto esta Desarrollado de la siguiente manera es un sistema hecho en la parte del back end con python django con una base de datos en mysql luego pasamos al front que esta desarrollado con react con la libreria de chakra y utilizamos los componentes para que sea de una mejor visualizacion
+
 crear carpetas del env
 + python3 -m venv nombre-env
 
@@ -19,7 +21,7 @@ pip install tools from Back End
 + pip install mysqlclient
 + pip install djangorestframework   
 + pip install django-cors-headers 
-+ pip install djangop  
++ pip install django 
 
 
 npm install tools form Front End

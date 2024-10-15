@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box } from '@chakra-ui/react';
 import axios from 'axios';
 
-const EditRoleModal = ({ role, onClose, onSave }) => {
-    const [nombre_rol, setNombreRol] = useState(role.nombre_rol.toUpperCase());
-    const [permisos, setPermisos] = useState(role.permisos.split(',').map(p => p.trim()));  // Convertir a lista de IDs
-    const [selectAll, setSelectAll] = useState({});
+const EditRoleModal = ({ roleData, onClose, onEdit }) => {
+    const [nombre_rol, setNombreRol] = useState('');
+    const [permisos, setPermisos] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -38,39 +38,41 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
         }
     ];
 
+    // Cargar datos del rol al iniciar el modal
+    useEffect(() => {
+        if (roleData) {
+            setNombreRol(roleData.nombre_rol);
+            setPermisos(roleData.permisos);
+        }
+    }, [roleData]);
+
     const handlePermisoChange = (modulo, permisoId, checked) => {
         setPermisos(prevState => {
-            // Si el permiso está marcado y se selecciona, añadirlo; de lo contrario, eliminarlo
-            if (checked) {
-                return [...new Set([...prevState, permisoId.toString()])];  // Asegurarse de que sea único
-            } else {
-                return prevState.filter(id => id !== permisoId.toString());
-            }
+            const permisosModulo = prevState[modulo] || [];
+            return {
+                ...prevState,
+                [modulo]: checked ? [...permisosModulo, permisoId] : permisosModulo.filter(id => id !== permisoId)
+            };
         });
     };
 
     const handleSelectAllChange = (modulo, checked) => {
-        const allPermisos = modulos.find(m => m.nombre === modulo).permisosOpciones.map(p => p.id.toString());
-        setPermisos(prevState => checked ? [...new Set([...prevState, ...allPermisos])] : prevState.filter(id => !allPermisos.includes(id)));
-        setSelectAll(prevState => ({
+        const allPermisos = modulos.find(m => m.nombre === modulo).permisosOpciones.map(p => p.id);
+        setPermisos(prevState => ({
             ...prevState,
-            [modulo]: checked
+            [modulo]: checked ? allPermisos : []
         }));
     };
 
     const isAllSelected = (modulo) => {
-        const allPermisos = modulos.find(m => m.nombre === modulo).permisosOpciones.map(p => p.id.toString());
-        return allPermisos.every(permiso => permisos.includes(permiso));
+        const permisosModulo = permisos[modulo] || [];
+        const allPermisos = modulos.find(m => m.nombre === modulo).permisosOpciones.map(p => p.id);
+        return permisosModulo.length === allPermisos.length;
     };
 
     const handleNombreRolChange = (e) => {
-        setNombreRol(e.target.value.toUpperCase());
+        setNombreRol(e.target.value);
         setErrors(prevErrors => ({ ...prevErrors, nombre_rol: undefined }));
-    };
-
-    const validateNombreRol = (nombre) => {
-        const nombreRolRegex = /^[A-Z\s]{4,50}$/;
-        return nombreRolRegex.test(nombre);
     };
 
     const handleSubmit = async (e) => {
@@ -79,14 +81,12 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
 
         setErrors({});
         const frontendErrors = {};
-
         if (!nombre_rol.trim()) {
             frontendErrors.nombre_rol = 'El nombre del rol es obligatorio.';
-        } else if (!validateNombreRol(nombre_rol)) {
-            frontendErrors.nombre_rol = 'El nombre del rol debe tener entre 4 y 50 caracteres, solo letras y espacios.';
         }
 
-        if (!permisos.length) {
+        const permisosCombinados = Object.values(permisos).flat().join(',');
+        if (!permisosCombinados) {
             frontendErrors.permisos = 'Debe seleccionar al menos un permiso.';
         }
 
@@ -96,24 +96,18 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
         }
 
         setLoading(true);
-
-        const updatedRole = {
-            ...role,
-            nombre_rol,
-            permisos: permisos.join(',')
-        };
+        const updatedRole = { nombre_rol, permisos: permisosCombinados };
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/odomed/roles/${role.id_rol}/`, updatedRole);
-
+            const response = await axios.put(`http://127.0.0.1:8000/odomed/roles/edit/${roleData.id}/`, updatedRole);
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
-                onSave(response.data);
+                onEdit(response.data);
                 onClose();
             }
         } catch (error) {
-            const errorMessage = error.response?.data.errors || { general: 'Error al actualizar el rol. Inténtelo de nuevo más tarde.' };
+            const errorMessage = error.response?.data.errors || { general: 'Error al editar el rol. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
         } finally {
             setLoading(false);
@@ -121,58 +115,67 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
     };
 
     return (
-        <div className="modal">
-            <div className="modal-content">
-                <span className="close" onClick={onClose}>&times;</span>
-                <h3>Editar Rol</h3>
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Nombre del Rol:</label>
-                        <input
-                            type="text"
-                            value={nombre_rol}
-                            onChange={handleNombreRolChange}
-                        />
-                        {errors.nombre_rol && <p className="error">{errors.nombre_rol}</p>}
-                    </div>
+        <Modal isOpen={true} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Editar Rol</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <form onSubmit={handleSubmit}>
+                        <FormControl isInvalid={!!errors.nombre_rol}>
+                            <FormLabel>Nombre del Rol:</FormLabel>
+                            <Input
+                                placeholder="Nombre del rol"
+                                value={nombre_rol}
+                                onChange={handleNombreRolChange}
+                                mb={4}
+                            />
+                            {errors.nombre_rol && <FormErrorMessage>{errors.nombre_rol}</FormErrorMessage>}
+                        </FormControl>
 
-                    {modulos.map(modulo => (
-                        <details key={modulo.nombre}>
-                            <summary><label>{modulo.nombre}:</label></summary>
-                            <div>
-                                <div>
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected(modulo.nombre)}
-                                        onChange={(e) => handleSelectAllChange(modulo.nombre, e.target.checked)}
-                                    />
-                                    <label>Seleccionar todos</label>
-                                </div>
+                        <Accordion allowToggle mt={4}>
+                            {modulos.map(modulo => (
+                                <AccordionItem key={modulo.nombre}>
+                                    <AccordionButton>
+                                        <Box flex="1" textAlign="left">
+                                            {modulo.nombre}
+                                        </Box>
+                                        <Checkbox
+                                            isChecked={isAllSelected(modulo.nombre)}
+                                            onChange={(e) => handleSelectAllChange(modulo.nombre, e.target.checked)}
+                                            ml="auto"
+                                        >
+                                            Seleccionar todos
+                                        </Checkbox>
+                                    </AccordionButton>
+                                    <AccordionPanel pb={4}>
+                                        {modulo.permisosOpciones.map(permiso => (
+                                            <Checkbox
+                                                key={permiso.id}
+                                                isChecked={(permisos[modulo.nombre] || []).includes(permiso.id)}
+                                                onChange={(e) => handlePermisoChange(modulo.nombre, permiso.id, e.target.checked)}
+                                                mb={2}
+                                            >
+                                                {permiso.label}
+                                            </Checkbox>
+                                        ))}
+                                    </AccordionPanel>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
 
-                                {modulo.permisosOpciones.map(permiso => (
-                                    <div key={permiso.id}>
-                                        <input
-                                            type="checkbox"
-                                            checked={permisos.includes(permiso.id.toString())}
-                                            onChange={(e) => handlePermisoChange(modulo.nombre, permiso.id, e.target.checked)}
-                                        />
-                                        <label>{permiso.label}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </details>
-                    ))}
-
-                    {errors.permisos && <p className="error">{errors.permisos}</p>}
-                    {errors.general && <p className="error">{errors.general}</p>}
-
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Guardando...' : 'Guardar'}
-                    </button>
-                    <button type="button" onClick={onClose}>Cancelar</button>
-                </form>
-            </div>
-        </div>
+                        {errors.permisos && <FormErrorMessage>{errors.permisos}</FormErrorMessage>}
+                        {errors.general && <FormErrorMessage>{errors.general}</FormErrorMessage>}
+                    </form>
+                </ModalBody>
+                <ModalFooter>
+                    <Button colorScheme="teal" mr={3} isLoading={loading} onClick={handleSubmit}>
+                        {loading ? 'Editando...' : 'Guardar Cambios'}
+                    </Button>
+                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     );
 };
 

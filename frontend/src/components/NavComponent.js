@@ -1,38 +1,47 @@
 import React, { useState } from 'react';
-import { Box, Flex, Text, Button, Spacer, Link, Image, IconButton, Collapse, VStack } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'; // Importa CloseIcon
-import { useNavigate } from 'react-router-dom'; // Importa el hook useNavigate
+import { Box, Flex, Text, Button, Link, Image, IconButton, Collapse, VStack } from '@chakra-ui/react';
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
 
 const NavComponent = () => {
-    const [isOpen, setIsOpen] = useState(false); // Estado para manejar el menú desplegable
-    const navigate = useNavigate(); // Hook para redirigir a otra página
+    const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     const handleLoginRedirect = () => {
-        navigate('/login'); // Redirige a la página de login
+        navigate('/login');
     };
 
     return (
         <Box bg="white" px={4} boxShadow="sm">
             <Flex h={16} alignItems="center" justifyContent="space-between">
-                {/* Logo de la empresa */}
-                <Box>
+                
+                {/* Contenedor del botón hamburguesa */}
+                <Box flex="1" display={{ base: 'flex', md: 'none' }} justifyContent="flex-start">
+                    <IconButton
+                        aria-label={isOpen ? "Close menu" : "Open menu"}
+                        icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+                        variant="outline"
+                        bg="#319795"
+                        color="white"
+                        onClick={() => setIsOpen(!isOpen)}
+                        width="48px"
+                        height="48px"
+                    />
+                </Box>
+
+                {/* Contenedor del logo */}
+                <Box flex="1" display="flex" justifyContent={{ base: 'center', md: 'flex-start' }}>
                     <Image src="/path-to-logo/odomed-logo.png" alt="OdontoMed Logo" boxSize="50px" />
                 </Box>
 
-                <IconButton
-                    aria-label={isOpen ? "Close menu" : "Open menu"}
-                    icon={isOpen ? <CloseIcon /> : <HamburgerIcon />} // Cambia el icono según el estado
-                    variant="outline"
-                    bg="#319795" // Color del botón de hamburguesa
-                    color="white" // Color del texto del botón
-                    onClick={() => setIsOpen(!isOpen)} // Alterna el estado del menú
-                    display={{ md: 'none' }} // Solo se muestra en pantallas pequeñas
-                    width="48px" // Aumenta el ancho del botón de hamburguesa
-                    height="48px" // Aumenta la altura del botón de hamburguesa
-                />
-
-                {/* Enlaces de navegación */}
-                <Flex display={{ base: 'none', md: 'flex' }} alignItems="center" gap={6}>
+                {/* Enlaces de navegación (solo se muestran en pantallas grandes) */}
+                <Flex
+                    display={{ base: 'none', md: 'flex' }}
+                    alignItems="center"
+                    gap={6}
+                    flex="2"
+                    justifyContent="center" // Centra los enlaces
+                >
                     <Link href="/acerca" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Acerca de</Text>
                     </Link>
@@ -43,7 +52,10 @@ const NavComponent = () => {
                         <Text>Contacto</Text>
                     </Link>
                     <Text>951-79585650</Text>
-                    {/* Botón de Ingresar en pantallas grandes */}
+                </Flex>
+
+                {/* Contenedor del botón de Ingresar */}
+                <Box flex="1" display="flex" justifyContent="flex-end">
                     <Button
                         colorScheme="teal"
                         bg="#319795"
@@ -51,42 +63,37 @@ const NavComponent = () => {
                         borderRadius="md"
                         _hover={{ bg: '#28726D' }}
                         onClick={handleLoginRedirect}
+                        display={{ base: 'block' }}
                     >
                         Ingresar
                     </Button>
-                </Flex>
+                </Box>
             </Flex>
 
             {/* Menú desplegable para pantallas pequeñas */}
-            <Collapse in={isOpen} animateOpacity>
-                <VStack spacing={4} align="flex-start" p={4} display={{ md: 'none' }}>
-                    <Link href="/acerca" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Acerca de</Text>
-                    </Link>
-                    <Link href="/servicios" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Servicios</Text>
-                    </Link>
-                    <Link href="/contacto" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Contacto</Text>
-                    </Link>
-                    <Text>951-79585650</Text>
+           <Collapse in={isOpen} animateOpacity>
+    <VStack
+        spacing={4}
+        alignItems="start"
+        p={4}
+        display={{ md: 'none' }}
+        width="100%" // Ocupa todo el ancho disponible
+    >
+        <Link href="/acerca" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+            <Text textAlign="left">Acerca de</Text>
+        </Link>
+        <Link href="/servicios" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+            <Text textAlign="left">Servicios</Text>
+        </Link>
+        <Link href="/contacto" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+            <Text textAlign="left">Contacto</Text>
+        </Link>
+        <Text width="100%" textAlign="left">951-79585650</Text>
+    </VStack>
+</Collapse>
 
-                    {/* Botón de Ingresar en el menú desplegable */}
-                    <Box width="full">
-                        <Button
-                            colorScheme="teal"
-                            bg="#319795"
-                            size="md"
-                            borderRadius="md"
-                            _hover={{ bg: '#28726D' }}
-                            onClick={handleLoginRedirect}
-                            width="full" // Asegúrate de que el botón ocupe todo el ancho disponible
-                        >
-                            Ingresar
-                        </Button>
-                    </Box>
-                </VStack>
-            </Collapse>
+
+
         </Box>
     );
 };
