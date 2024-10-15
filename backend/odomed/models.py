@@ -11,7 +11,6 @@ class Roles(models.Model):
         db_table = 'roles'
         managed = False  
 
-
 # Model for Usuarios table
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -31,7 +30,6 @@ class Usuario(models.Model):
         db_table = 'usuarios'
         managed = False
 
-
 # Model for Citas table
 class Citas(models.Model):
     id_cita = models.AutoField(primary_key=True)
@@ -48,7 +46,6 @@ class Citas(models.Model):
         db_table = 'citas'
         managed = False
 
-
 # Model for Costos table
 class Costos(models.Model):
     id_costo = models.AutoField(primary_key=True)
@@ -58,7 +55,6 @@ class Costos(models.Model):
     class Meta:
         db_table = 'costos'
         managed = False
-
 
 # Model for Diagnosticos table
 class Diagnosticos(models.Model):
@@ -74,7 +70,6 @@ class Diagnosticos(models.Model):
         db_table = 'diagnosticos'
         managed = False
 
-
 # Model for HistorialesClinicos table
 class HistorialesClinicos(models.Model):
     id_historial = models.AutoField(primary_key=True)
@@ -88,7 +83,6 @@ class HistorialesClinicos(models.Model):
         db_table = 'historiales_clinicos'
         managed = False
 
-
 # Model for Horarios table
 class Horarios(models.Model):
     id_horario = models.AutoField(primary_key=True)
@@ -98,7 +92,6 @@ class Horarios(models.Model):
     class Meta:
         db_table = 'horarios'
         managed = False
-
 
 # Model for Odontologos table
 class Odontologos(models.Model):
@@ -110,7 +103,6 @@ class Odontologos(models.Model):
     class Meta:
         db_table = 'odontologos'
         managed = False
-
 
 # Model for Pacientes table
 class Pacientes(models.Model):
@@ -124,7 +116,6 @@ class Pacientes(models.Model):
         db_table = 'pacientes'
         managed = False
 
-
 # Model for Practicantes table
 class Practicantes(models.Model):
     id_practicante = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True, db_column='id_practicante')
@@ -136,7 +127,6 @@ class Practicantes(models.Model):
     class Meta:
         db_table = 'practicantes'
         managed = False
-
 
 # Model for Prescripciones table
 class Prescripciones(models.Model):
@@ -152,7 +142,6 @@ class Prescripciones(models.Model):
         db_table = 'prescripciones'
         managed = False
 
-
 # Model for Recepcionistas table
 class Recepcionistas(models.Model):
     id_recepcionista = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True, db_column='id_recepcionista')
@@ -161,7 +150,6 @@ class Recepcionistas(models.Model):
     class Meta:
         db_table = 'recepcionistas'
         managed = False
-
 
 # Model for Resena table
 class Resena(models.Model):
@@ -178,7 +166,6 @@ class Resena(models.Model):
         constraints = [
             models.CheckConstraint(check=models.Q(calificacion__gte=1, calificacion__lte=5), name='resena_chk_1')
         ]
-
 
 # Model for Tratamientos table
 class Tratamientos(models.Model):

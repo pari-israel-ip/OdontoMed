@@ -13,8 +13,7 @@ from datetime import datetime, timedelta
 
 def home(request):
     return HttpResponse("Bienvenido a la API de Odomed.")
-
-
+#crud de roles
 @csrf_exempt
 def rol_list(request):
     if request.method == 'GET':
@@ -109,13 +108,44 @@ def rol_create(request):
         )
 
         return JsonResponse({'message': 'Paciente Creado Correctamente'}, status=201)
+#crud de roles
 
-
-@csrf_exempt
 def usuario_list(request):
     if request.method == 'GET':
-        usuarios = list(Usuario.objects.filter(activo=True).values())
-        return JsonResponse(usuarios, safe=False)
+        # Obtiene todos los pacientes activos
+        pacientes = Pacientes.objects.filter(activo=True).select_related('id_paciente').prefetch_related('historialesclinicos_set')
+
+        data = []
+        for paciente in pacientes:
+            # Agrega los detalles del paciente
+            paciente_info = {
+                'id_paciente': paciente.id_paciente.id_usuario,  # Acceso a Usuario a través del OneToOne
+                'nombres': paciente.id_paciente.nombres,
+                'apellidos': paciente.id_paciente.apellidos,
+                'nombre_completo': f"{paciente.id_paciente.nombres} {paciente.id_paciente.apellidos}",
+                'ci': paciente.id_paciente.ci,
+                'fecha_nacimiento': paciente.id_paciente.fecha_nacimiento,
+                'email': paciente.id_paciente.email,
+                'direccion': paciente.id_paciente.direccion,
+                'telefono': paciente.id_paciente.telefono,
+                'seguro_medico': paciente.seguro_medico,
+                'alergias': paciente.alergias,
+                'antecedentes_medicos': paciente.antecedentes_medicos,
+                'historiales': []
+            }
+            
+            # Agrega la información de los historiales clínicos
+            for historial in paciente.historialesclinicos_set.all():
+                paciente_info['historiales'].append({
+                    'id_historial': historial.id_historial,
+                    'id_odontologo': historial.id_odontologo_id,  # Solo el ID del odontólogo
+                    'fecha_hora_creacion': historial.fecha_hora_creacion,
+                    'notas_generales': historial.notas_generales,
+                })
+
+            data.append(paciente_info)
+
+        return JsonResponse(data, safe=False)
 
 @csrf_exempt
 def usuario_detail(request, id_usuario):
@@ -126,22 +156,64 @@ def usuario_detail(request, id_usuario):
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
-        usuario.nombres = data.get('nombres', usuario.nombres)
-        usuario.apellidos = data.get('apellidos', usuario.apellidos)
+        
+        # Validación de campos
+        if 'nombres' in data and not data['nombres']:
+            return JsonResponse({'error': 'NOMBRES NO PUEDE ESTAR VACÍO'}, status=400)
+        if 'apellidos' in data and not data['apellidos']:
+            return JsonResponse({'error': 'APELLIDOS NO PUEDE ESTAR VACÍO'}, status=400)
+        if 'ci' in data and not data['ci']:
+            return JsonResponse({'error': 'CARNET DE IDENTIDAD NO PUEDE ESTAR VACÍO'}, status=400)
+        if 'email' in data and not data['email']:
+            return JsonResponse({'error': 'EMAIL NO PUEDE ESTAR VACÍO'}, status=400)
+        if 'telefono' in data and not data['telefono']:
+            return JsonResponse({'error': 'TELÉFONO NO PUEDE ESTAR VACÍO'}, status=400)
+        if 'fecha_nacimiento' in data and not data['fecha_nacimiento']:
+            return JsonResponse({'error': 'FECHA DE NACIMIENTO NO PUEDE ESTAR VACÍA'}, status=400)
+        if 'direccion' in data and not data['direccion']:
+            return JsonResponse({'error': 'DIRECCIÓN NO PUEDE ESTAR VACÍA'}, status=400)
+        if 'contrasenia' in data and not data['contrasenia']:
+            return JsonResponse({'error': 'CONTRASEÑA NO PUEDE ESTAR VACÍA'}, status=400)
+        
+        # Actualizar atributos
+        usuario.nombres = data.get('nombres', usuario.nombres).upper()
+        usuario.apellidos = data.get('apellidos', usuario.apellidos).upper()
         usuario.ci = data.get('ci', usuario.ci)
-        usuario.email = data.get('email', usuario.email)
+        usuario.email = data.get('email', usuario.email).upper()
         usuario.telefono = data.get('telefono', usuario.telefono)
         usuario.fecha_nacimiento = data.get('fecha_nacimiento', usuario.fecha_nacimiento)
         usuario.rol_id = data.get('rol', usuario.rol.id_rol)  # Asegúrate de que se pasa el ID del rol
-        usuario.direccion = data.get('direccion', usuario.direccion)
+        usuario.direccion = data.get('direccion', usuario.direccion).upper()
         usuario.contrasenia = data.get('contrasenia', usuario.contrasenia)
+        
         usuario.save()
-        return JsonResponse({'message': 'Usuario actualizado'})
+        return JsonResponse({'message': 'USUARIO ACTUALIZADO'})
 
     elif request.method == 'DELETE':
-        usuario.activo = False
-        usuario.save()
-        return JsonResponse({'message': 'Usuario eliminado lógicamente'})
+        # Extraer el id del usuario del request (asumiendo que el ID del usuario es pasado)
+        usuario_id = id_usuario
+        
+        try:
+            # Obtén el usuario
+            usuario = Usuario.objects.get(id_usuario=usuario_id)
+            
+            # Primero, desactivar el historial clínico relacionado
+            # Asumiendo que tienes un método para encontrar los historiales clínicos del paciente
+            pacientes = Pacientes.objects.filter(id_paciente=usuario)  # Asumiendo que el paciente está relacionado con el usuario
+            for paciente in pacientes:
+                # Desactivar todos los historiales clínicos asociados a este paciente
+                HistorialesClinicos.objects.filter(id_paciente=paciente).update(activo=False)
+                # Desactivar el paciente
+                paciente.activo = False
+                paciente.save()
+
+            # Desactivar el usuario
+            usuario.activo = False
+            usuario.save()
+
+            return JsonResponse({'message': 'Usuario eliminado lógicamente'})
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
 
 @csrf_exempt
@@ -298,3 +370,61 @@ def odontologo_list(request):
 
         # Enviar la lista como respuesta JSON
         return JsonResponse(odontologos_con_nombre_completo, safe=False)
+
+@csrf_exempt
+def historial_detail(request, id_historial):
+    historial = get_object_or_404(HistorialesClinicos, id_historial=id_historial)
+    
+    if request.method == 'GET':
+        return JsonResponse(historial)
+    elif request.method == 'PUT':
+        try:
+            historial = get_object_or_404(HistorialesClinicos, id_historial=id_historial)
+            data = json.loads(request.body.decode('utf-8'))
+
+            # Validaciones y guardado en mayúsculas
+            notas_generales = data.get('notas_generales', '').upper()
+            
+            if not notas_generales:
+                return JsonResponse({'error': 'LAS NOTAS GENERALES SON REQUERIDAS'}, status=400)
+
+            historial.notas_generales = notas_generales
+            historial.save()
+
+            return JsonResponse({'message': 'Historial actualizado correctamente'})
+        
+        except Exception as e:
+            return JsonResponse({'error': 'ERROR AL ACTUALIZAR EL HISTORIAL'}, status=500)
+    
+    return JsonResponse({'error': 'MÉTODO NO PERMITIDO'}, status=405)
+
+@csrf_exempt
+def paciente_detail(request, id_paciente):
+    paciente = get_object_or_404(Pacientes, id_paciente=id_paciente)
+    
+    if request.method == 'GET':
+        return JsonResponse(paciente)
+    if request.method == 'PUT':
+        try:
+            paciente = get_object_or_404(Pacientes, id_paciente=id_paciente)
+            data = json.loads(request.body.decode('utf-8'))
+
+            # Validaciones y guardado en mayúsculas
+            seguro_medico = data.get('seguro_medico', '').upper()
+            alergias = data.get('alergias', '').upper()
+            antecedentes_medicos = data.get('antecedentes_medicos', '').upper()
+
+            if not seguro_medico:
+                return JsonResponse({'error': 'EL SEGURO MÉDICO ES REQUERIDO'}, status=400)
+
+            paciente.seguro_medico = seguro_medico
+            paciente.alergias = alergias
+            paciente.antecedentes_medicos = antecedentes_medicos
+            paciente.save()
+
+            return JsonResponse({'message': 'Paciente actualizado correctamente'})
+        
+        except Exception as e:
+            return JsonResponse({'error': 'ERROR AL ACTUALIZAR EL PACIENTE'}, status=500)
+    
+    return JsonResponse({'error': 'MÉTODO NO PERMITIDO'}, status=405)
