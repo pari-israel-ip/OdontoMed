@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box } from '@chakra-ui/react';
+import {
+    Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay,
+    ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Accordion, AccordionItem,
+    AccordionButton, AccordionPanel, Box
+} from '@chakra-ui/react';
 import axios from 'axios';
 
 const CreateRoleModal = ({ onClose, onCreate }) => {
@@ -95,6 +99,7 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
+                        {/* Nombre del Rol */}
                         <FormControl isInvalid={!!errors.nombre_rol}>
                             <FormLabel>Nombre del Rol:</FormLabel>
                             <Input
@@ -104,7 +109,7 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
                             />
                             {errors.nombre_rol && <FormErrorMessage>{errors.nombre_rol}</FormErrorMessage>}
                         </FormControl>
-
+                        <FormControl isInvalid={!!errors.permisos}>
                         {/* Accordion para mostrar permisos */}
                         <Accordion allowToggle mt={4}>
                             {modulos.map(modulo => (
@@ -136,10 +141,20 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
                             ))}
                         </Accordion>
 
-                        {errors.permisos && <FormErrorMessage>{errors.permisos}</FormErrorMessage>}
-                        {errors.general && <FormErrorMessage>{errors.general}</FormErrorMessage>}
+                        {/* Error handling for permisos */}
+                        {errors.permisos && <FormErrorMessage >{errors.permisos}</FormErrorMessage>}
+                        </FormControl>
+
                     </form>
                 </ModalBody>
+
+                {/* General errors */}
+                {errors.general && (
+                    <Box color="red.500" mt={2} fontSize="sm">
+                        {errors.general}
+                    </Box>
+                )}
+
                 <ModalFooter>
                     <Button colorScheme="teal" mr={3} isLoading={loading} onClick={handleSubmit}>
                         {loading ? 'Creando...' : 'Crear Rol'}

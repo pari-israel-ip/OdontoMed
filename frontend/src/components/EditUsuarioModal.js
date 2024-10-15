@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Input, Select, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
 import roleService from '../services/roleService'; // Asegúrate de que la ruta sea correcta
+import axios from 'axios';
 
 const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
-    const [nombres, setNombres] = useState(usuario.nombres);
-    const [apellidos, setApellidos] = useState(usuario.apellidos);
-    const [ci, setCi] = useState(usuario.ci);
-    const [email, setEmail] = useState(usuario.email);
-    const [telefono, setTelefono] = useState(usuario.telefono);
+    const [nombres, setNombres] = useState(usuario.nombres.toUpperCase());
+    const [apellidos, setApellidos] = useState(usuario.apellidos.toUpperCase());
+    const [ci, setCi] = useState(usuario.ci.toUpperCase());
+    const [email, setEmail] = useState(usuario.email.toUpperCase());
+    const [telefono, setTelefono] = useState(usuario.telefono.toUpperCase());
     const [fecha_nacimiento, setFechaNacimiento] = useState(usuario.fecha_nacimiento || '');
     const [rol, setRol] = useState(usuario.rol); // Asignar rol del usuario
     const [direccion, setDireccion] = useState(usuario.direccion);
@@ -21,13 +22,13 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                 const response = await roleService.getRoles();
                 setRoles(response.data);
             } catch (error) {
-                console.error("Error fetching roles:", error);
+                console.error("ERROR FETCHING ROLES:", error);
             }
         };
         fetchRoles();
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Validación simple de los campos requeridos
@@ -56,8 +57,25 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
             direccion, 
             contrasenia 
         };
-        onSave(updatedUsuario);
-        onClose();  // Cerrar el modal después de guardar
+    
+        try {
+            const response = await axios.put(`http://127.0.0.1:8000/odomed/usuario/${usuario.id_paciente}/`, updatedUsuario);
+    
+            // Si hay errores específicos en la respuesta
+            if (response.data.errors) {
+                setErrors(response.data.errors);
+            } else {
+                // Si la actualización fue exitosa
+                onSave(response.data);
+                onClose();
+            }
+        } catch (error) {
+            // Si ocurre un error en el servidor o en la solicitud
+            const errorMessage = error.response?.data.errors || { general: 'ERROR AL ACTUALIZAR EL USUARIO. INTÉNTELO DE NUEVO MÁS TARDE.' };
+            setErrorMessages(errorMessage);
+        } finally {
+            setLoading(false); // Desactivar estado de carga
+        }
     };
 
     return (

@@ -35,7 +35,7 @@ function App() {
                 <Layout>
                     <Routes>
                         <Route path="/login" element={<LoginComponent />} />
-                        <Route path="/usuarios" element={<UsuariosComponent />} />
+                        <Route path="/pacientes" element={<UsuariosComponent />} />
                         <Route path="/roles" element={<RolesComponent />} />
                         {/* Agrega más rutas si es necesario */}
                     </Routes>
