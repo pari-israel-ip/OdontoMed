@@ -1,5 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    Checkbox,
+    Text,
+    Box,
+} from '@chakra-ui/react';
 
 const EditRoleModal = ({ role, onClose, onSave }) => {
     const [nombre_rol, setNombreRol] = useState(role.nombre_rol.toUpperCase());
@@ -40,7 +56,6 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
 
     const handlePermisoChange = (modulo, permisoId, checked) => {
         setPermisos(prevState => {
-            // Si el permiso está marcado y se selecciona, añadirlo; de lo contrario, eliminarlo
             if (checked) {
                 return [...new Set([...prevState, permisoId.toString()])];  // Asegurarse de que sea único
             } else {
@@ -121,58 +136,61 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
     };
 
     return (
-        <div className="modal">
-            <div className="modal-content">
-                <span className="close" onClick={onClose}>&times;</span>
-                <h3>Editar Rol</h3>
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Nombre del Rol:</label>
-                        <input
+        <Modal isOpen onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Editar Rol</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <FormControl isInvalid={errors.nombre_rol}>
+                        <FormLabel>Nombre del Rol:</FormLabel>
+                        <Input
                             type="text"
                             value={nombre_rol}
                             onChange={handleNombreRolChange}
                         />
-                        {errors.nombre_rol && <p className="error">{errors.nombre_rol}</p>}
-                    </div>
+                        {errors.nombre_rol && <Text color="red.500">{errors.nombre_rol}</Text>}
+                    </FormControl>
 
                     {modulos.map(modulo => (
-                        <details key={modulo.nombre}>
-                            <summary><label>{modulo.nombre}:</label></summary>
-                            <div>
-                                <div>
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected(modulo.nombre)}
+                        <Box key={modulo.nombre} mt={4}>
+                            <details>
+                                <summary><strong>{modulo.nombre}:</strong></summary>
+                                <Box pl={4}>
+                                    <Checkbox
+                                        isChecked={isAllSelected(modulo.nombre)}
                                         onChange={(e) => handleSelectAllChange(modulo.nombre, e.target.checked)}
-                                    />
-                                    <label>Seleccionar todos</label>
-                                </div>
-
-                                {modulo.permisosOpciones.map(permiso => (
-                                    <div key={permiso.id}>
-                                        <input
-                                            type="checkbox"
-                                            checked={permisos.includes(permiso.id.toString())}
+                                    >
+                                        Seleccionar todos
+                                    </Checkbox>
+                                    {modulo.permisosOpciones.map(permiso => (
+                                        <Checkbox
+                                            key={permiso.id}
+                                            isChecked={permisos.includes(permiso.id.toString())}
                                             onChange={(e) => handlePermisoChange(modulo.nombre, permiso.id, e.target.checked)}
-                                        />
-                                        <label>{permiso.label}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </details>
+                                            display="block"
+                                            mt={1}
+                                        >
+                                            {permiso.label}
+                                        </Checkbox>
+                                    ))}
+                                </Box>
+                            </details>
+                        </Box>
                     ))}
 
-                    {errors.permisos && <p className="error">{errors.permisos}</p>}
-                    {errors.general && <p className="error">{errors.general}</p>}
+                    {errors.permisos && <Text color="red.500">{errors.permisos}</Text>}
+                    {errors.general && <Text color="red.500">{errors.general}</Text>}
+                </ModalBody>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Guardando...' : 'Guardar'}
-                    </button>
-                    <button type="button" onClick={onClose}>Cancelar</button>
-                </form>
-            </div>
-        </div>
+                <ModalFooter>
+                    <Button colorScheme="blue" onClick={handleSubmit} isLoading={loading}>
+                        Guardar
+                    </Button>
+                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     );
 };
 
