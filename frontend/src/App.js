@@ -2,23 +2,30 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import NavComponent from './components/NavComponent';
-import RolesComponent from './components/RolesComponent';
+import NavComponentLogin from './components/NavComponentLogin';
+import BodyComponent from './components/BodyComponent';
+import FooterComponent from './components/FooterComponent';
 import LoginComponent from './components/LoginComponent';
-import UsuariosComponent from './components/UsuarioComponent';  // Otros componentes que necesites
-
-// Componente para manejar la estructura de la aplicación
+import RolesComponent from './components/RolesComponent';
+import UsuariosComponent from './components/UsuarioComponent';
+ 
 function Layout({ children }) {
-    const location = useLocation();  // Hook para obtener la ruta actual
-
-    // Condicionamos que el NavComponent no se renderice en la ruta "/login"
+    const location = useLocation();
+ 
+    const isLoginPage = location.pathname === '/login';
+    const isUserOrRolesPage = location.pathname === '/usuarios' || location.pathname === '/roles';
+ 
     return (
         <>
-            {location.pathname !== '/login' && <NavComponent />}
-            {children}  {/* Aquí se renderizan las rutas hijas */}
+            {!isLoginPage && !isUserOrRolesPage && <NavComponent />}
+            {isUserOrRolesPage && <NavComponentLogin />}
+            {!isUserOrRolesPage && !isLoginPage && <BodyComponent />}
+            {children}
+            {!isUserOrRolesPage && !isLoginPage && <FooterComponent />}
         </>
     );
 }
-
+ 
 function App() {
     return (
         <Router>
@@ -26,15 +33,15 @@ function App() {
                 <Layout>
                     <Routes>
                         <Route path="/login" element={<LoginComponent />} />
-                        <Route path="/pacientes" element={<UsuariosComponent />} />
+                        <Route path="/usuarios" element={<UsuariosComponent />} />
                         <Route path="/roles" element={<RolesComponent />} />
-
-                        {/* Agrega más rutas si es necesario */}
+                        {/* Otras rutas si es necesario */}
                     </Routes>
                 </Layout>
             </div>
         </Router>
     );
 }
-
+ 
 export default App;
+ 
