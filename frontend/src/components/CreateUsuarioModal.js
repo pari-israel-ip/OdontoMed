@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Select, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Textarea 
-
+import {
+    Button,
+    Input,
+    Select,
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    Textarea,
 } from '@chakra-ui/react';
-import roleService from '../services/roleService'; // Asegúrate de que la ruta sea correcta
-import odontologoService from '../services/odontologoService'; // Importa el servicio de odontólogos
+import roleService from '../services/roleService';
+import odontologoService from '../services/odontologoService';
 import axios from 'axios';
 
 const CreateUsuarioModal = ({ onClose, onCreate }) => {
@@ -25,7 +38,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
     const [odontologos, setOdontologos] = useState([]);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
 
     // Cargar roles y odontólogos al montar el componente
     useEffect(() => {
@@ -54,6 +66,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (loading) return;
+
         // Validación simple de los campos requeridos
         const validationErrors = {};
         if (!nombres.trim()) validationErrors.nombres = 'LOS NOMBRES SON OBLIGATORIOS.';
@@ -61,7 +74,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
         if (!ci.trim()) validationErrors.ci = 'EL C.I. ES OBLIGATORIO.';
         if (!email.trim()) validationErrors.email = 'EL EMAIL ES OBLIGATORIO.';
         if (!contrasenia.trim()) validationErrors.contrasenia = 'LA CONTRASEÑA ES OBLIGATORIA.';
-        if (!seguro_medico.trim()) validationErrors.seguro_medico = 'EL SEGURO MEDICO ES OBLIGATORIA.';
+        if (!seguro_medico.trim()) validationErrors.seguro_medico = 'EL SEGURO MEDICO ES OBLIGATORIO.';
         if (!telefono.trim()) validationErrors.telefono = 'EL TELEFONO ES OBLIGATORIO.';
         if (!fecha_nacimiento.trim()) validationErrors.fecha_nacimiento = 'LA FECHA DE NACIMIENTO ES OBLIGATORIA.';
         if (!direccion.trim()) validationErrors.direccion = 'LA DIRECCION ES OBLIGATORIA.';
@@ -75,15 +88,26 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
             setErrors(validationErrors);
             return;
         }
-    
+
         setLoading(true); // Inicia el estado de carga
 
-        const newUsuario = { 
-            nombres, apellidos, ci, email, telefono, fecha_nacimiento, rol, direccion, contrasenia, 
-            seguro_medico, alergias, antecedentes_medicos, notas_generales, id_odontologo 
+        const newUsuario = {
+            nombres,
+            apellidos,
+            ci,
+            email,
+            telefono,
+            fecha_nacimiento,
+            rol,
+            direccion,
+            contrasenia,
+            seguro_medico,
+            alergias,
+            antecedentes_medicos,
+            notas_generales,
+            id_odontologo,
         };
-    
-    
+
         try {
             const response = await axios.post('http://127.0.0.1:8000/odomed/usuario/create/', newUsuario);
             if (response.data.errors) {
@@ -163,10 +187,9 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 required
                             />
                             {errors.telefono && <FormErrorMessage>{errors.telefono}</FormErrorMessage>}
-
                         </FormControl>
 
-                        <FormControl  isInvalid={!!errors.fecha_nacimiento} mb={4}>
+                        <FormControl isInvalid={!!errors.fecha_nacimiento} mb={4}>
                             <FormLabel>Fecha de Nacimiento</FormLabel>
                             <Input
                                 type="date"
@@ -175,24 +198,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 required
                             />
                             {errors.fecha_nacimiento && <FormErrorMessage>{errors.fecha_nacimiento}</FormErrorMessage>}
-
-                        </FormControl>
-
-                        <FormControl isInvalid={!!errors.rol} mb={4}>
-                            <FormLabel>Rol</FormLabel>
-                            <Select
-                                placeholder="Selecciona un rol"
-                                value={rol}
-                                onChange={(e) => setRol(e.target.value)}
-                                required
-                            >
-                                {roles.map((role) => (
-                                    <option key={role.id_rol} value={role.id_rol}>
-                                        {role.nombre_rol}
-                                    </option>
-                                ))}
-                            </Select>
-                            {errors.rol && <FormErrorMessage>{errors.rol}</FormErrorMessage>}
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.direccion} mb={4}>
@@ -204,7 +209,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 required
                             />
                             {errors.direccion && <FormErrorMessage>{errors.direccion}</FormErrorMessage>}
-
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.contrasenia} mb={4}>
@@ -219,7 +223,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                             {errors.contrasenia && <FormErrorMessage>{errors.contrasenia}</FormErrorMessage>}
                         </FormControl>
 
-                        {/* Campos de Pacientes */}
                         <FormControl isInvalid={!!errors.seguro_medico} mb={4}>
                             <FormLabel>Seguro Médico</FormLabel>
                             <Input
@@ -229,20 +232,16 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 required
                             />
                             {errors.seguro_medico && <FormErrorMessage>{errors.seguro_medico}</FormErrorMessage>}
-
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.alergias} mb={4}>
                             <FormLabel>Alergias</FormLabel>
-                            <Input
+                            <Textarea
                                 placeholder="Alergias"
                                 value={alergias}
-                                defaultValue="Ninguno"
                                 onChange={(e) => setAlergias(e.target.value)}
-                                required
                             />
                             {errors.alergias && <FormErrorMessage>{errors.alergias}</FormErrorMessage>}
-
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.antecedentes_medicos} mb={4}>
@@ -250,16 +249,35 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                             <Textarea
                                 placeholder="Antecedentes Médicos"
                                 value={antecedentes_medicos}
-                                defaultValue="Ninguno"
                                 onChange={(e) => setAntecedentesMedicos(e.target.value)}
-                                required
                             />
                             {errors.antecedentes_medicos && <FormErrorMessage>{errors.antecedentes_medicos}</FormErrorMessage>}
-
                         </FormControl>
 
-                        {/* Campos de Historiales Clínicos */}
-                        
+                        <FormControl isInvalid={!!errors.notas_generales} mb={4}>
+                            <FormLabel>Notas Generales</FormLabel>
+                            <Textarea
+                                placeholder="Notas Generales"
+                                value={notas_generales}
+                                onChange={(e) => setNotasGenerales(e.target.value)}
+                            />
+                            {errors.notas_generales && <FormErrorMessage>{errors.notas_generales}</FormErrorMessage>}
+                        </FormControl>
+
+                        <FormControl isInvalid={!!errors.rol} mb={4}>
+                            <FormLabel>Rol</FormLabel>
+                            <Select
+                                placeholder="Selecciona un rol"
+                                value={rol}
+                                onChange={(e) => setRol(e.target.value)}
+                                required
+                            >
+                                {roles.map((role) => (
+                                    <option key={role.id} value={role.id}>{role.name}</option>
+                                ))}
+                            </Select>
+                            {errors.rol && <FormErrorMessage>{errors.rol}</FormErrorMessage>}
+                        </FormControl>
 
                         <FormControl isInvalid={!!errors.id_odontologo} mb={4}>
                             <FormLabel>Odontólogo</FormLabel>
@@ -270,32 +288,23 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 required
                             >
                                 {odontologos.map((odontologo) => (
-                                    <option key={odontologo.id_odontologo} value={odontologo.id_odontologo}>
-                                        {odontologo.nombre_completo}
-                                    </option>
+                                    <option key={odontologo.id} value={odontologo.id}>{odontologo.nombre}</option>
                                 ))}
                             </Select>
                             {errors.id_odontologo && <FormErrorMessage>{errors.id_odontologo}</FormErrorMessage>}
                         </FormControl>
-                        <FormControl isInvalid={!!errors.notas_generales} mb={4}>
-                            <FormLabel>Notas Generales</FormLabel>
-                            <Textarea
-                                placeholder="Notas Generales"
-                                value={notas_generales}
-                                defaultValue="Ninguna observacion"
-                                onChange={(e) => setNotasGenerales(e.target.value)}
-                                required
-                            />
-                            {errors.notas_generales && <FormErrorMessage>{errors.notas_generales}</FormErrorMessage>}
 
-                        </FormControl>
+                        <Button
+                            colorScheme="teal"
+                            isLoading={loading}
+                            type="submit"
+                        >
+                            Crear Usuario
+                        </Button>
                     </form>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
-                        Crear Usuario
-                    </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

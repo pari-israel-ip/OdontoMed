@@ -10,11 +10,13 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     const [email, setEmail] = useState(usuario.email.toUpperCase());
     const [telefono, setTelefono] = useState(usuario.telefono.toUpperCase());
     const [fecha_nacimiento, setFechaNacimiento] = useState(usuario.fecha_nacimiento || '');
-    const [rol, setRol] = useState(usuario.rol); // Asignar rol del usuario
+    const [rol, setRol] = useState(usuario.rol);
     const [direccion, setDireccion] = useState(usuario.direccion);
     const [contrasenia, setContrasenia] = useState(usuario.contrasenia);
     const [roles, setRoles] = useState([]);
     const [errors, setErrors] = useState({});
+    const [errorMessages, setErrorMessages] = useState({});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -31,6 +33,8 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setLoading(true);
+
         // Validación simple de los campos requeridos
         const validationErrors = {};
         if (!nombres.trim()) validationErrors.nombres = 'Los nombres son obligatorios.';
@@ -42,6 +46,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            setLoading(false);
             return;
         }
 
@@ -57,24 +62,21 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
             direccion, 
             contrasenia 
         };
-    
+
         try {
             const response = await axios.put(`http://127.0.0.1:8000/odomed/usuario/${usuario.id_paciente}/`, updatedUsuario);
-    
-            // Si hay errores específicos en la respuesta
+
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
-                // Si la actualización fue exitosa
                 onSave(response.data);
                 onClose();
             }
         } catch (error) {
-            // Si ocurre un error en el servidor o en la solicitud
             const errorMessage = error.response?.data.errors || { general: 'ERROR AL ACTUALIZAR EL USUARIO. INTÉNTELO DE NUEVO MÁS TARDE.' };
             setErrorMessages(errorMessage);
         } finally {
-            setLoading(false); // Desactivar estado de carga
+            setLoading(false);
         }
     };
 
@@ -189,7 +191,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                     </form>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
+                    <Button colorScheme="teal" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Guardar
                     </Button>
                     <Button variant="ghost" onClick={onClose}>Cancelar</Button>
