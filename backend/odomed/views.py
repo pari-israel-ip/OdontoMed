@@ -152,7 +152,35 @@ def usuario_detail(request, id_usuario):
     usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
     
     if request.method == 'GET':
-        return JsonResponse(usuario)
+        paciente = Pacientes.objects.filter(id_paciente=usuario).first()  # Obtener el paciente asociado si existe
+
+        usuario_info = {
+            'id_usuario': usuario.id_usuario,
+            'nombres': usuario.nombres,
+            'apellidos': usuario.apellidos,
+            'nombre_completo': f"{usuario.nombres} {usuario.apellidos}",
+            'ci': usuario.ci,
+            'fecha_nacimiento': usuario.fecha_nacimiento,
+            'email': usuario.email,
+            'direccion': usuario.direccion,
+            'telefono': usuario.telefono,
+            'seguro_medico': paciente.seguro_medico if paciente else None,
+            'alergias': paciente.alergias if paciente else None,
+            'antecedentes_medicos': paciente.antecedentes_medicos if paciente else None,
+            'historiales': []
+        }
+        
+        # Agrega la información de los historiales clínicos
+        if paciente:
+            for historial in paciente.historialesclinicos_set.all():
+                usuario_info['historiales'].append({
+                    'id_historial': historial.id_historial,
+                    'id_odontologo': historial.id_odontologo_id,  # Solo el ID del odontólogo
+                    'fecha_hora_creacion': historial.fecha_hora_creacion,
+                    'notas_generales': historial.notas_generales,
+                })
+
+        return JsonResponse(usuario_info, safe=False)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)

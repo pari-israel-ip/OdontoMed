@@ -1,5 +1,4 @@
-// src/components/ShowUsuarioModal.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -8,18 +7,36 @@ import {
     ModalBody,
     ModalCloseButton,
     Text,
-    Button
+    Button,
+    Box
 } from '@chakra-ui/react';
+import { useParams, useNavigate } from 'react-router-dom';  
+import usuarioService from '../services/usuarioService';
 import EditUsuarioModal from './EditUsuarioModal';
 import EditHistorialModal from './EditHistorialModal'; // Importa el componente de historial
 import EditPacienteModal from './EditPacienteModal'; // Importa el componente de paciente
 
-const ShowUsuarioModal = ({ usuario, onClose }) => {
+const ShowUsuarioModal = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isEditHistorialOpen, setIsEditHistorialOpen] = useState(false);
     const [isEditPacienteOpen, setIsEditPacienteOpen] = useState(false);
     const [selectedHistorial, setSelectedHistorial] = useState(null);
+    const { id } = useParams();  
+    const [usuario, setUsuario] = useState(null);
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchUsuario = async () => {
+            try {
+                const response = await usuarioService.getUsuario(id);
+                setUsuario(response.data);
+            } catch (error) {
+                console.error('Error fetching usuario:', error);
+            }
+        };
+
+        fetchUsuario();
+    }, [id]);
     const handleEdit = () => {
         setIsEditModalOpen(true);
     };
@@ -32,10 +49,16 @@ const ShowUsuarioModal = ({ usuario, onClose }) => {
     const handleEditPaciente = () => {
         setIsEditPacienteOpen(true);
     };
+    const onClose = () => {
+        navigate('/usuarios');  // Redirige a la lista de usuarios cuando se cierra el modal
+    };
 
+    if (!usuario) {
+        return null; // Puedes agregar un loader aquí si lo prefieres
+    }
     return (
         <>
-            <Modal isOpen={!!usuario} onClose={onClose}>
+            <Modal isOpen={!!usuario} onClose={onClose} size="full">
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Detalles del Paciente</ModalHeader>

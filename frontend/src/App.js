@@ -2,19 +2,27 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import NavComponent from './components/NavComponent';
-import RolesComponent from './components/RolesComponent';
+import NavComponentLogin from './components/NavComponentLogin';
+import BodyComponent from './components/BodyComponent';
+import FooterComponent from './components/FooterComponent';
 import LoginComponent from './components/LoginComponent';
-import UsuariosComponent from './components/UsuarioComponent';  // Otros componentes que necesites
-
-// Componente para manejar la estructura de la aplicación
+import RolesComponent from './components/RolesComponent';
+import UsuariosComponent from './components/UsuarioComponent';
+import ShowUsuarioModal from './components/ShowUsuarioModal'; // Importa el modal
 function Layout({ children }) {
-    const location = useLocation();  // Hook para obtener la ruta actual
+    const location = useLocation();
 
-    // Condicionamos que el NavComponent no se renderice en la ruta "/login"
+    const isLoginPage = location.pathname === '/login';
+    const isUserOrRolesPage = location.pathname === '/usuarios' || location.pathname === '/roles'
+    || location.pathname === '/usuarios:id';
+
     return (
         <>
-            {location.pathname !== '/login' && <NavComponent />}
-            {children}  {/* Aquí se renderizan las rutas hijas */}
+            {!isLoginPage && !isUserOrRolesPage && <NavComponent />}
+            {isUserOrRolesPage && <NavComponentLogin />}
+            {!isUserOrRolesPage && !isLoginPage && <BodyComponent />}
+            {children}
+            {!isUserOrRolesPage && !isLoginPage && <FooterComponent />}
         </>
     );
 }
@@ -26,10 +34,11 @@ function App() {
                 <Layout>
                     <Routes>
                         <Route path="/login" element={<LoginComponent />} />
-                        <Route path="/pacientes" element={<UsuariosComponent />} />
+                        <Route path="/usuarios" element={<UsuariosComponent />} />
                         <Route path="/roles" element={<RolesComponent />} />
+                        <Route path="/usuarios/:id" element={<ShowUsuarioModal />} /> {/* Nueva ruta */}
 
-                        {/* Agrega más rutas si es necesario */}
+                        {/* Otras rutas si es necesario */}
                     </Routes>
                 </Layout>
             </div>

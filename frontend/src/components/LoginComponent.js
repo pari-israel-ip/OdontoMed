@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate
 import loginService from '../services/loginService';
 
 const LoginComponent = () => {
@@ -7,6 +8,7 @@ const LoginComponent = () => {
     const [contrasenia, setContrasenia] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    const navigate = useNavigate();  // Inicializa useNavigate
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -14,6 +16,8 @@ const LoginComponent = () => {
             const response = await loginService.login(email, contrasenia);
             setMessage(response.data.message);
             setIsError(false);
+            // Redirige a la ruta /usuarios después del inicio de sesión exitoso
+            navigate('/usuarios');
         } catch (error) {
             setMessage(error.response?.data?.message || 'Error en el login');
             setIsError(true);

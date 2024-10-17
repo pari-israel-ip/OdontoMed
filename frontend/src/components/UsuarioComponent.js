@@ -1,3 +1,4 @@
+// UsuariosComponent.js
 import React, { useEffect, useState } from 'react';
 import {
     Box,
@@ -13,15 +14,14 @@ import {
     Flex,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
-import usuarioService from '../services/usuarioService';  // Asegúrate de que la ruta sea correcta
-import ShowUsuarioModal from './ShowUsuarioModal';  // Ruta al modal que mostrarás
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
+import usuarioService from '../services/usuarioService';
 import CreateUsuarioModal from './CreateUsuarioModal';  // Ruta al modal de creación
 
 const UsuariosComponent = () => {
     const [usuarios, setUsuarios] = useState([]);
+    const navigate = useNavigate(); // Usa useNavigate para redirigir
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [currentUsuario, setCurrentUsuario] = useState(null);
-    const [isShowModalOpen, setIsShowModalOpen] = useState(false); // Para el modal de detalles
 
     useEffect(() => {
         loadUsuarios();
@@ -37,9 +37,7 @@ const UsuariosComponent = () => {
     };
 
     const handleDelete = async (id_usuario) => {
-        // Confirmar si el usuario realmente quiere eliminar el usuario
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Paciente?");
-        
         if (confirmDelete) {
             try {
                 await usuarioService.deleteUsuario(id_usuario);
@@ -50,22 +48,8 @@ const UsuariosComponent = () => {
         }
     };
 
-    const handleShow = (usuario) => {
-        setCurrentUsuario(usuario);
-        setIsShowModalOpen(true);
-        loadUsuarios();
-
-    };
-
-    const handleCreate = async (newUsuario) => {
-        try {
-            await usuarioService.createUsuario(newUsuario);
-            setIsCreateModalOpen(false);  // Cerrar modal después de crear
-        } catch (error) {
-            console.error('Error creating usuario:', error);
-        } finally {
-            loadUsuarios();
-        }
+    const handleShow = (usuarioId) => {
+        navigate(`/usuarios/${usuarioId}`);
     };
 
     return (
@@ -76,7 +60,6 @@ const UsuariosComponent = () => {
                 Crear Nuevo Paciente
             </Button>
 
-            {/* Tabla de usuarios */}
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
@@ -100,7 +83,7 @@ const UsuariosComponent = () => {
                                         icon={<InfoIcon />}
                                         colorScheme="cyan"
                                         size="sm"
-                                        onClick={() => handleShow(usuario)}
+                                        onClick={() => handleShow(usuario.id_paciente)}  // Redirigir a la ruta del modal
                                         mr={2}
                                     />
                                     <IconButton
@@ -115,22 +98,6 @@ const UsuariosComponent = () => {
                     ))}
                 </Tbody>
             </Table>
-
-            {/* Modal para mostrar detalles del paciente */}
-            {isShowModalOpen && (
-                <ShowUsuarioModal
-                    usuario={currentUsuario}
-                    onClose={() => setIsShowModalOpen(false)}
-                />
-            )}
-
-            {/* Modal de creación */}
-            {isCreateModalOpen && (
-                <CreateUsuarioModal
-                    onClose={() => setIsCreateModalOpen(false)}
-                    onCreate={handleCreate}
-                />
-            )}
         </Box>
     );
 };
