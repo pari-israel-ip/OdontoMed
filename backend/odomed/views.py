@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario, Odontologo,Practicante,Recepcionista,Paciente
+from .models import Roles,Usuario, Odontologos,Practicantes,Recepcionistas
 from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate

@@ -101,7 +101,7 @@ class Odontologos(models.Model):
     activo = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'odontologos'
+        db_table = 'Odontologos'
         managed = False
 
 # Model for Pacientes table
