@@ -31,7 +31,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const response = await roleService.getRoles();
+                const response = await roleService.getRolesPaciente();
                 setRoles(response.data);
             } catch (error) {
                 console.error("Error fetching roles:", error);
@@ -181,7 +181,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.rol} mb={4}>
                             <FormLabel>Rol</FormLabel>
                             <Select
-                                placeholder="Selecciona un rol"
                                 value={rol}
                                 onChange={(e) => setRol(e.target.value)}
                                 required

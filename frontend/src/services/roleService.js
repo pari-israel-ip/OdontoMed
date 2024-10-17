@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8000/odomed/roles/';  // Ajusta según tu conf
 
 const roleService = {
     getRoles: () => axios.get(API_URL),
+    getRolesPaciente: () => axios.get(`${API_URL}paciente/`),
     getRole: (id) => axios.get(`${API_URL}${id}/`),
     createRole: (roleData) => axios.post(`${API_URL}create/`, roleData),
     updateRole: (id, roleData) => axios.put(`${API_URL}${id}/`, roleData),

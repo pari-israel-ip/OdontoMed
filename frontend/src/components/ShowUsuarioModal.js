@@ -24,7 +24,7 @@ const ShowUsuarioModal = () => {
     const { id } = useParams();  
     const [usuario, setUsuario] = useState(null);
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         const fetchUsuario = async () => {
             try {
@@ -37,17 +37,32 @@ const ShowUsuarioModal = () => {
 
         fetchUsuario();
     }, [id]);
+
+    const loadUsuarios = async () => {
+        try {
+            const response = await usuarioService.getUsuario(id);
+            setUsuario(response.data);
+        } catch (error) {
+            console.error('Error fetching usuarios:', error);
+        }
+    };
+
+    
+
     const handleEdit = () => {
         setIsEditModalOpen(true);
+        loadUsuarios();
     };
 
     const handleEditHistorial = (historial) => {
         setSelectedHistorial(historial); // Guardar el historial seleccionado para editar
         setIsEditHistorialOpen(true);
+        loadUsuarios();
     };
 
     const handleEditPaciente = () => {
         setIsEditPacienteOpen(true);
+        loadUsuarios();
     };
     const onClose = () => {
         navigate('/usuarios');  // Redirige a la lista de usuarios cuando se cierra el modal
@@ -97,7 +112,12 @@ const ShowUsuarioModal = () => {
             </Modal>
 
             {isEditModalOpen && (
-                <EditUsuarioModal usuario={usuario} onClose={() => setIsEditModalOpen(false)} onSave={onClose} />
+                <EditUsuarioModal usuario={usuario} onClose={() => setIsEditModalOpen(false)} 
+                onSave={(updatedUser) => {
+                    setIsEditModalOpen(false);
+                    loadUsuarios();
+
+                }} />
             )}
 
             {isEditHistorialOpen && selectedHistorial && (
@@ -107,6 +127,8 @@ const ShowUsuarioModal = () => {
                     onSave={(updatedHistorial) => {
                         // Puedes actualizar el historial en el estado aquí si es necesario
                         setIsEditHistorialOpen(false);
+                        loadUsuarios();
+
                     }}
                 />
             )}
@@ -118,6 +140,7 @@ const ShowUsuarioModal = () => {
                     onSave={(updatedPaciente) => {
                         // Puedes actualizar el paciente en el estado aquí si es necesario
                         setIsEditPacienteOpen(false);
+                        loadUsuarios();
                     }}
                 />
             )}

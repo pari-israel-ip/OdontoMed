@@ -48,6 +48,12 @@ const UsuariosComponent = () => {
         }
     };
 
+    const handleCreate = (newUsuario) => {
+        // Aquí puedes actualizar la lista de usuarios o simplemente volver a cargar
+        setUsuarios((prevUsuarios) => [...prevUsuarios, newUsuario]);
+        setIsCreateModalOpen(false); // Cierra el modal
+    };
+
     const handleShow = (usuarioId) => {
         navigate(`/usuarios/${usuarioId}`);
     };
@@ -98,7 +104,13 @@ const UsuariosComponent = () => {
                     ))}
                 </Tbody>
             </Table>
+            {isCreateModalOpen && (
+            <   CreateUsuarioModal 
+                onClose={() => setIsCreateModalOpen(false)} 
+                onSave={handleCreate} />
+            )}
         </Box>
+        
     );
 };
 

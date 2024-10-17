@@ -19,6 +19,12 @@ def rol_list(request):
     if request.method == 'GET':
         roles = list(Roles.objects.filter(activo=True).values())
         return JsonResponse(roles, safe=False)
+    
+@csrf_exempt
+def rol_list_paciente(request):
+    if request.method == 'GET':
+        roles = list(Roles.objects.filter(activo=True,  nombre_rol='PACIENTE').values())
+        return JsonResponse(roles, safe=False)
 
 @csrf_exempt
 def rol_detail(request, id_rol):
@@ -226,11 +232,6 @@ def usuario_detail(request, id_usuario):
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
             errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
 
-        # Validación de rol
-        rol_id = data.get('rol')
-        if not Roles.objects.filter(id_rol=rol_id).exists():
-            errors['rol'] = 'El rol seleccionado no existe.'
-
         # Validación de contraseña
         contrasenia = data.get('contrasenia', '')
         password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
@@ -246,7 +247,6 @@ def usuario_detail(request, id_usuario):
         usuario.email = data.get('email', usuario.email).upper()
         usuario.telefono = data.get('telefono', usuario.telefono)
         usuario.fecha_nacimiento = data.get('fecha_nacimiento', usuario.fecha_nacimiento)
-        usuario.rol_id = data.get('rol', usuario.rol.id_rol)  # Asegúrate de que se pasa el ID del rol
         usuario.direccion = data.get('direccion', usuario.direccion).upper()
         usuario.contrasenia = data.get('contrasenia', usuario.contrasenia)
         
@@ -445,12 +445,21 @@ def historial_detail(request, id_historial):
         try:
             historial = get_object_or_404(HistorialesClinicos, id_historial=id_historial)
             data = json.loads(request.body.decode('utf-8'))
-
+            errors = {}
             # Validaciones y guardado en mayúsculas
             notas_generales = data.get('notas_generales', '').upper()
+            # Validación de id_paciente e id_odontologo
+            id_odontologo = data.get('id_odontologo')
+            if not Odontologos.objects.filter(id_odontologo=id_odontologo).exists():
+                errors['id_odontologo'] = 'El odontólogo seleccionado no existe.'
+            notas_generales = data.get('notas_generales', '').strip().upper()  # Convertir a mayúsculas
+            if not re.match(r'^[A-Z0-9\s]*$', notas_generales):  # Regex modificado para letras mayúsculas
+                errors['notas_generales'] = 'Las notas generales solo pueden contener letras, números y espacios.'
+            if not 5 <= len(notas_generales) <= 200:
+                errors['notas_generales'] = 'Las notas generales deben tener entre 5 y 200 caracteres.'
             
-            if not notas_generales:
-                return JsonResponse({'error': 'LAS NOTAS GENERALES SON REQUERIDAS'}, status=400)
+            if errors:
+                return JsonResponse({'errors': errors}, status=400)
 
             historial.notas_generales = notas_generales
             historial.save()
@@ -469,26 +478,33 @@ def paciente_detail(request, id_paciente):
     if request.method == 'GET':
         return JsonResponse(paciente)
     if request.method == 'PUT':
-        try:
-            paciente = get_object_or_404(Pacientes, id_paciente=id_paciente)
-            data = json.loads(request.body.decode('utf-8'))
-
-            # Validaciones y guardado en mayúsculas
-            seguro_medico = data.get('seguro_medico', '').upper()
-            alergias = data.get('alergias', '').upper()
-            antecedentes_medicos = data.get('antecedentes_medicos', '').upper()
-
-            if not seguro_medico:
-                return JsonResponse({'error': 'EL SEGURO MÉDICO ES REQUERIDO'}, status=400)
-
-            paciente.seguro_medico = seguro_medico
-            paciente.alergias = alergias
-            paciente.antecedentes_medicos = antecedentes_medicos
-            paciente.save()
-
-            return JsonResponse({'message': 'Paciente actualizado correctamente'})
         
-        except Exception as e:
-            return JsonResponse({'error': 'ERROR AL ACTUALIZAR EL PACIENTE'}, status=500)
-    
+        paciente = get_object_or_404(Pacientes, id_paciente=id_paciente)
+        data = json.loads(request.body.decode('utf-8'))
+        errors = {}
+
+        seguro_medico = data.get('seguro_medico', '').strip().upper()  # Convertir a mayúsculas
+        if not 8 <= len(seguro_medico) <= 15 or not re.match(r'^[A-Z0-9]+$', seguro_medico):  # Regex modificado para letras mayúsculas
+            errors['seguro_medico'] = 'El seguro médico debe tener entre 8 y 15 caracteres y contener solo letras y números.'
+
+        # Validación de alergias y antecedentes médicos
+        alergias = data.get('alergias', '').strip().upper()  # Convertir a mayúsculas
+        antecedentes_medicos = data.get('antecedentes_medicos', '').strip().upper()  # Convertir a mayúsculas
+        if not re.match(r'^[A-Z0-9\s]*$', alergias):  # Regex modificado para letras mayúsculas
+            errors['alergias'] = 'Las alergias solo pueden contener letras, números y espacios.'
+        if not re.match(r'^[A-Z0-9\s]*$', antecedentes_medicos):  # Regex modificado para letras mayúsculas
+            errors['antecedentes_medicos'] = 'Los antecedentes médicos solo pueden contener letras, números y espacios.'
+        if not seguro_medico:
+            return JsonResponse({'error': 'EL SEGURO MÉDICO ES REQUERIDO'}, status=400)
+
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)    
+        paciente.seguro_medico = seguro_medico
+        paciente.alergias = alergias
+        paciente.antecedentes_medicos = antecedentes_medicos
+        paciente.save()
+
+        return JsonResponse({'message': 'Paciente actualizado correctamente'})
+
+     
     return JsonResponse({'error': 'MÉTODO NO PERMITIDO'}, status=405)

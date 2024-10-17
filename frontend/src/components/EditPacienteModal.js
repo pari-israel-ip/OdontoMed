@@ -24,7 +24,7 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/odomed/paciente/${paciente.id_paciente}/`, {
+            const response = await axios.put(`http://127.0.0.1:8000/odomed/paciente/${paciente.id_usuario}/`, {
                 seguro_medico: seguroMedico,
                 alergias,
                 antecedentes_medicos: antecedentesMedicos,

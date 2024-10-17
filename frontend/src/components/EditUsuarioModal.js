@@ -31,7 +31,6 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     const [direccion, setDireccion] = useState(usuario.direccion.toUpperCase());
     const [contrasenia, setContrasenia] = useState(usuario.contrasenia || '');
     const [roles, setRoles] = useState([]);
-    const [errorMessages, setErrorMessages] = useState({});
     const [errors, setErrors] = useState({});
 
     const [loading, setLoading] = useState(false);
@@ -51,7 +50,6 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrorMessages({}); // Limpiar mensajes de error previos
         setLoading(true); // Activar estado de carga
     
         const updatedUsuario = {
@@ -68,7 +66,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
         };
     
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/odomed/usuario/${usuario.id_paciente}/`, updatedUsuario);
+            const response = await axios.put(`http://127.0.0.1:8000/odomed/usuario/${usuario.id_usuario}/`, updatedUsuario);
     
             // Si hay errores específicos en la respuesta
             if (response.data.errors) {
@@ -81,7 +79,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
         } catch (error) {
             // Si ocurre un error en el servidor o en la solicitud
             const errorMessage = error.response?.data.errors || { general: 'ERROR AL ACTUALIZAR EL USUARIO. INTÉNTELO DE NUEVO MÁS TARDE.' };
-            setErrorMessages(errorMessage);
+            setErrors(errorMessage);
         } finally {
             setLoading(false); // Desactivar estado de carga
         }
@@ -95,9 +93,9 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
-                        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                        <Grid templateColumns="repeat(2, 1fr)" gap={8}>
                             <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.nombres}>
+                                <FormControl isRequired isInvalid={!!errors.nombres}>
                                     <FormLabel>Nombres</FormLabel>
                                     <Input
                                         type="text"
@@ -109,7 +107,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.apellidos}>
+                                <FormControl isRequired isInvalid={!!errors.apellidos}>
                                     <FormLabel>Apellidos</FormLabel>
                                     <Input
                                         type="text"
@@ -121,7 +119,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.ci}>
+                                <FormControl isRequired isInvalid={!!errors.ci}>
                                     <FormLabel>C.I.</FormLabel>
                                     <Input
                                         type="text"
@@ -133,7 +131,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.email}>
+                                <FormControl isRequired isInvalid={!!errors.email}>
                                     <FormLabel>Email</FormLabel>
                                     <Input
                                         type="email"
@@ -145,7 +143,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl isInvalid={!!errorMessages.telefono}>
+                                <FormControl isInvalid={!!errors.telefono}>
                                     <FormLabel>Teléfono</FormLabel>
                                     <Input
                                         type="text"
@@ -169,23 +167,9 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                 </FormControl>
                             </GridItem>
 
-                            <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.rol}>
-                                    <FormLabel>Rol</FormLabel>
-                                    <Select value={rol} onChange={(e) => setRol(e.target.value)} required>
-                                        <option value="">Selecciona un rol</option>
-                                        {roles.map((role) => (
-                                            <option key={role.id_rol} value={role.id_rol}>
-                                                {role.nombre_rol}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                    {errors.rol && <FormErrorMessage>{errors.rol}</FormErrorMessage>}
-                                </FormControl>
-                            </GridItem>
 
                             <GridItem>
-                                <FormControl isInvalid={!!errorMessages.direccion}>
+                                <FormControl isInvalid={!!errors.direccion}>
                                     <FormLabel>Dirección</FormLabel>
                                     <Input
                                         type="text"
@@ -197,7 +181,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl isRequired isInvalid={!!errorMessages.contrasenia}>
+                                <FormControl isRequired isInvalid={!!errors.contrasenia}>
                                     <FormLabel>Contraseña</FormLabel>
                                     <Input
                                         type="password"
