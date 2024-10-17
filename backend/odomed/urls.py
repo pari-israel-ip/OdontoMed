@@ -23,6 +23,7 @@ urlpatterns = [
     path('diagnostico/<int:id_diagnostico>/', diagnostico_detail, name='diagnostico_detail'),  
     path('diagnostico/create/', diagnostico_create, name='diagnostico_create'),  
     path('diagnostico/historial/<int:id_historial>/', diagnostico_list, name='diagnostico_list'),  
+    path('paciente/', paciente_detail, name='paciente_list'),  
 
     path('login/', login, name='login'),  # Ruta para el login
 ]

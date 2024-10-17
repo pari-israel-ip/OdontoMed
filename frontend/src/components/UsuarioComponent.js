@@ -35,7 +35,7 @@ const UsuariosComponent = () => {
             console.error('Error fetching usuarios:', error);
         }
     };
-
+    
     const handleDelete = async (id_usuario) => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Paciente?");
         if (confirmDelete) {
@@ -106,8 +106,10 @@ const UsuariosComponent = () => {
             </Table>
             {isCreateModalOpen && (
             <   CreateUsuarioModal 
-                onClose={() => setIsCreateModalOpen(false)} 
-                onSave={handleCreate} />
+                onClose={() => {setIsCreateModalOpen(false)
+                    loadUsuarios()
+                }} 
+                onCreate={handleCreate} />
             )}
         </Box>
         

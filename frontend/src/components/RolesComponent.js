@@ -55,9 +55,7 @@ const RolesComponent = () => {
             await roleService.createRole(newRole);
         } catch (error) {
             console.error('Error creating role:', error);
-        } finally {
-            loadRoles();
-        }
+        } 
     };
 
     return (

@@ -51,6 +51,8 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
         fetchOdontologos();
     }, []);
 
+    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (loading) return;
@@ -185,8 +187,10 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                                 onChange={(e) => setRol(e.target.value)}
                                 required
                             >
+                                    <option value="">Seleccione un rol</option>
+
                                 {roles.map((role) => (
-                                    <option key={role.id_rol} value={role.id_rol}>
+                                    <option selected key={role.id_rol} value={role.id_rol}>
                                         {role.nombre_rol}
                                     </option>
                                 ))}
