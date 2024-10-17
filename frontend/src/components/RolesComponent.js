@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Box, Button, Heading, List, ListItem, IconButton, Flex } from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
-import EditRoleModal from './EditRoleModal';
-import CreateRoleModal from './CreateRoleModal';  // Asegúrate de que la ruta sea correcta
+import EditRoleModal from './EditRoleModal';  // Ruta al modal de edición
+import CreateRoleModal from './CreateRoleModal';  // Ruta al modal de creación
 
 const RolesComponent = () => {
     const [roles, setRoles] = useState([]);
@@ -40,39 +42,59 @@ const RolesComponent = () => {
         try {
             await roleService.updateRole(updatedRole.id_rol, {
                 nombre_rol: updatedRole.nombre_rol,
-                permisos: updatedRole.permisos
+                permisos: updatedRole.permisos,
             });
+            loadRoles();  // Recarga de roles después de la actualización
+            setIsEditModalOpen(false); // Cierra el modal después de guardar
         } catch (error) {
             console.error('Error updating role:', error);
-        } finally{
-            loadRoles();
         }
     };
 
     const handleCreate = async (newRole) => {
         try {
-            await roleService.createRole(newRole);  // Asegúrate de tener esta función en roleService
+            await roleService.createRole(newRole);
+            loadRoles();  // Recarga de roles después de la creación
+            setIsCreateModalOpen(false); // Cierra el modal después de crear
         } catch (error) {
             console.error('Error creating role:', error);
-        } finally{
-            loadRoles();
         }
     };
 
     return (
-        <div>
-            <h2>Roles</h2>
-            <button onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Rol</button>
-            <ul>
-                {roles.map(role => (
-                    <li key={role.id_rol}>
-                        {role.nombre_rol}
-                        <button onClick={() => handleEdit(role)}>Edit</button>
-                        <button onClick={() => handleDelete(role.id_rol)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+        <Box p={4}>
+            <Heading as="h2" size="lg" mb={4}>Roles</Heading>
 
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
+                Crear Nuevo Rol
+            </Button>
+
+            <List spacing={3}>
+                {roles.map((role) => (
+                    <ListItem key={role.id_rol}>
+                        <Flex justify="space-between" align="center">
+                            {role.nombre_rol}
+                            <Box>
+                                <IconButton
+                                    icon={<EditIcon />}
+                                    colorScheme="blue"
+                                    size="sm"
+                                    onClick={() => handleEdit(role)}
+                                    mr={2}
+                                />
+                                <IconButton
+                                    icon={<DeleteIcon />}
+                                    colorScheme="red"
+                                    size="sm"
+                                    onClick={() => handleDelete(role.id_rol)}
+                                />
+                            </Box>
+                        </Flex>
+                    </ListItem>
+                ))}
+            </List>
+
+            {/* Modal de edición */}
             {isEditModalOpen && (
                 <EditRoleModal
                     role={currentRole}
@@ -81,13 +103,14 @@ const RolesComponent = () => {
                 />
             )}
 
+            {/* Modal de creación */}
             {isCreateModalOpen && (
                 <CreateRoleModal
                     onClose={() => setIsCreateModalOpen(false)}
                     onCreate={handleCreate}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 

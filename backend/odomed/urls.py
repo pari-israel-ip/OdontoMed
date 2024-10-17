@@ -17,6 +17,9 @@ urlpatterns = [
     path('usuario/', usuario_list, name='usuario_list'),  
     path('usuario/<int:id_usuario>/', usuario_detail, name='usuario_detail'),  
     path('usuario/create/', usuario_create, name='usuario_create'),  
+    path('odontologo/', odontologo_list, name='odontologo_list'),  
+    path('paciente/<int:id_paciente>/', paciente_detail, name='paciente_detail'),  
+    path('historial/<int:id_historial>/', historial_detail, name='historial_detail'),  
     path('login/', login, name='login'),  # Ruta para el login
     # Rutas para Pacientes
     path('pacientes/', paciente_list, name='paciente_list'),  # Para obtener la lista de pacientes

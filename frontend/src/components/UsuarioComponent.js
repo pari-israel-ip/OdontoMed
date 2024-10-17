@@ -1,14 +1,27 @@
-// src/components/UsuariosComponent.js
 import React, { useEffect, useState } from 'react';
+import {
+    Box,
+    Button,
+    Heading,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    IconButton,
+    Flex,
+} from '@chakra-ui/react';
+import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import usuarioService from '../services/usuarioService';  // Asegúrate de que la ruta sea correcta
-import EditUsuarioModal from './EditUsuarioModal';  // Ruta al modal de edición
+import ShowUsuarioModal from './ShowUsuarioModal';  // Ruta al modal que mostrarás
 import CreateUsuarioModal from './CreateUsuarioModal';  // Ruta al modal de creación
 
 const UsuariosComponent = () => {
     const [usuarios, setUsuarios] = useState([]);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentUsuario, setCurrentUsuario] = useState(null);
+    const [isShowModalOpen, setIsShowModalOpen] = useState(false); // Para el modal de detalles
 
     useEffect(() => {
         loadUsuarios();
@@ -24,76 +37,101 @@ const UsuariosComponent = () => {
     };
 
     const handleDelete = async (id_usuario) => {
-        try {
-            await usuarioService.deleteUsuario(id_usuario);
-            loadUsuarios();
-        } catch (error) {
-            console.error('Error deleting usuario:', error);
+        // Confirmar si el usuario realmente quiere eliminar el usuario
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Paciente?");
+        
+        if (confirmDelete) {
+            try {
+                await usuarioService.deleteUsuario(id_usuario);
+                loadUsuarios();
+            } catch (error) {
+                console.error('Error deleting usuario:', error);
+            }
         }
     };
 
-    const handleEdit = (usuario) => {
+    const handleShow = (usuario) => {
         setCurrentUsuario(usuario);
-        setIsEditModalOpen(true);
-    };
+        setIsShowModalOpen(true);
+        loadUsuarios();
 
-    const handleSave = async (updatedUsuario) => {
-        try {
-            await usuarioService.updateUsuario(updatedUsuario.id_usuario, {
-                nombres: updatedUsuario.nombres,
-                apellidos: updatedUsuario.apellidos,
-                ci: updatedUsuario.ci,
-                email: updatedUsuario.email,
-                telefono: updatedUsuario.telefono,
-                fecha_nacimiento: updatedUsuario.fecha_nacimiento,
-                rol: updatedUsuario.rol,
-                direccion: updatedUsuario.direccion,
-                contrasenia: updatedUsuario.contrasenia,
-            });
-            loadUsuarios();
-        } catch (error) {
-            console.error('Error updating usuario:', error);
-        }
     };
 
     const handleCreate = async (newUsuario) => {
         try {
-            await usuarioService.createUsuario(newUsuario);  // Asegúrate de tener esta función en usuarioService
-            loadUsuarios();
+            await usuarioService.createUsuario(newUsuario);
+            setIsCreateModalOpen(false);  // Cerrar modal después de crear
         } catch (error) {
             console.error('Error creating usuario:', error);
+        } finally {
+            loadUsuarios();
         }
     };
 
     return (
-        <div>
-            <h2>Usuarios</h2>
-            <button onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Usuario</button>
-            <ul>
-                {usuarios.map(usuario => (
-                    <li key={usuario.id_usuario}>
-                        {`${usuario.nombres} ${usuario.apellidos}`}
-                        <button onClick={() => handleEdit(usuario)}>Edit</button>
-                        <button onClick={() => handleDelete(usuario.id_usuario)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+        <Box p={4}>
+            <Heading as="h2" size="lg" mb={4}>Pacientes</Heading>
 
-            {isEditModalOpen && (
-                <EditUsuarioModal
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
+                Crear Nuevo Paciente
+            </Button>
+
+            {/* Tabla de usuarios */}
+            <Table variant="striped" colorScheme="teal">
+                <Thead>
+                    <Tr>
+                        <Th>Nombre Completo</Th>
+                        <Th>CI</Th>
+                        <Th>Fecha de Nacimiento</Th>
+                        <Th>Seguro Médico</Th>
+                        <Th>Acciones</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {usuarios.map((usuario) => (
+                        <Tr key={usuario.id_paciente}>
+                            <Td>{usuario.nombre_completo}</Td>
+                            <Td>{usuario.ci}</Td>
+                            <Td>{usuario.fecha_nacimiento}</Td>
+                            <Td>{usuario.seguro_medico}</Td>
+                            <Td>
+                                <Flex justify="space-between">
+                                    <IconButton
+                                        icon={<InfoIcon />}
+                                        colorScheme="cyan"
+                                        size="sm"
+                                        onClick={() => handleShow(usuario)}
+                                        mr={2}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        size="sm"
+                                        onClick={() => handleDelete(usuario.id_paciente)}
+                                    />
+                                </Flex>
+                            </Td>
+                        </Tr>
+                    ))}
+                </Tbody>
+            </Table>
+
+            {/* Modal para mostrar detalles del paciente */}
+            {isShowModalOpen && (
+                <ShowUsuarioModal
                     usuario={currentUsuario}
-                    onClose={() => setIsEditModalOpen(false)}
-                    onSave={handleSave}
+                    onClose={() => setIsShowModalOpen(false)}
                 />
             )}
 
+            {/* Modal de creación */}
             {isCreateModalOpen && (
                 <CreateUsuarioModal
                     onClose={() => setIsCreateModalOpen(false)}
                     onCreate={handleCreate}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 
