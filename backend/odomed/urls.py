@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login, rol_list, rol_detail, rol_create,usuario_list,rol_list_paciente,usuario_detail,usuario_create, odontologo_list, paciente_detail,historial_detail
+from .views import diagnostico_list, diagnostico_create, diagnostico_detail, login, rol_list, rol_detail, rol_create,usuario_list,rol_list_paciente,usuario_detail,usuario_create, odontologo_list, paciente_detail,historial_detail
 from django.http import HttpResponse
 
 
@@ -20,5 +20,9 @@ urlpatterns = [
     path('odontologo/', odontologo_list, name='odontologo_list'),  
     path('paciente/<int:id_paciente>/', paciente_detail, name='paciente_detail'),  
     path('historial/<int:id_historial>/', historial_detail, name='historial_detail'),  
+    path('diagnostico/<int:id_diagnostico>/', diagnostico_detail, name='diagnostico_detail'),  
+    path('diagnostico/create/', diagnostico_create, name='diagnostico_create'),  
+    path('diagnostico/historial/<int:id_historial>/', diagnostico_list, name='diagnostico_list'),  
+
     path('login/', login, name='login'),  # Ruta para el login
 ]

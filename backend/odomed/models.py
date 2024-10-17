@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 
 # Model for Roles table
 class Roles(models.Model):
@@ -61,9 +63,8 @@ class Diagnosticos(models.Model):
     id_diagnostico = models.AutoField(primary_key=True)
     id_historial = models.ForeignKey('HistorialesClinicos', on_delete=models.SET_NULL, null=True, db_column='id_historial')
     nombre_diagnostico = models.CharField(max_length=100)
-    codigo_diagnostico = models.CharField(max_length=10, null=True, blank=True)
     descripcion = models.TextField(null=True, blank=True)
-    fecha_diagnostico = models.DateField(null=True, blank=True)
+    fecha_diagnostico = models.DateField(default=timezone.now)
     activo = models.BooleanField(default=True)
 
     class Meta:

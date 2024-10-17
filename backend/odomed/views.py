@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos
+from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
@@ -279,7 +279,6 @@ def usuario_detail(request, id_usuario):
         except Usuario.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
-
 @csrf_exempt
 def usuario_create(request):
     if request.method == 'POST':
@@ -396,7 +395,6 @@ def usuario_create(request):
             'message': 'Paciente Creado Correctamente'
         }, status=201)
 
-
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
@@ -410,7 +408,6 @@ def login(request):
         except Usuario.DoesNotExist:
             return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
     return JsonResponse({'message': 'Método no permitido'}, status=405)
-
 
 @csrf_exempt
 def odontologo_list(request):
@@ -508,3 +505,103 @@ def paciente_detail(request, id_paciente):
 
      
     return JsonResponse({'error': 'MÉTODO NO PERMITIDO'}, status=405)
+
+@csrf_exempt
+def diagnostico_list(request, id_historial):
+    if request.method == 'GET':
+        diagnosticos = list(Diagnosticos.objects.filter(id_historial=id_historial, activo=True).values())
+
+        if not diagnosticos:
+            return JsonResponse({'error': 'NO SE ENCONTRARON DIAGNOSTICOS PARA ESE ID_HISTORIAL'}, status=404)
+
+        return JsonResponse(diagnosticos, safe=False)
+
+nombre_pattern = re.compile(r'^[A-Za-z0-9 ]+$')
+descripcion_pattern = re.compile(r'^[A-Za-z0-9 ]+$')
+
+@csrf_exempt
+def diagnostico_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Convertir los datos a mayúsculas
+        nombre_diagnostico = data.get('nombre_diagnostico', '').upper()
+        descripcion = data.get('descripcion', '').upper()
+
+        # Validaciones
+        errors = {}
+
+        # Validar nombre_diagnostico
+        if not (5 <= len(nombre_diagnostico) <= 50):
+            errors['nombre_diagnostico'] = "EL NOMBRE DEL DIAGNOSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES."
+        elif not nombre_pattern.match(nombre_diagnostico):
+            errors['nombre_diagnostico'] = "EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+
+        # Validar descripcion
+        if not (5 <= len(descripcion) <= 200):
+            errors['descripcion'] = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES."
+        elif not descripcion_pattern.match(descripcion):
+            errors['descripcion'] = "LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+
+        # Validar id_historial
+        id_historial = data.get('id_historial')
+        if not id_historial:
+            errors['id_historial'] = "EL ID DEL HISTORIAL ES OBLIGATORIO."
+        else:
+            # Obtener la instancia de HistorialesClinicos
+            historial = get_object_or_404(HistorialesClinicos, id_historial=id_historial)
+
+        # Si hay errores, devolverlos con un estado 400
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+
+        # Crear el nuevo diagnóstico si no hay errores
+        nuevo_diagnostico = Diagnosticos.objects.create(
+            id_historial=historial,  # Asigna la instancia del historial
+            nombre_diagnostico=nombre_diagnostico,
+            descripcion=descripcion,
+        )
+
+        return JsonResponse({"message": "DIAGNOSTICO CREADO CORRECTAMENTE"}, status=201)
+
+@csrf_exempt
+def diagnostico_detail(request, id_diagnostico):
+    diagnostico = get_object_or_404(Diagnosticos, id_diagnostico=id_diagnostico)
+    
+    if request.method == 'GET':
+        return JsonResponse({
+            "id_diagnostico": diagnostico.id_diagnostico,
+            "id_historial": diagnostico.id_historial.id_historial,
+            "nombre_diagnostico": diagnostico.nombre_diagnostico,
+            "descripcion": diagnostico.descripcion,
+            "fecha_diagnostico": diagnostico.fecha_diagnostico,
+        })
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        diagnostico.nombre_diagnostico = data.get('nombre_diagnostico', diagnostico.nombre_diagnostico).upper()
+        diagnostico.descripcion = data.get('descripcion', diagnostico.descripcion).upper()
+        # Validaciones
+        errors = {}
+
+        # Validar nombre_diagnostico
+        if not (5 <= len(diagnostico.nombre_diagnostico) <= 50):
+            errors['nombre_diagnostico'] = "EL NOMBRE DEL DIAGNOSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES."
+        elif not nombre_pattern.match(diagnostico.nombre_diagnostico):
+            errors['nombre_diagnostico'] = "EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+
+        # Validar descripcion
+        if not (5 <= len(diagnostico.descripcion) <= 200):
+            errors['descripcion'] = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES."
+        elif not descripcion_pattern.match(diagnostico.descripcion):
+            errors['descripcion'] = "LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+
+        diagnostico.save()
+        return JsonResponse({"message": "Diagnóstico actualizado exitosamente."})
+
+    elif request.method == 'DELETE':
+        diagnostico.activo = False  # Eliminación lógica
+        diagnostico.save()
+        return JsonResponse({"message": "Diagnóstico eliminado exitosamente."})
