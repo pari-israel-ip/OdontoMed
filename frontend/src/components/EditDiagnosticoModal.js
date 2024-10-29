@@ -11,16 +11,17 @@ import {
     FormLabel,
     Input,
     Textarea,
-    useToast
+    useToast,
+    FormErrorMessage
 } from '@chakra-ui/react';
-import diagnosticoService from '../services/diagnosticoService'; // Asegúrate de que esta ruta sea correcta
+import diagnosticoService from '../services/diagnosticoService';
 
 const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
     const [nombreDiagnostico, setNombreDiagnostico] = useState('');
     const [fechaDiagnostico, setFechaDiagnostico] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const toast = useToast();
     const [errors, setErrors] = useState({});
+    const toast = useToast();
 
     useEffect(() => {
         if (diagnostico) {
@@ -45,18 +46,18 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
                 duration: 3000,
                 isClosable: true,
             });
-            onSave(); // Llama a onSave para actualizar la lista de diagnósticos
+            onSave();
+            onClose();
         } catch (error) {
             console.error('Error updating diagnostico:', error);
             toast({
                 title: "Error al actualizar diagnóstico.",
-                description: "Ocurrió un error al intentar actualizar el diagnóstico.",
+                description: "Ocurrió un error al intentar actualizar.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
             });
         }
-        onClose(); // Cierra el modal
     };
 
     return (
@@ -67,29 +68,32 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
-                        <FormControl isRequired>
+                        <FormControl isInvalid={!!errors.nombre_diagnostico} isRequired>
                             <FormLabel>Nombre del Diagnóstico</FormLabel>
                             <Input
                                 value={nombreDiagnostico}
                                 onChange={(e) => setNombreDiagnostico(e.target.value)}
                             />
+                            <FormErrorMessage>{errors.nombre_diagnostico}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl mt={4} isRequired>
+                        <FormControl mt={4} isInvalid={!!errors.fecha_diagnostico} isRequired>
                             <FormLabel>Fecha del Diagnóstico</FormLabel>
                             <Input
                                 type="date"
                                 value={fechaDiagnostico}
                                 onChange={(e) => setFechaDiagnostico(e.target.value)}
                             />
+                            <FormErrorMessage>{errors.fecha_diagnostico}</FormErrorMessage>
                         </FormControl>
 
-                        <FormControl mt={4}>
+                        <FormControl mt={4} isInvalid={!!errors.descripcion}>
                             <FormLabel>Descripción</FormLabel>
                             <Textarea
                                 value={descripcion}
                                 onChange={(e) => setDescripcion(e.target.value)}
                             />
+                            <FormErrorMessage>{errors.descripcion}</FormErrorMessage>
                         </FormControl>
 
                         <Button mt={4} colorScheme="blue" type="submit">

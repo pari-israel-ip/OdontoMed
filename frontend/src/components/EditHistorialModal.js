@@ -1,4 +1,3 @@
-// src/components/EditHistorialModal.js
 import React, { useState, useEffect } from 'react';
 import {
     Modal,
@@ -12,27 +11,28 @@ import {
     Textarea,
     Button,
     FormErrorMessage,
-    Select
+    Select,
+    useToast
 } from '@chakra-ui/react';
+import odontologoService from '../services/odontologoService';
 import axios from 'axios';
-import odontologoService from '../services/odontologoService'; // Importa el servicio de odontólogos
 
 const EditHistorialModal = ({ historial, onClose, onSave }) => {
     const [notasGenerales, setNotasGenerales] = useState(historial.notas_generales || '');
     const [odontologos, setOdontologos] = useState([]);
     const [selectedOdontologo, setSelectedOdontologo] = useState(historial.id_odontologo?.id_odontologo || '');
     const [errors, setErrors] = useState({});
+    const toast = useToast();
 
     useEffect(() => {
         const fetchOdontologos = async () => {
             try {
-                const response = await odontologoService.getOdontologos(); // Obtén todos los odontólogos
+                const response = await odontologoService.getOdontologos();
                 setOdontologos(response.data);
             } catch (error) {
                 console.error('Error al obtener los odontólogos:', error);
             }
         };
-        
         fetchOdontologos();
     }, []);
 
@@ -41,18 +41,32 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
         try {
             const response = await axios.put(`http://127.0.0.1:8000/odomed/historial/${historial.id_historial}/`, {
                 notas_generales: notasGenerales,
-                id_odontologo: selectedOdontologo // Envía el odontólogo seleccionado
+                id_odontologo: selectedOdontologo
             });
 
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Historial actualizado.",
+                    description: "El historial clínico ha sido actualizado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onSave(response.data);
-                onClose(); // Cerrar el modal después de guardar
+                onClose();
             }
         } catch (error) {
             const errorMessage = error.response?.data.errors || { general: 'Error al actualizar el historial. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
+            toast({
+                title: "Error al actualizar historial.",
+                description: "Ocurrió un error al intentar actualizar.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
         }
     };
 
@@ -64,24 +78,22 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
-                        <FormControl isInvalid={!!errors.notas_generales}>
+                        <FormControl isInvalid={!!errors.notas_generales} isRequired>
                             <FormLabel>Notas Generales</FormLabel>
                             <Textarea
                                 value={notasGenerales}
                                 onChange={(e) => setNotasGenerales(e.target.value)}
                                 placeholder="Ingrese las notas generales"
-                                required
                             />
                             <FormErrorMessage>{errors.notas_generales}</FormErrorMessage>
                         </FormControl>
                         
-                        <FormControl mt={4} isInvalid={!!errors.id_odontologo}>
+                        <FormControl mt={4} isInvalid={!!errors.id_odontologo} isRequired>
                             <FormLabel>Odontólogo</FormLabel>
                             <Select
                                 value={selectedOdontologo}
                                 onChange={(e) => setSelectedOdontologo(e.target.value)}
                                 placeholder="Seleccione un odontólogo"
-                                required
                             >
                                 {odontologos.map(odontologo => (
                                     <option key={odontologo.id_odontologo} value={odontologo.id_odontologo}>

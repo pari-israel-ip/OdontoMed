@@ -12,9 +12,9 @@ import {
     Input,
     Textarea,
     Button,
-    FormErrorMessage
+    FormErrorMessage,
+    useToast
 } from '@chakra-ui/react';
-import diagnosticoService from '../services/diagnosticoService';
 import axios from 'axios';
 
 const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => {
@@ -22,6 +22,7 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
     const [descripcion, setDescripcion] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,20 +33,26 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
         };
 
         try {
-         const response = await axios.post('http://127.0.0.1:8000/odomed/diagnostico/create/', nuevoDiagnostico);
-         if (response.data.errors) {
-             setErrors(response.data.errors);
-         } else {
-            console.log(response.data);
-            onCreated(response.data);
-            onClose();
-         }
-     } catch (error) {
-         const errorMessage = error.response?.data.errors || { general: 'Error al crear el rol. Inténtelo de nuevo más tarde.' };
-         setErrors(errorMessage);
-     } finally {
-         setLoading(false);
-     }
+            const response = await axios.post('http://127.0.0.1:8000/odomed/diagnostico/create/', nuevoDiagnostico);
+            if (response.data.errors) {
+                setErrors(response.data.errors);
+            } else {
+                onCreated(response.data);
+                toast({
+                    title: "Diagnóstico creado.",
+                    description: "El diagnóstico ha sido creado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
+                onClose();
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data.errors || { general: 'Error al crear el diagnóstico. Inténtelo de nuevo más tarde.' };
+            setErrors(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -62,7 +69,6 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                             onChange={(e) => setNombreDiagnostico(e.target.value)}
                         />
                         {errors.nombre_diagnostico && <FormErrorMessage>{errors.nombre_diagnostico}</FormErrorMessage>}
-
                     </FormControl>
 
                     <FormControl mt={4} isRequired isInvalid={!!errors.descripcion}>
@@ -72,12 +78,11 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                             onChange={(e) => setDescripcion(e.target.value)}
                         />
                         {errors.descripcion && <FormErrorMessage>{errors.descripcion}</FormErrorMessage>}
-
                     </FormControl>
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+                    <Button colorScheme="blue" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear
                     </Button>
                     <Button variant="ghost" onClick={onClose}>Cancelar</Button>
