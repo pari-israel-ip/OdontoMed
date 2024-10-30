@@ -39,6 +39,11 @@ const ShowUsuarioModal = () => {
             try {
                 const response = await usuarioService.getUsuario(id);
                 setUsuario(response.data);
+                if (response.data.historiales && response.data.historiales.length > 0) {
+                    const historialId = response.data.historiales[0].id_historial;
+                    await loadDiagnosticos(historialId); // Llama a loadDiagnosticos con el primer historial
+                    setIdHistorial(historialId);
+                }
             } catch (error) {
                 console.error('Error fetching usuario:', error);
             }
@@ -210,6 +215,7 @@ const ShowUsuarioModal = () => {
                     idHistorial={idHistorial}  // Enviar idHistorial para la creación
                     onDiagnosticoCreated={loadUsuarios}
                     onCreated={() => {setIsCreateModalOpen(false);
+                        loadDiagnosticos(idHistorial)
                     }}
                     
                 />
@@ -221,6 +227,7 @@ const ShowUsuarioModal = () => {
                     onClose={() => setIsEditDiagnosticoOpen(false)}
                     onSave={() => {
                         setIsEditDiagnosticoOpen(false);
+                        loadDiagnosticos(idHistorial);
                     }}
                 />
             )}
