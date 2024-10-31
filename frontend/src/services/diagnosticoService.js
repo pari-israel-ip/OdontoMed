@@ -8,7 +8,7 @@ const diagnosticoService = {
     getDiagnostico: (id) => axios.get(`${API_URL}${id}/`),
     createDiagnostico: (DiagnosticoData) => axios.post(`${API_URL}create/`, DiagnosticoData),
     updateDiagnostico: (id, DiagnosticoData) => axios.put(`${API_URL}${id}/`, DiagnosticoData),
-    //deleteRole: (id) => axios.delete(`${API_URL}${id}/`)
+    //deleteDiagnostico: (id) => axios.delete(`${API_URL}${id}/`)
 };
 
 export default diagnosticoService;

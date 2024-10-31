@@ -21,6 +21,7 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
     const [nombreTratamiento, setNombreTratamiento] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [fechaTratamiento, setFechaTratamiento] = useState('');
+    const [monto, setMonto] = useState('0');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const toast = useToast();
@@ -28,12 +29,22 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        
+        if (monto < 0) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                monto: "EL MONTO DEBE SER MAYOR O IGUAL A CERO."
+            }));
+            setLoading(false);
+            return;
+        }
 
         const nuevoTratamiento = {
             id_historial: idHistorial,
             nombre_tratamiento: nombreTratamiento,
             descripcion,
-            fecha_tratamiento: fechaTratamiento
+            fecha_tratamiento: fechaTratamiento,
+            monto
         };
 
         try {
@@ -92,6 +103,17 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                             onChange={(e) => setFechaTratamiento(e.target.value)}
                         />
                         {errors.fecha_tratamiento && <FormErrorMessage>{errors.fecha_tratamiento}</FormErrorMessage>}
+                    </FormControl>
+
+                    <FormControl mt={4} isRequired isInvalid={!!errors.monto}>
+                        <FormLabel>Monto</FormLabel>
+                        <Input
+                            type="number"
+                            step="0.01"
+                            value={monto}
+                            onChange={(e) => setMonto(e.target.value)|| 0}
+                        />
+                        {errors.monto && <FormErrorMessage>{errors.monto}</FormErrorMessage>}
                     </FormControl>
                 </ModalBody>
 

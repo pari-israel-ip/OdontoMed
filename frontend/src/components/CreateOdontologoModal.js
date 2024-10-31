@@ -193,7 +193,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                             {errors.telefono && <FormErrorMessage>{errors.telefono}</FormErrorMessage>}
                         </FormControl>
 
-                        <FormControl isInvalid={!!errors.fechaNacimiento} mb={4}>
+                        <FormControl isInvalid={!!errors.fecha_nacimiento} mb={4}>
                             <FormLabel>Fecha de Nacimiento</FormLabel>
                             <Input
                                 type="date"
@@ -201,7 +201,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
                                 required
                             />
-                            {errors.fechaNacimiento && <FormErrorMessage>{errors.fechaNacimiento}</FormErrorMessage>}
+                            {errors.fecha_nacimiento && <FormErrorMessage>{errors.fecha_nacimiento}</FormErrorMessage>}
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.direccion} mb={4}>
@@ -228,7 +228,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                         </FormControl>
 
                         {/* Campos de Odontólogo */}
-                        <FormControl isInvalid={!!errors.numeroLicencia} mb={4}>
+                        <FormControl isInvalid={!!errors.numero_licencia} mb={4}>
                             <FormLabel>Número de Licencia</FormLabel>
                             <Input
                                 placeholder="Número de Licencia"
@@ -236,16 +236,17 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                                 onChange={(e) => setNumeroLicencia(e.target.value)}
                                 required
                             />
-                            {errors.numeroLicencia && <FormErrorMessage>{errors.numeroLicencia}</FormErrorMessage>}
+                            {errors.numero_licencia && <FormErrorMessage>{errors.numero_licencia}</FormErrorMessage>}
                         </FormControl>
 
-                        <FormControl mb={4}>
+                        <FormControl isInvalid={!!errors.especializacion} mb={4}>
                             <FormLabel>Especialización</FormLabel>
                             <Input
                                 placeholder="Especialización (opcional)"
                                 value={especializacion}
                                 onChange={(e) => setEspecializacion(e.target.value)}
                             />
+                            {errors.especializacion && <FormErrorMessage>{errors.especializacion}</FormErrorMessage>}
                         </FormControl>
                     </form>
                 </ModalBody>

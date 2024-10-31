@@ -13,11 +13,14 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';  
 import usuarioService from '../services/usuarioService';
 import EditUsuarioModal from './EditUsuarioModal';
-import EditHistorialModal from './EditHistorialModal'; // Importa el componente de historial
-import EditPacienteModal from './EditPacienteModal'; // Importa el componente de paciente
+import EditHistorialModal from './EditHistorialModal'; 
+import EditPacienteModal from './EditPacienteModal'; 
 import CreateDiagnosticoModal from './CreateDiagnosticoModal';
-import diagnosticoService from '../services/diagnosticoService'; // Importa el servicio de diagnóstico
-import EditDiagnosticoModal from './EditDiagnosticoModal.js'; // Asegúrate de que la ruta sea correcta
+import diagnosticoService from '../services/diagnosticoService'; 
+import EditDiagnosticoModal from './EditDiagnosticoModal.js'; 
+import CreateTratamientoModal from './CreateTratamientoModal.js'
+import tratamientoService from '../services/tratamientoService.js';
+import EditTratamientoModal from './EditTratamientoModal.js';
 
 const ShowUsuarioModal = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -29,8 +32,12 @@ const ShowUsuarioModal = () => {
     const [usuario, setUsuario] = useState(null);
     const [idHistorial, setIdHistorial] = useState(null);  // Variable para guardar el id del historial
     const [diagnosticos, setDiagnosticos] = useState([]); // Estado para diagnosticos
+    const [tratamientos, setTratamientos] = useState([]); // Estado para diagnosticos
+    const [selectedTratamiento, setSelectedTratamiento] = useState(null);
     const [selectedDiagnostico, setSelectedDiagnostico] = useState(null); // Estado para el diagnóstico seleccionado
     const [isEditDiagnosticoOpen, setIsEditDiagnosticoOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
+    const [isCreateTratamientoOpen, setIsCreateTratamientoOpen] = useState(false);
+    const [isEditTratamientoOpen, setIsEditTratamientoOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
 
     const navigate = useNavigate();
     
@@ -41,7 +48,8 @@ const ShowUsuarioModal = () => {
                 setUsuario(response.data);
                 if (response.data.historiales && response.data.historiales.length > 0) {
                     const historialId = response.data.historiales[0].id_historial;
-                    await loadDiagnosticos(historialId); // Llama a loadDiagnosticos con el primer historial
+                    await loadDiagnosticos(historialId);
+                    await loadTratamientos(historialId); // Llama a loadDiagnosticos con el primer historial
                     setIdHistorial(historialId);
                 }
             } catch (error) {
@@ -70,6 +78,15 @@ const ShowUsuarioModal = () => {
         }
     };
 
+    const loadTratamientos = async (historialId) => {
+        try {
+            const response = await tratamientoService.getTratamientosHistorial(historialId);
+            setTratamientos(response.data); // Almacenar los diagnósticos en el estado
+        } catch (error) {
+            console.error('Error fetching tratamientos:', error);
+        }
+    };
+
     const handleEdit = () => {
         setIsEditModalOpen(true);
         loadUsuarios();
@@ -86,17 +103,30 @@ const ShowUsuarioModal = () => {
         setIdHistorial(idHistorial);
         loadDiagnosticos(idHistorial);
     };
-
+    
+    
     const handleEditDiagnostico = (diagnostico) => {
         setSelectedDiagnostico(diagnostico); // Guardar el diagnóstico seleccionado para editar
         setIsEditDiagnosticoOpen(true);
 
     };
-
+    
     const handleEditPaciente = () => {
         setIsEditPacienteOpen(true);
         loadUsuarios();
     };
+
+    const handleCreateTratamiento = (idHistorial) => {
+        setIsCreateTratamientoOpen(true);
+        setIdHistorial(idHistorial);
+        //loadDiagnosticos(idHistorial);
+    };
+
+    const handleEditTratamiento = (tratamiento) => {
+        setSelectedTratamiento(tratamiento); // Guardar el tratamiento seleccionado para editar
+        setIsEditTratamientoOpen(true);
+    };
+
     const onClose = () => {
         navigate('/usuarios');  // Redirige a la lista de usuarios cuando se cierra el modal
     };
@@ -165,9 +195,24 @@ const ShowUsuarioModal = () => {
                         ))}
                         </Box>
                             <Box>
-                                {/* Aquí puedes agregar cualquier contenido adicional que quieras mostrar en la columna de la derecha */}
-                                <Text>Esta es la columna de la derecha, puedes agregar información adicional aquí.</Text>
-                                {/* Puedes añadir más elementos según lo que necesites mostrar */}
+                                <Button colorScheme="green" onClick={() => setIsCreateTratamientoOpen(true)}>
+                                    Crear Nuevo Tratamiento
+                                </Button>
+                                {tratamientos.length > 0 && (
+                                    <Box mt={4}>
+                                        <Text><strong>Tratamientos:</strong></Text>
+                                        {tratamientos.map(tratamiento => (
+                                            <Box key={tratamiento.id_tratamiento} p={2} border="1px solid teal" borderRadius="md">
+                                                <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
+                                                <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
+                                                <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
+                                                <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)}>
+                                                    Editar Tratamiento
+                                                </Button>
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                )}
                             </Box>
                         </Grid>
                     </ModalBody>
@@ -230,6 +275,27 @@ const ShowUsuarioModal = () => {
                         loadDiagnosticos(idHistorial);
                     }}
                 />
+            )}
+            {isCreateTratamientoOpen && (
+                <CreateTratamientoModal
+                    isOpen={isCreateTratamientoOpen}
+                    onClose={() => setIsCreateTratamientoOpen(false)}
+                    idHistorial={idHistorial}  // Enviar el historial correspondiente
+                    onTratamientoCreated={loadUsuarios}
+                    onCreated={() => {
+                        setIsCreateTratamientoOpen(false);
+                        loadTratamientos(idHistorial);
+                    }}
+                />
+            )}
+            {isEditTratamientoOpen && (
+                <EditTratamientoModal 
+                tratamiento={selectedTratamiento} 
+                onClose={() => setIsEditTratamientoOpen(false)} 
+                onSave={() => {
+                    setIsEditTratamientoOpen(false);
+                    loadTratamientos(idHistorial);
+                }}/>
             )}
 
         </>

@@ -95,6 +95,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                 onClose();
             }
         } catch (error) {
+            console.error("Error response:", error.response?.data); // Imprimir la respuesta de error del servidor
             const errorMessage = error.response?.data.errors || { general: 'ERROR AL CREAR EL USUARIO. INTÉNTELO DE NUEVO MÁS TARDE.' };
             setErrors(errorMessage);
         } finally {
