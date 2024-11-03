@@ -29,6 +29,7 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
 
     useEffect(() => {
         if (tratamiento) {
+            console.log(tratamiento);
             setNombreTratamiento(tratamiento.nombre_tratamiento);
             setFechaTratamiento(tratamiento.fecha_tratamiento);
             setDescripcion(tratamiento.descripcion || '');

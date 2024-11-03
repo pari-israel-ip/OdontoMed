@@ -135,7 +135,7 @@ class Prescripciones(models.Model):
     id_historial = models.ForeignKey(HistorialesClinicos, on_delete=models.SET_NULL, null=True, db_column='id_historial')
     nombre_medicamento = models.CharField(max_length=100, null=True, blank=True)
     dosis = models.CharField(max_length=50, null=True, blank=True)
-    fecha_inicio = models.DateField(null=True, blank=True)
+    fecha_inicio = models.DateField(auto_now_add=True)
     fecha_fin = models.DateField(null=True, blank=True)
     activo = models.BooleanField(default=True)
 

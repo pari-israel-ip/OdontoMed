@@ -23,6 +23,10 @@ import EditDiagnosticoModal from './EditDiagnosticoModal.js';
 import CreateTratamientoModal from './CreateTratamientoModal.js'
 import tratamientoService from '../services/tratamientoService.js';
 import EditTratamientoModal from './EditTratamientoModal.js';
+import CreatePrescriptionModal from './CreatePrescriptionModal';
+import prescripcionService from '../services/prescripcionService.js'
+import EditPrescriptionModal from './EditPrescriptionModal.js';
+
 
 const ShowUsuarioModal = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -35,11 +39,16 @@ const ShowUsuarioModal = () => {
     const [idHistorial, setIdHistorial] = useState(null);  // Variable para guardar el id del historial
     const [diagnosticos, setDiagnosticos] = useState([]); // Estado para diagnosticos
     const [tratamientos, setTratamientos] = useState([]); // Estado para diagnosticos
+    const [prescripciones, setPrescripciones] = useState([]); // Estado para diagnosticos
     const [selectedTratamiento, setSelectedTratamiento] = useState(null);
+    const [selectedPrescripcion, setSelectedPrescripcion] = useState(null);
     const [selectedDiagnostico, setSelectedDiagnostico] = useState(null); // Estado para el diagnóstico seleccionado
     const [isEditDiagnosticoOpen, setIsEditDiagnosticoOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const [isCreateTratamientoOpen, setIsCreateTratamientoOpen] = useState(false);
     const [isEditTratamientoOpen, setIsEditTratamientoOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
+    const [isCreatePrescriptionOpen, setIsCreatePrescriptionOpen] = useState(false); // Estado para modal de prescripción
+    const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
+
 
     const navigate = useNavigate();
     
@@ -51,7 +60,8 @@ const ShowUsuarioModal = () => {
                 if (response.data.historiales && response.data.historiales.length > 0) {
                     const historialId = response.data.historiales[0].id_historial;
                     await loadDiagnosticos(historialId);
-                    await loadTratamientos(historialId); // Llama a loadDiagnosticos con el primer historial
+                    await loadTratamientos(historialId); 
+                    await loadPrescripciones(historialId);// Llama a loadDiagnosticos con el primer historial
                     setIdHistorial(historialId);
                 }
             } catch (error) {
@@ -90,6 +100,15 @@ const ShowUsuarioModal = () => {
             setTratamientos({});
         }
     };
+    const loadPrescripciones = async (historialId) => {
+        try {
+            const response = await prescripcionService.getPrescripcionHistorial(historialId);
+            setPrescripciones(response.data); 
+        } catch (error) {
+            console.error('Error fetching prescripciones:', error);
+            setPrescripciones({});
+        }
+    };
 
     const handleEdit = () => {
         setIsEditModalOpen(true);
@@ -125,11 +144,20 @@ const ShowUsuarioModal = () => {
         setIdHistorial(idHistorial);
         //loadDiagnosticos(idHistorial);
     };
-
+    const handleCreatePrescription = () => {
+        setIsCreatePrescriptionOpen(true);
+    };
     const handleEditTratamiento = (tratamiento) => {
         setSelectedTratamiento(tratamiento); // Guardar el tratamiento seleccionado para editar
         setIsEditTratamientoOpen(true);
     };
+
+    const handleEditPrescripcion = (prescripcion) => {
+        setSelectedPrescripcion(prescripcion);
+        //console.log(prescripcion);
+        setIsEditPrescripcionOpen(true); // Abre el modal
+    };
+    
 
     const handleDeleteDiagnostico = async (id_diagnostico) => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
@@ -149,6 +177,18 @@ const ShowUsuarioModal = () => {
             try {
                 await tratamientoService.deleteTratamiento(id_tratamiento);
                 loadTratamientos(idHistorial);
+            } catch (error) {
+                console.error('Error deleting diagnostico:', error);
+            }
+        }
+    };
+
+    const handleDeletePrescripcion = async (id_medicamento) => {
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar esta prescripcion?");
+        if (confirmDelete) {
+            try {
+                await prescripcionService.deletePrescripcion(id_medicamento);
+                loadPrescripciones(idHistorial);
             } catch (error) {
                 console.error('Error deleting diagnostico:', error);
             }
@@ -251,15 +291,60 @@ const ShowUsuarioModal = () => {
                                                     size="sm"
                                                     onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)}
                                                 />
+                                                
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                )}
+                                <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>
+                                    Crear Nueva Prescripción
+                                </Button>
+                                {prescripciones.length > 0 && (
+                                    <Box mt={4}>
+                                        <Text><strong>Prescripciones:</strong></Text>
+                                        {prescripciones.map(prescripcion => (
+                                            <Box key={prescripcion.id_medicamento} p={2} border="1px solid teal" borderRadius="md">
+                                                <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
+                                                <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
+                                                <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
+                                                <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
+                                                <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)}>
+                                                    Editar Prescripcion
+                                                </Button>
+                                                <IconButton
+                                                    icon={<DeleteIcon />}
+                                                    colorScheme="red"
+                                                    size="sm"
+                                                    onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)}
+                                                />
+                                                
                                             </Box>
                                         ))}
                                     </Box>
                                 )}
                             </Box>
+                            <Box>
+                                
+                            </Box>
+                            
                         </Grid>
                     </ModalBody>
                 </ModalContent>
             </Modal>
+
+           
+            {isCreatePrescriptionOpen && (
+                <CreatePrescriptionModal
+                    isOpen={isCreatePrescriptionOpen}
+                    onClose={() => setIsCreatePrescriptionOpen(false)}
+                    idHistorial={idHistorial}
+                    onPrescriptionCreated={() => {
+                        setIsCreatePrescriptionOpen(false);
+                        loadPrescripciones(idHistorial);
+                        // Aquí puedes actualizar la lista de prescripciones si es necesario
+                    }}
+                />
+            )}
 
             {isEditModalOpen && (
                 <EditUsuarioModal usuario={usuario} onClose={() => setIsEditModalOpen(false)} 
@@ -339,6 +424,17 @@ const ShowUsuarioModal = () => {
                     loadTratamientos(idHistorial);
                 }}/>
             )}
+
+            {isEditPrescripcionOpen && (
+                <EditPrescriptionModal 
+                prescripcion={selectedPrescripcion} 
+                onClose={() => setIsEditPrescripcionOpen(false)} 
+                onSave={() => {
+                    setIsEditPrescripcionOpen(false);
+                    loadPrescripciones(idHistorial);
+
+                }} />
+            )}      
 
         </>
     );

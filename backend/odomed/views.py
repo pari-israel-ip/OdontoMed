@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos
+from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos, Prescripciones
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
@@ -16,6 +16,8 @@ from django.utils.dateparse import parse_date
 import json
 import re
 from datetime import datetime, timedelta
+from django.utils import timezone
+
 
 def home(request):
     return HttpResponse("Bienvenido a la API de Odomed.")
@@ -915,3 +917,108 @@ def tratamiento_detail(request, id_tratamiento):
         tratamiento.activo = False  # Eliminación lógica
         tratamiento.save()
         return JsonResponse({"message": "Tratamiento eliminado exitosamente."})
+    
+@csrf_exempt
+def prescripcion_list(request, id_historial):
+    if request.method == 'GET':
+        tratamientos = list(Prescripciones.objects.filter(id_historial=id_historial, activo=True).order_by('-fecha_inicio').values())
+
+        if not tratamientos:
+            return JsonResponse({'error': 'NO SE ENCONTRARON PRESCRIPCIONES PARA ESE ID_HISTORIAL'}, status=404)
+
+        return JsonResponse(tratamientos, safe=False)
+
+@csrf_exempt
+def prescripcion_create(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            id_historial = data.get('id_historial')
+            prescripciones = data.get('prescripciones')
+
+            if not id_historial or not prescripciones:
+                return JsonResponse({'error': 'Faltan datos requeridos.'}, status=400)
+
+            # Procesar las prescripciones
+            for prescripcion in prescripciones:
+                # Asegúrate de que cada prescripción tenga los campos requeridos
+                nombre_medicamento = prescripcion.get('nombre_medicamento')
+                dosis = prescripcion.get('dosis')
+                fecha_fin = prescripcion.get('fecha_fin')
+
+                if not nombre_medicamento or not dosis or not fecha_fin:
+                    return JsonResponse({'error': 'Faltan datos en la prescripción.'}, status=400)
+
+                nueva_prescripcion = Prescripciones(
+                    id_historial_id=id_historial,  # Usa el campo foráneo id_historial
+                    nombre_medicamento=nombre_medicamento.upper(),
+                    dosis=dosis.upper(),
+                    fecha_fin=fecha_fin,
+                    activo=True  # Asumimos que todas las prescripciones son activas al crearlas
+                )
+                nueva_prescripcion.save()
+
+            return JsonResponse({'message': 'Prescripciones creadas con éxito.'}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Formato de JSON no válido.'}, status=400)
+
+    return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
+dosis_pattern = re.compile(r'^[A-Za-z0-9 ]+$')   # Ajusta según sea necesario
+
+@csrf_exempt
+def prescripcion_detail(request, id_medicamento):
+    prescripcion = get_object_or_404(Prescripciones, id_medicamento=id_medicamento)
+
+    if request.method == 'GET':
+        return JsonResponse({
+            "id_medicamento": prescripcion.id_medicamento,
+            "id_historial": prescripcion.id_historial.id_historial,
+            "nombre_medicamento": prescripcion.nombre_medicamento,
+            "dosis": prescripcion.dosis,
+            "fecha_inicio": prescripcion.fecha_inicio.strftime('%Y-%m-%d'),
+            "fecha_fin": prescripcion.fecha_fin.strftime('%Y-%m-%d'),
+            "activo": prescripcion.activo,
+        })
+    if request.method == 'PUT':
+        data = json.loads(request.body.decode('utf-8'))
+        errors = {}
+        # Actualizar los campos de la prescripción con los datos recibidos
+        nombre_medicamento = data.get('nombre_medicamento', prescripcion.nombre_medicamento).upper()
+        dosis = data.get('dosis', prescripcion.dosis).upper()
+        fecha_fin = data.get('fecha_fin', prescripcion.fecha_fin.strftime('%Y-%m-%d'))
+
+        if not (5 <= len(nombre_medicamento) <= 50):
+            errors['nombre_medicamento'] = 'EL NOMBRE DEL MEDICAMENTO DEBE TENER ENTRE 5 Y 50 CARACTERES.'
+        elif not nombre_pattern.match(nombre_medicamento):
+            errors['nombre_medicamento'] = 'EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'
+        if not (3 <= len(dosis) <= 200):
+            errors['dosis'] = 'LA DOSIS DEBE TENER ENTRE 5 Y 200 CARACTERES.'
+    
+        if fecha_fin:
+            try:
+                fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d')
+                if fecha_fin < datetime.now() or fecha_fin > datetime.now() + timedelta(days=30 * 1):
+                    errors['fecha_fin'] = 'La fecha de fin debe estar entre hoy y los próximos 30 días.'
+            except ValueError:
+                errors['fecha_fin'] = 'La fecha fin debe tener el formato correcto (YYYY-MM-DD).'
+
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+
+        # Actualizar los campos de la prescripción
+        prescripcion.nombre_medicamento = nombre_medicamento.upper()
+        prescripcion.dosis = dosis.upper()
+        prescripcion.fecha_fin = fecha_fin
+
+        # Guardar la prescripción
+        prescripcion.save()
+
+        return JsonResponse({
+            'message': 'PRESCRIPCIÓN ACTUALIZADA EXITOSAMENTE'
+        }, status=200)
+
+    elif request.method == 'DELETE':
+        prescripcion.activo = False  # Eliminación lógica
+        prescripcion.save()
+        return JsonResponse({"message": "Prescripción eliminada exitosamente."})
