@@ -77,6 +77,14 @@ def rol_detail(request, id_rol):
     elif request.method == 'GET':
         return JsonResponse(rol)
     elif request.method == 'DELETE':
+        linked_users = Usuario.objects.filter(rol=rol, activo=True)  # Replace `is_active` with your field for active users
+
+        if linked_users.exists():
+            # Return an error message if there are active users linked to this role
+            return JsonResponse({
+                'error': 'No se puede eliminar este rol porque hay usuarios vinculados a él.'
+            }, status=400)
+
         rol.activo = False
         rol.save()
         return JsonResponse({'message': 'Rol eliminado lógicamente'})

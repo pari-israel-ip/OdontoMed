@@ -12,6 +12,10 @@ import {
     Td,
     IconButton,
     Flex,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
@@ -19,6 +23,7 @@ import EditRoleModal from './EditRoleModal';
 import CreateRoleModal from './CreateRoleModal';
 
 const RolesComponent = () => {
+    const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
     const [roles, setRoles] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -41,9 +46,11 @@ const RolesComponent = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este rol?");
         if (confirmDelete) {
             try {
-                await roleService.deleteRole(id_rol);
+                const response = await roleService.deleteRole(id_rol);
+                setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
                 loadRoles();
             } catch (error) {
+                setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el odontólogo' });
                 console.error('Error deleting role:', error);
             }
         }
@@ -79,6 +86,21 @@ const RolesComponent = () => {
     return (
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>Roles</Heading>
+
+            {message && (
+                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+                    <AlertIcon />
+                    {message.type === 'error' ? (
+                        <>
+                            <AlertTitle>Error:</AlertTitle>
+                            <AlertDescription>{message.text}</AlertDescription>
+                        </>
+                    ) : (
+                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
+                    )}
+                </Alert>
+            )}
+
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
                 Crear Nuevo Rol
             </Button>
