@@ -18,7 +18,6 @@ import re
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
-from .decorators import jwt_required  # Asegúrate de que el import sea correcto
 
 
 
