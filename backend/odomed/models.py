@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password
+
 
 
 # Model for Roles table
@@ -27,6 +29,11 @@ class Usuario(models.Model):
     contrasenia = models.CharField(max_length=255)
     activo = models.BooleanField(default=True)
     codigo = models.IntegerField(default=0)
+    def save(self, *args, **kwargs):
+        # Encripta la contraseña antes de guardar
+        if self.contrasenia and not self.contrasenia.startswith('pbkdf2_sha256$'):
+            self.contrasenia = make_password(self.contrasenia)
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'usuarios'

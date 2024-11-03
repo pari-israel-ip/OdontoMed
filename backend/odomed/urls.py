@@ -2,9 +2,6 @@ from django.urls import path
 from .views import prescripcion_detail, prescripcion_list, prescripcion_create, tratamiento_costo, tratamiento_detail, tratamiento_list,tratamiento_create, odontologo_detail,odontologo_create,diagnostico_list, diagnostico_create, diagnostico_detail, login, rol_list, rol_detail, rol_create,usuario_list,rol_list_paciente,usuario_detail,usuario_create, odontologo_list, paciente_detail,historial_detail
 from django.http import HttpResponse
 
-
-
-
 def odomed_home(request):
     return HttpResponse("Bienvenido a Odomed.")
 
@@ -35,4 +32,5 @@ urlpatterns = [
     path('prescripcion/<int:id_medicamento>/', prescripcion_detail, name='prescripcion_detail'),  
 
     path('login/', login, name='login'),  # Ruta para el login
+
 ]

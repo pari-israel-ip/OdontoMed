@@ -17,6 +17,10 @@ import json
 import re
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.contrib.auth.hashers import check_password
+from .decorators import jwt_required  # Asegúrate de que el import sea correcto
+
+
 
 
 def home(request):
@@ -419,10 +423,15 @@ def login(request):
         contrasenia = data.get('contrasenia')
 
         try:
-            usuario = Usuario.objects.get(email=email, contrasenia=contrasenia)
-            return JsonResponse({'message': 'Login exitoso', 'usuario_id': usuario.id_usuario}, status=200)
+            usuario = Usuario.objects.get(email=email)
+            # Verifica la contraseña
+            if check_password(contrasenia, usuario.contrasenia):
+                return JsonResponse({'message': 'Login exitoso', 'usuario_id': usuario.id_usuario}, status=200)
+            else:
+                return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
         except Usuario.DoesNotExist:
             return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
+    
     return JsonResponse({'message': 'Método no permitido'}, status=405)
 
 @csrf_exempt

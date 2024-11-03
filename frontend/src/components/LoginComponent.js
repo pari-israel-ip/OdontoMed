@@ -16,6 +16,10 @@ const LoginComponent = () => {
             const response = await loginService.login(email, contrasenia);
             setMessage(response.data.message);
             setIsError(false);
+            
+            // Guardar el token en el local storage
+            localStorage.setItem('token', response.data.token);  // Asumiendo que el token se envía en la respuesta
+
             // Redirige a la ruta /usuarios después del inicio de sesión exitoso
             navigate('/usuarios');
         } catch (error) {
