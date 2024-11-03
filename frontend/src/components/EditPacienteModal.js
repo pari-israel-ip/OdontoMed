@@ -1,5 +1,5 @@
 // src/components/EditPacienteModal.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -11,7 +11,8 @@ import {
     FormLabel,
     Input,
     Button,
-    FormErrorMessage
+    FormErrorMessage,
+    useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -20,9 +21,11 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
     const [alergias, setAlergias] = useState(paciente.alergias || '');
     const [antecedentesMedicos, setAntecedentesMedicos] = useState(paciente.antecedentes_medicos || '');
     const [errors, setErrors] = useState({});
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrors({});
         try {
             const response = await axios.put(`http://127.0.0.1:8000/odomed/paciente/${paciente.id_usuario}/`, {
                 seguro_medico: seguroMedico,
@@ -33,6 +36,13 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Paciente actualizado.",
+                    description: "El paciente ha sido actualizado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onSave(response.data);
                 onClose(); // Cerrar el modal después de guardar
             }

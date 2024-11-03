@@ -8,8 +8,10 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid
+    Box, Grid, IconButton
 } from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+
 import { useParams, useNavigate } from 'react-router-dom';  
 import usuarioService from '../services/usuarioService';
 import EditUsuarioModal from './EditUsuarioModal';
@@ -75,15 +77,17 @@ const ShowUsuarioModal = () => {
             setDiagnosticos(response.data); // Almacenar los diagnósticos en el estado
         } catch (error) {
             console.error('Error fetching diagnosticos:', error);
+            setDiagnosticos({});
         }
     };
 
     const loadTratamientos = async (historialId) => {
         try {
             const response = await tratamientoService.getTratamientosHistorial(historialId);
-            setTratamientos(response.data); // Almacenar los diagnósticos en el estado
+            setTratamientos(response.data); 
         } catch (error) {
             console.error('Error fetching tratamientos:', error);
+            setTratamientos({});
         }
     };
 
@@ -126,6 +130,31 @@ const ShowUsuarioModal = () => {
         setSelectedTratamiento(tratamiento); // Guardar el tratamiento seleccionado para editar
         setIsEditTratamientoOpen(true);
     };
+
+    const handleDeleteDiagnostico = async (id_diagnostico) => {
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
+        if (confirmDelete) {
+            try {
+                await diagnosticoService.deleteDiagnostico(id_diagnostico);
+                loadDiagnosticos(idHistorial);
+            } catch (error) {
+                console.error('Error deleting diagnostico:', error);
+            }
+        }
+    };
+
+    const handleDeleteTratamiento = async (id_tratamiento) => {
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
+        if (confirmDelete) {
+            try {
+                await tratamientoService.deleteTratamiento(id_tratamiento);
+                loadTratamientos(idHistorial);
+            } catch (error) {
+                console.error('Error deleting diagnostico:', error);
+            }
+        }
+    };
+
 
     const onClose = () => {
         navigate('/usuarios');  // Redirige a la lista de usuarios cuando se cierra el modal
@@ -186,6 +215,12 @@ const ShowUsuarioModal = () => {
                                                 <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)}>
                                                     Editar Diagnóstico
                                                 </Button>
+                                                <IconButton
+                                                    icon={<DeleteIcon />}
+                                                    colorScheme="red"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)}
+                                                />
                                             </Box>
                                         ))}
                                     </Box>
@@ -206,9 +241,16 @@ const ShowUsuarioModal = () => {
                                                 <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
                                                 <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
                                                 <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
+                                                <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento}</Text>
                                                 <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)}>
                                                     Editar Tratamiento
                                                 </Button>
+                                                <IconButton
+                                                    icon={<DeleteIcon />}
+                                                    colorScheme="red"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)}
+                                                />
                                             </Box>
                                         ))}
                                     </Box>

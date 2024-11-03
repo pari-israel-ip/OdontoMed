@@ -31,23 +31,67 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
         }
     }, [diagnostico]);
 
+    const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        const currentDate = new Date();
+        const maxDate = new Date(currentDate);
+        maxDate.setMonth(maxDate.getMonth() + 1);
+        const previousDate = new Date(diagnostico.fecha_diagnostico);
+        const formattedPreviousDate = formatDate(previousDate);
+
+        if (!nombreDiagnostico || nombreDiagnostico.length < 5 || nombreDiagnostico.length > 50) {
+            newErrors.nombre_diagnostico = "EL NOMBRE DEL DIAGNÓSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES.";
+        }
+        if (!fechaDiagnostico) {
+            newErrors.fecha_diagnostico = "LA FECHA DEL DIAGNÓSTICO ES OBLIGATORIA.";
+        } else {
+            const selectedDate = new Date(fechaDiagnostico);
+            if (selectedDate < previousDate) {
+                newErrors.fecha_diagnostico = `LA FECHA NO PUEDE SER ANTERIOR A ${formattedPreviousDate}.`;
+            } else if (selectedDate > maxDate) {
+                newErrors.fecha_diagnostico = "LA FECHA NO PUEDE SER MAYOR A UN MES EN ADELANTE.";
+            }
+        }
+        if (!descripcion || descripcion.length < 5 || descripcion.length > 200) {
+            newErrors.descripcion = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES.";
+        }
+        return newErrors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
         try {
-            await diagnosticoService.updateDiagnostico(diagnostico.id_diagnostico, {
+            const response = await diagnosticoService.updateDiagnostico(diagnostico.id_diagnostico, {
                 nombre_diagnostico: nombreDiagnostico,
                 fecha_diagnostico: fechaDiagnostico,
                 descripcion: descripcion
             });
-            toast({
-                title: "Diagnóstico actualizado.",
-                description: "El diagnóstico ha sido actualizado exitosamente.",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
-            onSave();
-            onClose();
+            if (response.data.errors) {
+                setErrors(response.data.errors);
+            } else {
+                toast({
+                    title: "Diagnóstico actualizado.",
+                    description: "El diagnóstico ha sido actualizado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
+                onSave(response.data);
+                onClose();
+            }
         } catch (error) {
             console.error('Error updating diagnostico:', error);
             toast({

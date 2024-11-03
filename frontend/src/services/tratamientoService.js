@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8000/odomed/tratamiento/';  // Ajusta según t
 const tratamientoService = {
     getTratamientosHistorial: (id) => axios.get(`${API_URL}historial/${id}/`),
     getTratamiento: (id) => axios.get(`${API_URL}${id}/`),
+    getCosto: (id) => axios.get(`${API_URL}costo/${id}/`),
     createTratamiento: (tratamientoData) => axios.post(`${API_URL}create/`, tratamientoData),
     updateTratamiento: (id, tratamientoData) => axios.put(`${API_URL}${id}/`, tratamientoData),
     deleteTratamiento: (id) => axios.delete(`${API_URL}${id}/`)

@@ -52,15 +52,7 @@ const NavComponentLogin = () => {
                     <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Roles</Text>
                     </Link>
-                    <Link href="/acerca" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Pacientes</Text>
-                    </Link>
-                    <Link href="/servicios" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Personal</Text>
-                    </Link>
-                    <Link href="/contacto" _hover={{ textDecoration: 'none', color: '#319795' }}>
-                        <Text>Citas</Text>
-                    </Link>
+                    
                     <Text></Text>
                     <Button onClick={handleLogout} colorScheme="teal">Cerrar sesión</Button>
                 </Flex>

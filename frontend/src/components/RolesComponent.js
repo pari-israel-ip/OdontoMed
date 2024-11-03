@@ -1,5 +1,19 @@
+// RolesComponent.js
 import React, { useEffect, useState } from 'react';
-import { Button, Heading, List, ListItem, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Heading,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    IconButton,
+    Flex,
+} from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
 import EditRoleModal from './EditRoleModal';
 import CreateRoleModal from './CreateRoleModal';
@@ -24,11 +38,14 @@ const RolesComponent = () => {
     };
 
     const handleDelete = async (id_rol) => {
-        try {
-            await roleService.deleteRole(id_rol);
-            loadRoles();
-        } catch (error) {
-            console.error('Error deleting role:', error);
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este rol?");
+        if (confirmDelete) {
+            try {
+                await roleService.deleteRole(id_rol);
+                loadRoles();
+            } catch (error) {
+                console.error('Error deleting role:', error);
+            }
         }
     };
 
@@ -53,26 +70,51 @@ const RolesComponent = () => {
     const handleCreate = async (newRole) => {
         try {
             await roleService.createRole(newRole);
+            loadRoles(); // Recargar los roles después de crear
         } catch (error) {
             console.error('Error creating role:', error);
-        } 
+        }
     };
 
     return (
-        <div>
+        <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>Roles</Heading>
-            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>Crear Nuevo Rol</Button>
-            <List spacing={3} mt={4}>
-                {roles.map(role => (
-                    <ListItem key={role.id_rol} display="flex" justifyContent="space-between" alignItems="center">
-                        {role.nombre_rol}
-                        <div>
-                            <Button size="sm" colorScheme="blue" onClick={() => handleEdit(role)}>Edit</Button>
-                            <Button size="sm" colorScheme="red" onClick={() => handleDelete(role.id_rol)}>Delete</Button>
-                        </div>
-                    </ListItem>
-                ))}
-            </List>
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
+                Crear Nuevo Rol
+            </Button>
+
+            <Table variant="striped" colorScheme="teal">
+                <Thead>
+                    <Tr>
+                        <Th>Nombre del Rol</Th>
+                        <Th>Acciones</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {roles.map(role => (
+                        <Tr key={role.id_rol}>
+                            <Td>{role.nombre_rol}</Td>
+                            <Td>
+                                <Flex justify="space-between">
+                                    <IconButton
+                                        icon={<EditIcon />}
+                                        colorScheme="blue"
+                                        size="sm"
+                                        onClick={() => handleEdit(role)}
+                                        mr={2}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        size="sm"
+                                        onClick={() => handleDelete(role.id_rol)}
+                                    />
+                                </Flex>
+                            </Td>
+                        </Tr>
+                    ))}
+                </Tbody>
+            </Table>
 
             {isEditModalOpen && (
                 <EditRoleModal
@@ -88,7 +130,7 @@ const RolesComponent = () => {
                     onCreate={handleCreate}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 

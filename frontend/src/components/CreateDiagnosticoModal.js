@@ -15,36 +15,32 @@ import {
     FormErrorMessage,
     useToast
 } from '@chakra-ui/react';
-import tratamientoService from '../services/tratamientoService';
+import axios from 'axios';
 
-const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => {
-    const [nombreTratamiento, setNombreTratamiento] = useState('');
+const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => {
+    const [nombreDiagnostico, setNombreDiagnostico] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [fechaTratamiento, setFechaTratamiento] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-
-        const nuevoTratamiento = {
-            id_historial: idHistorial,
-            nombre_tratamiento: nombreTratamiento,
-            descripcion,
-            fecha_tratamiento: fechaTratamiento
+        const nuevoDiagnostico = {
+            id_historial: idHistorial,  // Usar el id_historial proporcionado
+            nombre_diagnostico: nombreDiagnostico,
+            descripcion
         };
 
         try {
-            const response = await tratamientoService.createTratamiento(nuevoTratamiento);
+            const response = await axios.post('http://127.0.0.1:8000/odomed/diagnostico/create/', nuevoDiagnostico);
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
                 onCreated(response.data);
                 toast({
-                    title: "Tratamiento creado.",
-                    description: "El tratamiento ha sido creado exitosamente.",
+                    title: "Diagnóstico creado.",
+                    description: "El diagnóstico ha sido creado exitosamente.",
                     status: "success",
                     duration: 3000,
                     isClosable: true,
@@ -52,7 +48,7 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                 onClose();
             }
         } catch (error) {
-            const errorMessage = error.response?.data.errors || { general: 'Error al crear el tratamiento. Inténtelo de nuevo más tarde.' };
+            const errorMessage = error.response?.data.errors || { general: 'Error al crear el diagnóstico. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
         } finally {
             setLoading(false);
@@ -63,16 +59,16 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Crear Tratamiento</ModalHeader>
+                <ModalHeader>Crear Diagnóstico</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl isRequired isInvalid={!!errors.nombre_tratamiento}>
-                        <FormLabel>Nombre del Tratamiento</FormLabel>
+                    <FormControl isRequired isInvalid={!!errors.nombre_diagnostico}>
+                        <FormLabel>Nombre del Diagnóstico</FormLabel>
                         <Input
-                            value={nombreTratamiento}
-                            onChange={(e) => setNombreTratamiento(e.target.value)}
+                            value={nombreDiagnostico}
+                            onChange={(e) => setNombreDiagnostico(e.target.value)}
                         />
-                        {errors.nombre_tratamiento && <FormErrorMessage>{errors.nombre_tratamiento}</FormErrorMessage>}
+                        {errors.nombre_diagnostico && <FormErrorMessage>{errors.nombre_diagnostico}</FormErrorMessage>}
                     </FormControl>
 
                     <FormControl mt={4} isRequired isInvalid={!!errors.descripcion}>
@@ -82,16 +78,6 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                             onChange={(e) => setDescripcion(e.target.value)}
                         />
                         {errors.descripcion && <FormErrorMessage>{errors.descripcion}</FormErrorMessage>}
-                    </FormControl>
-
-                    <FormControl mt={4} isRequired isInvalid={!!errors.fecha_tratamiento}>
-                        <FormLabel>Fecha del Tratamiento</FormLabel>
-                        <Input
-                            type="date"
-                            value={fechaTratamiento}
-                            onChange={(e) => setFechaTratamiento(e.target.value)}
-                        />
-                        {errors.fecha_tratamiento && <FormErrorMessage>{errors.fecha_tratamiento}</FormErrorMessage>}
                     </FormControl>
                 </ModalBody>
 
@@ -106,4 +92,4 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
     );
 };
 
-export default CreateTratamientoModal;
+export default CreateDiagnosticoModal;

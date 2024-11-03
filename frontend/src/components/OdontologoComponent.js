@@ -1,4 +1,3 @@
-// src/components/OdontologosComponent.js
 import React, { useEffect, useState } from 'react';
 import {
     Box,
@@ -12,6 +11,10 @@ import {
     Td,
     IconButton,
     Flex,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
@@ -20,6 +23,7 @@ import CreateOdontologoModal from './CreateOdontologoModal'; // Ruta al modal de
 
 const OdontologosComponent = () => {
     const [odontologos, setOdontologos] = useState([]);
+    const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
     const navigate = useNavigate(); // Usa useNavigate para redirigir
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -30,40 +34,53 @@ const OdontologosComponent = () => {
     const loadOdontologos = async () => {
         try {
             const response = await odontologoService.getOdontologos();
-            console.log(response); // Para ver la respuesta completa
             setOdontologos(response.data);
         } catch (error) {
             console.error('Error fetching odontólogos:', error);
         }
     };
     
-    
     const handleDelete = async (id_odontologo) => {
-        console.log("id a borrar:", id_odontologo)
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Odontólogo?");
         if (confirmDelete) {
             try {
-                await odontologoService.deleteOdontologos(id_odontologo);
+                const response = await odontologoService.deleteOdontologos(id_odontologo);
+                setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
                 loadOdontologos();
             } catch (error) {
+                // Captura y muestra el mensaje de error desde el servidor
+                setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el odontólogo' });
                 console.error('Error deleting odontólogo:', error);
             }
         }
     };
 
     const handleCreate = (newOdontologo) => {
-        // Aquí puedes actualizar la lista de odontólogos o simplemente volver a cargar
         setOdontologos((prevOdontologos) => [...prevOdontologos, newOdontologo]);
-        setIsCreateModalOpen(false); // Cierra el modal
+        setIsCreateModalOpen(false);
     };
 
     const handleShow = (odontologoId) => {
-        navigate(`/odontologos/${odontologoId}`); // Redirigir a la ruta del modal
+        navigate(`/odontologos/${odontologoId}`);
     };
 
     return (
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>Odontólogos</Heading>
+
+            {message && (
+                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+                    <AlertIcon />
+                    {message.type === 'error' ? (
+                        <>
+                            <AlertTitle>Error:</AlertTitle>
+                            <AlertDescription>{message.text}</AlertDescription>
+                        </>
+                    ) : (
+                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
+                    )}
+                </Alert>
+            )}
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
                 Crear Nuevo Odontólogo
@@ -92,7 +109,7 @@ const OdontologosComponent = () => {
                                         icon={<InfoIcon />}
                                         colorScheme="cyan"
                                         size="sm"
-                                        onClick={() => handleShow(odontologo.id_odontologo)} // Redirigir a la ruta del modal
+                                        onClick={() => handleShow(odontologo.id_odontologo)}
                                         mr={2}
                                     />
                                     <IconButton

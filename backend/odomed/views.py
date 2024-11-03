@@ -450,18 +450,18 @@ def odontologo_create(request):
         
         nombres_regex = re.compile(r'^[A-Z\s]+$')
         if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
-            errors['nombres'] = 'Nombres inválidos.'
+            errors['nombres'] = 'El campo Nombres debe ser entre 3 a 100 caracteres.'
         
         apellidos = data.get('apellidos', '').strip().upper()
         
         if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
-            errors['apellidos'] = 'Apellidos inválidos.'
+            errors['apellidos'] = 'El campo Apellidos debe ser entre 3 a 100 caracteres.'
 
         
         ci = data.get('ci', '').strip()
         
         if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
-            errors['ci'] = 'Cédula de identidad inválida o ya en uso.'
+            errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
         
         email = data.get('email', '').strip().upper()
         
@@ -476,14 +476,14 @@ def odontologo_create(request):
         if fecha_nacimiento:
             try:
                 fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
-                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 3):
-                    errors['fecha_nacimiento'] = 'Fecha de nacimiento inválida.'
+                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 20):
+                    errors['fecha_nacimiento'] = 'La Fecha de nacimiento debe ser entre 80 a 20 años atras a la fecha actual.'
             except ValueError:
                 errors['fecha_nacimiento'] = 'Formato incorrecto para la fecha de nacimiento.'
         contrasenia = data.get('contrasenia', '')
         password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
         if not password_regex.match(contrasenia):
-            errors['contrasenia'] = 'Contraseña insegura.'
+            errors['contrasenia'] = 'Contraseña insegura: debe tener entre minimamente 8 caarcteres, letra, numeros y simbolo.'
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
@@ -493,7 +493,7 @@ def odontologo_create(request):
         # Validaciones para datos específicos de Odontologo
         numero_licencia = data.get('numero_licencia', '').strip().upper()
         if not numero_licencia or len(numero_licencia) < 5 or len(numero_licencia) > 50:
-            errors['numero_licencia'] = 'Número de licencia inválido.'
+            errors['numero_licencia'] = 'Número de licencia inválido de 5 a 50 caracteres.'
 
         especializacion = data.get('especializacion', '').strip().upper()
         if not re.match(r'^[A-Z\s]+$', especializacion):  # Only uppercase letters and spaces
@@ -554,6 +554,12 @@ def odontologo_detail(request, id_usuario):
         # Fetch the related Odontologos instance
         odontologo = get_object_or_404(Odontologos, id_odontologo=usuario)
 
+        historial_exists = HistorialesClinicos.objects.filter(id_odontologo=odontologo).exists()
+    
+        if historial_exists:
+            return JsonResponse({'error': 'NO SE PUEDE ELIMINAR. EXISTE UN HISTORIAL ASOCIADO AL ODONTÓLOGO'}, status=400)
+
+
         # Perform logical deletion
         usuario.activo = False
         usuario.save()
@@ -562,7 +568,8 @@ def odontologo_detail(request, id_usuario):
         odontologo.activo = False
         odontologo.save()
 
-        return JsonResponse({'message': 'Usuario y odontólogo eliminados lógicamente'}, status=204)
+        return JsonResponse({'success': 'ODONTÓLOGO ELIMINADOS LÓGICAMENTE'}, status=200)
+        
     if request.method == 'PUT':
         # Retrieve the Odontologos instance based on id_odontologo
         odontologo = get_object_or_404(Odontologos, id_odontologo=id_usuario)
@@ -656,7 +663,8 @@ def paciente_detail(request, id_paciente):
             return JsonResponse({'error': 'EL SEGURO MÉDICO ES REQUERIDO'}, status=400)
 
         if errors:
-            return JsonResponse({'errors': errors}, status=400)    
+            return JsonResponse({'errors': errors}, status=400)
+           
         paciente.seguro_medico = seguro_medico
         paciente.alergias = alergias
         paciente.antecedentes_medicos = antecedentes_medicos
@@ -823,3 +831,87 @@ def tratamiento_list(request, id_historial):
             return JsonResponse({'error': 'NO SE ENCONTRARON TRATAMIENTOS PARA ESE ID_HISTORIAL'}, status=404)
 
         return JsonResponse(tratamientos, safe=False)
+    
+@csrf_exempt
+def tratamiento_costo(request, id_costo):
+    if request.method == 'GET':
+        try:
+            costo = get_object_or_404(Costos, id_costo=id_costo)
+            # Serializamos el objeto en un diccionario
+            costo_data = {
+                'id_costo': costo.id_costo,
+                'monto': str(costo.monto),  # Convertimos a string para evitar problemas con Decimal
+                'activo': costo.activo
+            }
+            return JsonResponse(costo_data)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    
+@csrf_exempt
+def tratamiento_detail(request, id_tratamiento):
+    tratamiento = get_object_or_404(Tratamientos, id_tratamiento=id_tratamiento)
+    
+    if request.method == 'GET':
+        return JsonResponse({
+            "id_tratamiento": tratamiento.id_tratamiento,
+            "id_historial": tratamiento.id_historial.id_historial,
+            "nombre_tratamiento": tratamiento.nombre_tratamiento,
+            "descripcion": tratamiento.descripcion,
+            "fecha_tratamiento": tratamiento.fecha_tratamiento,
+            "monto":tratamiento.id_costo.monto,
+            "estado_tratamiento": tratamiento.estado_tratamiento,
+        })
+
+    elif request.method == 'PUT':
+        # Cargar el tratamiento específico
+        tratamiento = get_object_or_404(Tratamientos, id_tratamiento=id_tratamiento)
+        if tratamiento.estado_tratamiento == 'finalizado':
+            return JsonResponse({'error': 'NO SE PUEDE EDITAR UN TRATAMIENTO FINALIZADO'}, status=400)
+        # Parsear los datos del cuerpo de la solicitud
+        data = json.loads(request.body.decode('utf-8'))
+        errors = {}
+        
+        # Actualizar los campos del tratamiento con los datos recibidos
+        nombre_tratamiento = data.get('nombre_tratamiento', tratamiento.nombre_tratamiento).upper()
+        descripcion = data.get('descripcion', tratamiento.descripcion).upper()
+        fecha_tratamiento = data.get('fecha_tratamiento', tratamiento.fecha_tratamiento).upper()
+        estado_tratamiento = data.get('estado_tratamiento', tratamiento.estado_tratamiento)
+
+        if not (5 <= len(nombre_tratamiento) <= 50):
+            errors['nombre_tratamiento'] = 'EL NOMBRE DEL TRATAMIENTO DEBE TENER ENTRE 5 Y 50 CARACTERES.'
+        elif not nombre_pattern.match(nombre_tratamiento):
+            errors['nombre_tratamiento'] = 'EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'
+        if not (5 <= len(descripcion) <= 200):
+            errors['descripcion'] = 'LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES.'
+        elif not descripcion_pattern.match(descripcion):
+            errors['descripcion'] = 'LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'   
+        if fecha_tratamiento:
+            try:
+                fecha_tratamiento = datetime.strptime(fecha_tratamiento, '%Y-%m-%d')
+                if fecha_tratamiento < datetime.now() or fecha_tratamiento > datetime.now() + timedelta(days=30 * 1):
+                    errors['fecha_tratamiento'] = 'La fecha deL tratamiento debe iniciar entre la establecida previamente y un mes en adelante.'
+            except ValueError:
+                errors['fecha_tratamiento'] = 'La fecha de nacimiento debe tener el formato correcto (YYYY-MM-DD).'
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+        tratamiento.nombre_tratamiento = nombre_tratamiento
+        tratamiento.descripcion = descripcion
+        tratamiento.fecha_tratamiento = fecha_tratamiento
+        tratamiento.estado_tratamiento = estado_tratamiento
+        # Verificar si el monto también necesita actualización
+        if 'monto' in data:
+            tratamiento.id_costo.monto = data['monto']
+            tratamiento.id_costo.save()
+
+        # Guardar el tratamiento
+        tratamiento.save()
+        
+        return JsonResponse({
+            'message': 'TRATAMIENTO ACTUALIZADO EXITOSAMENTE'
+        }, status=200)
+    
+    elif request.method == 'DELETE':
+        tratamiento.activo = False  # Eliminación lógica
+        tratamiento.save()
+        return JsonResponse({"message": "Tratamiento eliminado exitosamente."})
