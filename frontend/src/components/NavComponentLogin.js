@@ -52,6 +52,9 @@ const NavComponentLogin = () => {
                     <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Roles</Text>
                     </Link>
+                    <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                        <Text>Recepcionistas</Text>
+                    </Link>
                     
                     <Text></Text>
                     <Button onClick={handleLogout} colorScheme="teal">Cerrar sesión</Button>
@@ -73,15 +76,13 @@ const NavComponentLogin = () => {
                     <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
                         <Text textAlign="left">Roles</Text>
                     </Link>
-                    <Link href="/acerca" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
-                        <Text textAlign="left">Pacientes</Text>
+                    <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+                        <Text textAlign="left">Odontologos</Text>
                     </Link>
-                    <Link href="/servicios" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
-                        <Text textAlign="left">Personal</Text>
+                    <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+                        <Text textAlign="left">Recepcionistas</Text>
                     </Link>
-                    <Link href="/contacto" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
-                        <Text textAlign="left">Citas</Text>
-                    </Link>
+            
                     <Text width="100%" textAlign="left"></Text>
                     <Button onClick={handleLogout} colorScheme="teal" width="100%">Cerrar sesión</Button>
                 </VStack>

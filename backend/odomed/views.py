@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos, Prescripciones
+from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos, Prescripciones, Recepcionistas
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
@@ -1038,3 +1038,131 @@ def prescripcion_detail(request, id_medicamento):
         prescripcion.activo = False  # Eliminación lógica
         prescripcion.save()
         return JsonResponse({"message": "Prescripción eliminada exitosamente."})
+    
+
+@csrf_exempt
+def recepcionista_list(request):
+    if request.method == 'GET':
+        # Filtrar los recepcionistas activos y obtener los datos necesarios desde la tabla Usuarios
+        recepcionistas = Recepcionistas.objects.filter(activo=True).select_related('id_recepcionista').values(
+            'id_recepcionista','id_recepcionista__direccion', 'id_recepcionista__nombres','id_recepcionista__ci','id_recepcionista__fecha_nacimiento','id_recepcionista__apellidos','id_recepcionista__telefono','id_recepcionista__email', 'activo'
+        )
+        # Crear una nueva lista con el nombre completo del odontólogo
+        recepcionistas_data = [
+            {
+                'id_usuario': recepcionista['id_recepcionista'],
+                'id_recepcionista': recepcionista['id_recepcionista'],
+                'ci': recepcionista['id_recepcionista__ci'],
+                'fecha_nacimiento': recepcionista['id_recepcionista__fecha_nacimiento'],
+                'nombre_completo': f"{recepcionista['id_recepcionista__nombres']} {recepcionista['id_recepcionista__apellidos']}",
+                'telefono': recepcionista['id_recepcionista__telefono'],
+                'email': recepcionista['id_recepcionista__email'],
+                'activo': recepcionista['activo'],
+                'nombres': recepcionista['id_recepcionista__nombres'],
+                'apellidos': recepcionista['id_recepcionista__apellidos'],
+                'direccion': recepcionista['id_recepcionista__direccion']
+            }
+            for recepcionista in recepcionistas
+        ]
+        # Enviar la lista como respuesta JSON
+        return JsonResponse(recepcionistas_data, safe=False)
+    
+@csrf_exempt
+def recepcionista_create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        errors = {}
+        # Validación y procesamiento de datos de usuario
+        nombres = data.get('nombres', '').strip().upper()
+        nombres_regex = re.compile(r'^[A-Z\s]+$')
+        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
+            errors['nombres'] = 'El campo Nombres debe ser entre 3 a 100 caracteres.'
+        apellidos = data.get('apellidos', '').strip().upper()
+        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
+            errors['apellidos'] = 'El campo Apellidos debe ser entre 3 a 100 caracteres.'        
+        ci = data.get('ci', '').strip()
+        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
+            errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
+        email = data.get('email', '').strip().upper()
+        if Usuario.objects.filter(email=email).exists():
+            errors['email'] = 'El email ya está en uso.'
+        telefono = data.get('telefono', '').strip()
+        if not re.match(r'^\d{8}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+        fecha_nacimiento = data.get('fecha_nacimiento')
+        if fecha_nacimiento:
+            try:
+                fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 20):
+                    errors['fecha_nacimiento'] = 'La Fecha de nacimiento debe ser entre 80 a 20 años atras a la fecha actual.'
+            except ValueError:
+                errors['fecha_nacimiento'] = 'Formato incorrecto para la fecha de nacimiento.'
+        contrasenia = data.get('contrasenia', '')
+        password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
+        if not password_regex.match(contrasenia):
+            errors['contrasenia'] = 'Contraseña insegura: debe tener entre minimamente 8 caarcteres, letra, numeros y simbolo.'
+        direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
+        direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
+        if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
+            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
+        
+        if not Roles.objects.filter(activo=True, nombre_rol='RECEPCIONISTA').exists():
+            return JsonResponse({'error': 'No existe un rol para este tipo de usuario, cree el rol RECEPCIONESTA'}, status=400)
+
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+        rol = Roles.objects.filter(activo=True, nombre_rol='RECEPCIONISTA').values().first()
+        # Crear usuario y recepcionista si no hay errores
+        usuario = Usuario(
+            nombres=nombres,
+            apellidos=apellidos,
+            ci=ci,
+            contrasenia=contrasenia,
+            email=email,
+            telefono=telefono,
+            fecha_nacimiento=fecha_nacimiento,
+            rol_id=rol['id_rol'],
+            direccion=direccion
+        )
+        usuario.save()
+        recepcionista = Recepcionistas.objects.create(
+            id_recepcionista = usuario
+        )
+        return JsonResponse({'message': 'Recepcionista creado correctamente'}, status=201)
+
+# Vista para obtener los detalles de un odontólogo específico
+@csrf_exempt
+def recepcionista_detail(request, id_usuario):
+    if request.method == 'GET':
+        # Fetch the Usuario instance with the given id and that is active
+        usuario = get_object_or_404(Usuario, id_usuario=id_usuario, activo=True)
+        # Now, retrieve the related Odontologos instance using id_odontologo
+        recepcionista = get_object_or_404(Recepcionistas, id_recepcionista=usuario)
+
+        recepcionista_info = {
+            'id_usuario': usuario.id_usuario,
+            'nombres': usuario.nombres,
+            'apellidos': usuario.apellidos,
+            'ci': usuario.ci,
+            'email': usuario.email,
+            'telefono': usuario.telefono
+        }
+        return JsonResponse(recepcionista_info, status=200)
+
+    if request.method == 'DELETE':
+        # Fetch the Usuario instance
+        usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
+
+        # Fetch the related Odontologos instance
+        recepcionista = get_object_or_404(Recepcionistas, id_recepcionista=usuario)
+        #historial_exists = HistorialesClinicos.objects.filter(id_odontologo=odontologo).exists()
+        #if historial_exists:
+        #    return JsonResponse({'error': 'NO SE PUEDE ELIMINAR. EXISTE UN HISTORIAL ASOCIADO AL ODONTÓLOGO'}, status=400)
+        # Perform logical deletion
+        usuario.activo = False
+        usuario.save()
+        # Also mark the related Odontologos as inactive
+        recepcionista.activo = False
+        recepcionista.save()
+
+        return JsonResponse({'success': 'ODONTÓLOGO ELIMINADOS LÓGICAMENTE'}, status=200)

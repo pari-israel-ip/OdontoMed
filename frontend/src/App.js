@@ -11,12 +11,13 @@ import UsuariosComponent from './components/UsuarioComponent';
 import ShowUsuarioModal from './components/ShowUsuarioModal'; // Importa el modal
 import OdontologosComponent from './components/OdontologoComponent';
 import ShowOdontologoModal from './components/ShowOdontologoModal';
+import RecepcionistasComponent from './components/RecepcionistaComponent';
 function Layout({ children }) {
     const location = useLocation();
 
     const isLoginPage = location.pathname === '/login';
     const isUserOrRolesPage = location.pathname === '/usuarios' || location.pathname === '/roles' || location.pathname === '/odontologos'
-    || location.pathname === '/usuarios:id';
+    || location.pathname === '/usuarios:id' || location.pathname === '/recepcionistas';
 
     return (
         <>
@@ -39,6 +40,8 @@ function App() {
                         <Route path="/usuarios" element={<UsuariosComponent />} />
                         <Route path="/odontologos" element={<OdontologosComponent />} />
                         <Route path="/roles" element={<RolesComponent />} />
+                        <Route path="/recepcionistas" element={<RecepcionistasComponent />} />
+
                         <Route path="/odontologos/:id" element={<ShowOdontologoModal />} /> 
 
                         <Route path="/usuarios/:id" element={<ShowUsuarioModal />} /> 
