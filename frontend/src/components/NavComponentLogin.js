@@ -55,6 +55,9 @@ const NavComponentLogin = () => {
                     <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Recepcionistas</Text>
                     </Link>
+                    <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                        <Text>Citas</Text>
+                    </Link>
                     
                     <Text></Text>
                     <Button onClick={handleLogout} colorScheme="teal">Cerrar sesión</Button>
@@ -81,6 +84,9 @@ const NavComponentLogin = () => {
                     </Link>
                     <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
                         <Text textAlign="left">Recepcionistas</Text>
+                    </Link>
+                    <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }} width="100%">
+                        <Text textAlign="left">Citas</Text>
                     </Link>
             
                     <Text width="100%" textAlign="left"></Text>

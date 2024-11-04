@@ -46,7 +46,7 @@ class Citas(models.Model):
     id_paciente = models.ForeignKey('Pacientes', on_delete=models.SET_NULL, null=True, db_column='id_paciente')
     id_odontologo = models.ForeignKey('Odontologos', on_delete=models.SET_NULL, null=True, db_column='id_odontologo')
     id_recepcionista = models.ForeignKey('Recepcionistas', on_delete=models.SET_NULL, null=True, db_column='id_recepcionista')
-    estado_cita = models.CharField(max_length=20, choices=[('programada', 'Programada'), ('completada', 'Completada'), ('cancelada', 'Cancelada'), ('en espera', 'En Espera')])
+    estado_cita = models.CharField(max_length=20, choices=[('programada', 'Programada'), ('completada', 'Completada'), ('cancelada', 'Cancelada'), ('en espera', 'En Espera')],default='en espera')
     id_costo = models.ForeignKey('Costos', on_delete=models.SET_NULL, null=True, db_column='id_costo')
     id_horario = models.ForeignKey('Horarios', on_delete=models.SET_NULL, null=True, db_column='id_horario')
     activo = models.BooleanField(default=True)

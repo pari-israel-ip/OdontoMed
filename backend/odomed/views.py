@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos, Prescripciones, Recepcionistas
+from .models import Horarios, Citas, Roles,Usuario, Pacientes, HistorialesClinicos, Odontologos, Diagnosticos, Tratamientos, Costos, Prescripciones, Recepcionistas
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 import json
@@ -1166,3 +1166,139 @@ def recepcionista_detail(request, id_usuario):
         recepcionista.save()
 
         return JsonResponse({'success': 'ODONTÓLOGO ELIMINADOS LÓGICAMENTE'}, status=200)
+
+@csrf_exempt
+def cita_list(request):
+    if request.method == 'GET':
+        # Filtrar las citas activas y obtener los datos necesarios desde las tablas relacionadas
+        citas = Citas.objects.filter(activo=True).select_related(
+            'id_paciente__id_paciente',  # Acceso indirecto a Usuario desde Paciente
+            'id_odontologo__id_odontologo',  # Acceso indirecto a Usuario desde Odontologo
+            'id_recepcionista__id_recepcionista',  # Acceso indirecto a Usuario desde Recepcionista
+            'id_costo', 'id_horario'
+        ).values(
+            'id_cita', 'fecha', 'estado_cita', 'id_odontologo', 'id_recepcionista', 'id_paciente', 'id_costo', 'id_horario',
+            'id_paciente__id_paciente__nombres', 'id_paciente__id_paciente__apellidos',  # Datos de Usuario desde Paciente
+            'id_odontologo__id_odontologo__nombres', 'id_odontologo__id_odontologo__apellidos',  # Datos de Usuario desde Odontologo
+            'id_recepcionista__id_recepcionista__nombres', 'id_recepcionista__id_recepcionista__apellidos',  # Datos de Usuario desde Recepcionista
+            'id_costo__monto',
+            'id_horario__horario',
+            'activo'
+        )
+
+        # Formatear los datos para enviarlos como respuesta JSON
+        citas_data = [
+            {
+                'id_costo': cita['id_costo'],
+                'id_horario': cita['id_horario'],
+                'id_odontologo': cita['id_odontologo'],
+                'id_recepcionista': cita['id_recepcionista'],
+                'id_paciente': cita['id_paciente'],
+                'id_cita': cita['id_cita'],
+                'fecha': cita['fecha'],
+                'estado_cita': cita['estado_cita'],
+                'paciente': f"{cita['id_paciente__id_paciente__nombres']} {cita['id_paciente__id_paciente__nombres']}",
+                'odontologo': f"{cita['id_odontologo__id_odontologo__nombres']} {cita['id_odontologo__id_odontologo__apellidos']}",
+                'recepcionista': f"{cita['id_recepcionista__id_recepcionista__nombres']} {cita['id_recepcionista__id_recepcionista__apellidos']}",
+                'monto': cita['id_costo__monto'],
+                'horario': cita['id_horario__horario'],
+                'activo': cita['activo']
+            }
+            for cita in citas
+        ]
+
+        # Enviar la lista como respuesta JSON
+        return JsonResponse(citas_data, safe=False)
+
+@csrf_exempt
+def crear_citas_automaticas(request):
+    # Fecha actual
+    fecha_actual = timezone.now().date()
+
+    # Obtener los odontólogos y horarios activos
+    odontologos_activos = Odontologos.objects.filter(activo=True)
+    horarios_activos = Horarios.objects.filter(activo=True)
+
+    # Contador de citas creadas y citas omitidas
+    citas_creadas = 0
+    citas_omitidas = 0
+
+    # Generar citas para los próximos 5 días
+    for dias in range(6):
+        fecha = fecha_actual + timedelta(days=dias)
+
+        for odontologo in odontologos_activos:
+            for horario in horarios_activos:
+                # Comprobar si ya existe una cita para el mismo odontólogo, horario y fecha
+                existe_cita = Citas.objects.filter(
+                    fecha=fecha,
+                    id_odontologo=odontologo,
+                    id_horario=horario
+                ).exists()
+
+                if not existe_cita:
+                    costo = Costos.objects.create(
+                        monto = 0
+                    )
+                    # Crear la cita si no existe
+                    Citas.objects.create(
+                        fecha=fecha,
+                        id_odontologo=odontologo,
+                        id_horario=horario,
+                        id_costo = costo,
+                        activo=True
+                    )
+                    citas_creadas += 1
+                else:
+                    # Incrementar el contador de citas omitidas
+                    citas_omitidas += 1
+
+    # Retornar una respuesta con los resultados
+    return JsonResponse({
+        "message": "Proceso de creación de citas completado.",
+        "citas_creadas": citas_creadas,
+        "citas_omitidas": citas_omitidas
+    })
+
+@csrf_exempt
+def cita_detail(request, id_cita):
+    if request.method == 'PUT':
+        try:
+            cita = get_object_or_404(Citas, id_cita=id_cita)
+            data = json.loads(request.body)
+
+            estado_cita = data.get('estado_cita')
+            id_paciente = data.get('id_paciente')
+            monto = data.get('monto')
+            id_costo = data.get('id_costo')
+
+            # Actualizar los campos específicos
+            if estado_cita:
+                cita.estado_cita = estado_cita
+            if id_paciente:
+                paciente = get_object_or_404(Pacientes, id_paciente=id_paciente)
+                cita.id_paciente = paciente
+            if monto is not None:
+                costo = get_object_or_404(Costos, id_costo = id_costo)
+                costo.monto = monto
+                costo.save()
+
+            cita.save()
+
+            return JsonResponse({
+                "message": "Cita actualizada correctamente"
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    if request.method == 'DELETE':
+        # Fetch the Usuario instance
+        cita = get_object_or_404(Citas, id_cita=id_cita)
+
+    
+        cita.activo = False
+        cita.save()
+        
+
+        return JsonResponse({'success': 'CITA ELIMINADOS LÓGICAMENTE'}, status=200)
+    else:
+        return JsonResponse({"error": "Método no permitido"}, status=405)
