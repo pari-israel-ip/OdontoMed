@@ -14,7 +14,7 @@ import {
     Input,
     Checkbox,
     Text,
-    Box,
+    Box,useToast
 } from '@chakra-ui/react';
 
 const EditRoleModal = ({ role, onClose, onSave }) => {
@@ -23,6 +23,7 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
     const [selectAll, setSelectAll] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     const modulos = [
         {
@@ -124,6 +125,13 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Rol actualizado.",
+                    description: "El rol ha sido actualizado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onSave(response.data);
                 onClose();
             }

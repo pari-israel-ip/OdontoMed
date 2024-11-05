@@ -14,7 +14,7 @@ import {
     List,
     ListItem,
     IconButton,
-    FormErrorMessage
+    FormErrorMessage, useToast
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 
@@ -27,6 +27,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
     const [listaMedicamentos, setListaMedicamentos] = useState([]);
     const [errorNombre, setErrorNombre] = useState('');
     const [errorFechaFin, setErrorFechaFin] = useState('');
+    const toast = useToast();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -80,6 +81,13 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
             await axios.post('http://127.0.0.1:8000/odomed/prescripcion/create/', {
                 id_historial: idHistorial,
                 prescripciones: listaMedicamentos,
+            });
+            toast({
+                title: "Prescripcion creado.",
+                description: "La prescripcion ha sido creado exitosamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
             });
             onPrescriptionCreated();
             onClose();

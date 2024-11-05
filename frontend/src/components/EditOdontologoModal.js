@@ -12,7 +12,7 @@ import {
     Input,
     Switch,
     Button,
-    FormErrorMessage
+    FormErrorMessage, useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -20,6 +20,7 @@ const EditOdontologoModal = ({ odontologo, id, onClose, onSave }) => {
     const [numeroLicencia, setNumeroLicencia] = useState(odontologo.numero_licencia || '');
     const [especializacion, setEspecializacion] = useState(odontologo.especializacion || '');
     const [errors, setErrors] = useState({});
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,6 +35,13 @@ const EditOdontologoModal = ({ odontologo, id, onClose, onSave }) => {
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Odontologo actualizado.",
+                    description: "El odontologo ha sido actualizado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onSave(response.data);
                 onClose(); // Close modal after saving
             }

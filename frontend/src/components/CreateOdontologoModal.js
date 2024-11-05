@@ -11,7 +11,7 @@ import {
     ModalHeader,
     ModalCloseButton,
     ModalBody,
-    ModalFooter,
+    ModalFooter, useToast
 } from '@chakra-ui/react';
 import roleService from '../services/roleService'; // Asegúrate de que la ruta sea correcta
 import axios from 'axios';
@@ -27,7 +27,8 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
     const [direccion, setDireccion] = useState('');
     const [contrasenia, setContrasenia] = useState('');
     const [rol, setRol] = useState('1'); // Asignar rol por defecto
-    
+    const toast = useToast();
+
     // Estados para el odontólogo
     const [numeroLicencia, setNumeroLicencia] = useState('');
     const [especializacion, setEspecializacion] = useState('');
@@ -116,6 +117,13 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
             if (odontologoResponse.data.errors) {
                 setErrors(odontologoResponse.data.errors);
             } else {
+                toast({
+                    title: "Odontologo creado.",
+                    description: "El Odontologo ha sido creado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onCreate(odontologoResponse.data);
                 onClose();
             }
@@ -162,6 +170,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.ci} mb={4}>
                             <FormLabel>C.I.</FormLabel>
                             <Input
+                                type='number'
                                 placeholder="C.I."
                                 value={ci}
                                 onChange={(e) => setCi(e.target.value)}
@@ -185,6 +194,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.telefono} mb={4}>
                             <FormLabel>Teléfono</FormLabel>
                             <Input
+                                type='number'
                                 placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}

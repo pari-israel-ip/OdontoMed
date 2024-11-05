@@ -77,9 +77,11 @@ const RolesComponent = () => {
     const handleCreate = async (newRole) => {
         try {
             await roleService.createRole(newRole);
-            loadRoles(); // Recargar los roles después de crear
         } catch (error) {
             console.error('Error creating role:', error);
+        }
+        finally{
+            loadRoles(); // Recargar los roles después de crear
         }
     };
 
@@ -148,8 +150,10 @@ const RolesComponent = () => {
 
             {isCreateModalOpen && (
                 <CreateRoleModal
-                    onClose={() => setIsCreateModalOpen(false)}
-                    onCreate={handleCreate}
+                    onClose={() => {setIsCreateModalOpen(false);
+                        loadRoles();
+                    }}
+                    onCreate={()=>handleCreate}
                 />
             )}
         </Box>

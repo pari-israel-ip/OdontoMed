@@ -324,7 +324,8 @@ def usuario_create(request):
         email = data.get('email', '').strip().upper()  # Convertir a mayúsculas
         if Usuario.objects.filter(email=email).exists():
             errors['email'] = 'El email ya está en uso.'
-
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
         # Validación de teléfono
         telefono = data.get('telefono', '').strip()
         if not re.match(r'^\d{8}$', telefono):
@@ -346,10 +347,9 @@ def usuario_create(request):
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
             errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
 
-        # Validación de rol
-        rol_id = data.get('rol')
-        if not Roles.objects.filter(id_rol=rol_id).exists():
-            errors['rol'] = 'El rol seleccionado no existe.'
+        if not Roles.objects.filter(activo=True, nombre_rol='PACIENTE').exists():
+            return JsonResponse({'error': 'No existe un rol para este tipo de usuario, cree el rol PACIENTE'}, status=400)
+
 
         # Validación de contraseña
         contrasenia = data.get('contrasenia', '')
@@ -383,6 +383,7 @@ def usuario_create(request):
         # Si hay errores, devolver el diccionario de errores
         if errors:
             return JsonResponse({'errors': errors}, status=400)
+        rol = Roles.objects.filter(activo=True, nombre_rol='PACIENTE').values().first()
 
         # Si no hay errores, crear el usuario y paciente
         usuario = Usuario.objects.create(
@@ -392,7 +393,7 @@ def usuario_create(request):
             email=email,
             telefono=telefono,
             fecha_nacimiento=fecha_nacimiento,
-            rol_id=rol_id,
+            rol_id=rol['id_rol'],
             direccion=direccion,
             contrasenia=contrasenia  # Asegúrate de que la contraseña se maneje correctamente (hashing)
         )
@@ -482,6 +483,8 @@ def odontologo_create(request):
             errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
         
         email = data.get('email', '').strip().upper()
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
         
         if Usuario.objects.filter(email=email).exists():
             errors['email'] = 'El email ya está en uso.'
@@ -501,7 +504,7 @@ def odontologo_create(request):
         contrasenia = data.get('contrasenia', '')
         password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
         if not password_regex.match(contrasenia):
-            errors['contrasenia'] = 'Contraseña insegura: debe tener entre minimamente 8 caarcteres, letra, numeros y simbolo.'
+            errors['contrasenia'] = 'Contraseña insegura: debe tener minimamente 8 caracteres, letra, numeros y simbolos(@$!%*?&).'
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
@@ -516,9 +519,12 @@ def odontologo_create(request):
         especializacion = data.get('especializacion', '').strip().upper()
         if not re.match(r'^[A-Z\s]+$', especializacion):  # Only uppercase letters and spaces
             errors['especializacion'] = 'La especialización solo puede contener letras y espacios.'
+        if not Roles.objects.filter(activo=True, nombre_rol='ODONTOLOGO').exists():
+            return JsonResponse({'error': 'No existe un rol para este tipo de usuario, cree el rol ODONTOLOGO'}, status=400)
 
         if errors:
             return JsonResponse({'errors': errors}, status=400)
+        rol = Roles.objects.filter(activo=True, nombre_rol='ODONTOLOGO').values().first()
 
         # Crear usuario y odontólogo si no hay errores
         usuario = Usuario(
@@ -529,7 +535,7 @@ def odontologo_create(request):
             email=email,
             telefono=telefono,
             fecha_nacimiento=fecha_nacimiento,
-            rol_id=1,
+            rol_id=rol['id_rol'],
             direccion=direccion
         )
     
@@ -1084,6 +1090,8 @@ def recepcionista_create(request):
         if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
             errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
         email = data.get('email', '').strip().upper()
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
         if Usuario.objects.filter(email=email).exists():
             errors['email'] = 'El email ya está en uso.'
         telefono = data.get('telefono', '').strip()

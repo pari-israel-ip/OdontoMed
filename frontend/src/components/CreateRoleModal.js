@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Button, Input, Checkbox, FormControl, FormLabel, FormErrorMessage, Modal, ModalOverlay,
     ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Accordion, AccordionItem,
-    AccordionButton, AccordionPanel, Box
+    AccordionButton, AccordionPanel, Box, useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -12,6 +12,7 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
     const [selectAll, setSelectAll] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     const modulos = [
         { nombre: 'Usuarios', permisosOpciones: [{ id: 1, label: 'Crear usuario' }, { id: 2, label: 'Editar usuario' }, { id: 3, label: 'Mostrar usuario' }, { id: 4, label: 'Eliminar usuario' }] },
@@ -80,6 +81,13 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Rol creado.",
+                    description: "El rol ha sido creado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onCreate(response.data);
                 onClose();
             }

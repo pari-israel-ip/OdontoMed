@@ -72,6 +72,13 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
+                toast({
+                    title: "Datos personales actualizados.",
+                    description: "Los datos personales han sido actualizados exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 // Si la actualización fue exitosa
                 onSave(response.data);
                 onClose();

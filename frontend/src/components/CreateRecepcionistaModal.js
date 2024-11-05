@@ -12,6 +12,7 @@ import {
     ModalCloseButton,
     ModalBody,
     ModalFooter,
+    useToast
 } from '@chakra-ui/react';
 import roleService from '../services/roleService'; // Asegúrate de que la ruta sea correcta
 import axios from 'axios';
@@ -26,7 +27,8 @@ const CreateRecepcionistaModal = ({ onClose, onCreate }) => {
     const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [direccion, setDireccion] = useState('');
     const [contrasenia, setContrasenia] = useState('');
-    
+    const toast = useToast();
+
     // Estados para manejo de errores y carga
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -92,6 +94,13 @@ const CreateRecepcionistaModal = ({ onClose, onCreate }) => {
             if (recepcionistaResponse.data.errors) {
                 setErrors(recepcionistaResponse.data.errors);
             } else {
+                toast({
+                    title: "Recepcionista Creado.",
+                    description: "El recepcionista ha sido creado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 onCreate(recepcionistaResponse.data);
                 onClose();
             }

@@ -12,7 +12,7 @@ import {
     FormControl,
     FormLabel,
     Select,
-    Input,
+    Input, useToast
 } from '@chakra-ui/react';
 import citaService from '../services/citaService';
 import usuarioService from '../services/usuarioService';
@@ -39,6 +39,13 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
         const updatedCita = { ...cita, estado_cita, id_paciente:paciente, monto };
         console.log(updatedCita);
         onSave(updatedCita);
+        toast({
+            title: "Cita actualizada.",
+            description: "La cita ha sido actualizada exitosamente.",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+        });
         onClose();
     };
 
