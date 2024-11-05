@@ -22,6 +22,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     const [paciente, setPaciente] = useState(cita.id_paciente || '');
     const [monto, setMonto] = useState(cita.monto || '');
     const [pacientes, setPacientes] = useState([]);
+    const toast = useToast();
 
     useEffect(() => {
         const fetchPacientes = async () => {
