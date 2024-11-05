@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'clinicaodontologica',  # Cambia a tu base de datos
         'USER': 'root',  # Usuario predeterminado de Laragon
-        'PASSWORD': '',  # Contraseña predeterminada (vacía en Laragon)
+        'PASSWORD': 'qwerty',  # Contraseña predeterminada (vacía en Laragon)
         'HOST': '127.0.0.1',  # Laragon usa localhost
         'PORT': '3306',  # Puerto predeterminado de MySQL en Laragon
     }
