@@ -15,7 +15,7 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,
+    AlertDescription,useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
@@ -28,6 +28,7 @@ const RolesComponent = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRole, setCurrentRole] = useState(null);
+    const toast = useToast();
 
     useEffect(() => {
         loadRoles();
@@ -49,6 +50,13 @@ const RolesComponent = () => {
                 const response = await roleService.deleteRole(id_rol);
                 setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
                 loadRoles();
+                toast({
+                    title: "Rol eliminado.",
+                    description: "El rol ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
             } catch (error) {
                 setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el odontólogo' });
                 console.error('Error deleting role:', error);

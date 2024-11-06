@@ -11,7 +11,7 @@ import {
     Th,
     Td,
     IconButton,
-    Flex,
+    Flex, useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
@@ -22,6 +22,7 @@ const UsuariosComponent = () => {
     const [usuarios, setUsuarios] = useState([]);
     const navigate = useNavigate(); // Usa useNavigate para redirigir
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const toast = useToast();
 
     useEffect(() => {
         loadUsuarios();
@@ -42,6 +43,13 @@ const UsuariosComponent = () => {
             try {
                 await usuarioService.deleteUsuario(id_usuario);
                 loadUsuarios();
+                toast({
+                    title: "Paciente eliminado.",
+                    description: "El paciente ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
             } catch (error) {
                 console.error('Error deleting usuario:', error);
             }

@@ -8,7 +8,7 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid, IconButton
+    Box, Grid, IconButton, useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 
@@ -48,6 +48,7 @@ const ShowUsuarioModal = () => {
     const [isEditTratamientoOpen, setIsEditTratamientoOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const [isCreatePrescriptionOpen, setIsCreatePrescriptionOpen] = useState(false); // Estado para modal de prescripción
     const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
+    const toast = useToast();
 
 
     const navigate = useNavigate();
@@ -163,6 +164,13 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
         if (confirmDelete) {
             try {
+                toast({
+                    title: "Diagnostico eliminado.",
+                    description: "El diagnostico ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 await diagnosticoService.deleteDiagnostico(id_diagnostico);
                 loadDiagnosticos(idHistorial);
             } catch (error) {
@@ -175,6 +183,13 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
         if (confirmDelete) {
             try {
+                toast({
+                    title: "Tratamiento eliminado.",
+                    description: "El tratamiento ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 await tratamientoService.deleteTratamiento(id_tratamiento);
                 loadTratamientos(idHistorial);
             } catch (error) {
@@ -187,6 +202,13 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar esta prescripcion?");
         if (confirmDelete) {
             try {
+                toast({
+                    title: "Medicamento eliminado.",
+                    description: "El tratamiento ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 await prescripcionService.deletePrescripcion(id_medicamento);
                 loadPrescripciones(idHistorial);
             } catch (error) {

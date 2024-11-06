@@ -174,7 +174,7 @@ def usuario_list(request):
 
 @csrf_exempt
 def usuario_detail(request, id_usuario):
-    usuario = get_object_or_404(Usuario, id_usuario=id_usuario)
+    usuario = get_object_or_404(Usuario, id_usuario=id_usuario, activo=True)
     
     if request.method == 'GET':
         paciente = Pacientes.objects.filter(id_paciente=usuario).first()  # Obtener el paciente asociado si existe

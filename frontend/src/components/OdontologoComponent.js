@@ -14,7 +14,7 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,
+    AlertDescription,useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
@@ -26,6 +26,7 @@ const OdontologosComponent = () => {
     const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
     const navigate = useNavigate(); // Usa useNavigate para redirigir
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const toast = useToast();
 
     useEffect(() => {
         loadOdontologos();
@@ -44,6 +45,13 @@ const OdontologosComponent = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Odontólogo?");
         if (confirmDelete) {
             try {
+                toast({
+                    title: "Rol eliminado.",
+                    description: "El rol ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 const response = await odontologoService.deleteOdontologos(id_odontologo);
                 setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
                 loadOdontologos();

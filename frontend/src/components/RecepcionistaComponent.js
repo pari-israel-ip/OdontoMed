@@ -14,7 +14,7 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,
+    AlertDescription,useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
@@ -29,6 +29,7 @@ const RecepcionistasComponent = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRecepcionista, setCurrentRecepcionista] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const toast = useToast();
 
 
     useEffect(() => {
@@ -48,6 +49,13 @@ const RecepcionistasComponent = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Recepcionista?");
         if (confirmDelete) {
             try {
+                toast({
+                    title: "Recepcionista eliminado.",
+                    description: "El recepcionista ha sido eliminado exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
                 const response = await recepcionistaService.deleteRecepcionistas(id_recepcionista);
                 setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
                 loadRecepcionistas();
