@@ -49,8 +49,37 @@ const ShowUsuarioModal = () => {
     const [isCreatePrescriptionOpen, setIsCreatePrescriptionOpen] = useState(false); // Estado para modal de prescripción
     const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const toast = useToast();
-
-
+    const downloadHistorialAsJson = () => {
+        const data = {
+            diagnosticos,
+            tratamientos,
+            prescripciones
+           
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `historial_${usuario.nombre_completo}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    // Aquí podrías hacer algo con los datos JSON cargados
+                    console.log(json);
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -241,7 +270,13 @@ const ShowUsuarioModal = () => {
                         <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
                         <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
                         <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-
+                        <Button colorScheme="blue" mt={4} onClick={downloadHistorialAsJson}>
+                                    Descargar Historial (JSON)
+                                </Button>
+                                <Button as="label" colorScheme="teal" mt={4}>
+                                    Cargar Historial (JSON)
+                                    <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
+                                </Button>
                         <Button colorScheme="blue" mt={4} onClick={handleEdit}>
                             Editar Datos Personales
                         </Button>
