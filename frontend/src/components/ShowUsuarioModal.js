@@ -8,10 +8,10 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid, IconButton, useToast
+    Box, Grid, IconButton, useToast, Select
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
-
+import jsPDF from 'jspdf';
 import { useParams, useNavigate } from 'react-router-dom';  
 import usuarioService from '../services/usuarioService';
 import EditUsuarioModal from './EditUsuarioModal';
@@ -49,20 +49,63 @@ const ShowUsuarioModal = () => {
     const [isCreatePrescriptionOpen, setIsCreatePrescriptionOpen] = useState(false); // Estado para modal de prescripción
     const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const toast = useToast();
-    const downloadHistorialAsJson = () => {
+    const downloadHistorial = (format) => {
         const data = {
+            usuario: {
+                nombre_completo: usuario.nombre_completo,
+                ci: usuario.ci,
+                fecha_nacimiento: usuario.fecha_nacimiento,
+                email: usuario.email,
+                direccion: usuario.direccion,
+                telefono: usuario.telefono,
+                seguro_medico: usuario.seguro_medico,
+                alergias: usuario.alergias,
+                antecedentes_medicos: usuario.antecedentes_medicos,
+            },
             diagnosticos,
             tratamientos,
-            prescripciones
-           
+            prescripciones,
         };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `historial_${usuario.nombre_completo}.json`;
-        link.click();
-        URL.revokeObjectURL(url);
+    
+        if (format === 'json') {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `historial_${usuario.nombre_completo}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } else if (format === 'xml') {
+            const xmlData = `
+                <historial>
+                    <usuario>
+                        <nombre_completo>${usuario.nombre_completo}</nombre_completo>
+                        <ci>${usuario.ci}</ci>
+                        <fecha_nacimiento>${usuario.fecha_nacimiento}</fecha_nacimiento>
+                        <email>${usuario.email}</email>
+                        <direccion>${usuario.direccion}</direccion>
+                        <telefono>${usuario.telefono}</telefono>
+                        <seguro_medico>${usuario.seguro_medico}</seguro_medico>
+                        <alergias>${usuario.alergias}</alergias>
+                        <antecedentes_medicos>${usuario.antecedentes_medicos}</antecedentes_medicos>
+                    </usuario>
+                    <!-- Agregar diagnosticos, tratamientos y prescripciones en XML -->
+                </historial>
+            `;
+            const blob = new Blob([xmlData], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `historial_${usuario.nombre_completo}.xml`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } else if (format === 'pdf') {
+            const doc = new jsPDF();
+            doc.text(`Historial Odontológico de ${usuario.nombre_completo}`, 10, 10);
+            doc.text(`CI: ${usuario.ci}`, 10, 20);
+            // Agrega más detalles como diagnóstico, tratamientos y prescripciones
+            doc.save(`historial_${usuario.nombre_completo}.pdf`);
+        }
     };
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -250,10 +293,12 @@ const ShowUsuarioModal = () => {
     const onClose = () => {
         navigate('/usuarios');  // Redirige a la lista de usuarios cuando se cierra el modal
     };
-
+    const [selectedFormat, setSelectedFormat] = useState('json');
     if (!usuario) {
         return null; // Puedes agregar un loader aquí si lo prefieres
     }
+  
+
     return (
         <>
             <Modal isOpen={!!usuario} onClose={onClose} size="full">
@@ -270,9 +315,14 @@ const ShowUsuarioModal = () => {
                         <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
                         <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
                         <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-                        <Button colorScheme="blue" mt={4} onClick={downloadHistorialAsJson}>
-                                    Descargar Historial (JSON)
-                                </Button>
+                        <Select mt={4} onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
+            <option value="json">JSON</option>
+            <option value="xml">XML</option>
+            <option value="pdf">PDF</option>
+        </Select>
+        <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>
+            Descargar Historial
+        </Button>
                                 <Button as="label" colorScheme="teal" mt={4}>
                                     Cargar Historial (JSON)
                                     <input type="file" accept="application/json" hidden onChange={handleFileUpload} />

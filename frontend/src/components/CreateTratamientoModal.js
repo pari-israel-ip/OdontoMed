@@ -49,6 +49,8 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
 
         try {
             const response = await tratamientoService.createTratamiento(nuevoTratamiento);
+            console.log(nuevoTratamiento)
+
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {

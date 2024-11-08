@@ -13,6 +13,9 @@ import OdontologosComponent from './components/OdontologoComponent';
 import ShowOdontologoModal from './components/ShowOdontologoModal';
 import RecepcionistasComponent from './components/RecepcionistaComponent';
 import CitasComponent from './components/CitasComponent';
+import ProtectedRoute from './components/ProtectedRoute';
+import Unauthorized from './components/unauthorized';
+
 function Layout({ children }) {
     const location = useLocation();
 
@@ -37,8 +40,12 @@ function App() {
             <div className="App">
                 <Layout>
                     <Routes>
+                        <Route path="/unauthorized" element={<Unauthorized />} />
+
                         <Route path="/login" element={<LoginComponent />} />
-                        <Route path="/usuarios" element={<UsuariosComponent />} />
+                        <Route path="/usuarios" element={ 
+                            <UsuariosComponent />
+                        } />
                         <Route path="/odontologos" element={<OdontologosComponent />} />
                         <Route path="/roles" element={<RolesComponent />} />
                         <Route path="/recepcionistas" element={<RecepcionistasComponent />} />

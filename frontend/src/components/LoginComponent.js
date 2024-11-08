@@ -2,30 +2,52 @@ import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate
 import loginService from '../services/loginService';
+import usuarioService from '../services/usuarioService';
+import roleService from '../services/roleService';
 
 const LoginComponent = () => {
     const [email, setEmail] = useState('');
     const [contrasenia, setContrasenia] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-    const navigate = useNavigate();  // Inicializa useNavigate
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            const response = await loginService.login(email, contrasenia);
-            setMessage(response.data.message);
-            setIsError(false);
-            
-            // Guardar el token en el local storage
-            localStorage.setItem('token', response.data.token);  // Asumiendo que el token se envía en la respuesta
+    try {
+        // Login usando el email y contraseña
+        const response = await loginService.login(email, contrasenia);
+        setMessage(response.data.message);
+        setIsError(false);
 
-            // Redirige a la ruta /usuarios después del inicio de sesión exitoso
-            navigate('/usuarios');
-        } catch (error) {
-            setMessage(error.response?.data?.message || 'Error en el login');
-            setIsError(true);
+        // Guardar el token en el local storage
+        localStorage.setItem('token', response.data.token);
+
+        // Obtener el usuario por email
+        const userResponse = await usuarioService.getUsuarioPorEmail(email);
+        console.log('Usuario Response:', userResponse.data);  // Depuración
+
+        const userId = userResponse.data.id_usuario;
+        if (!userId) {
+            throw new Error('ID de usuario no encontrado');
         }
+        const roleID = userResponse.data.rol;
+        if (!roleID) {
+            throw new Error('ID de rol no encontrado');
+        }
+        // Obtener el rol del usuario
+        const roleResponse = await roleService.getRole(roleID);
+        console.log('ROLE Response:', roleResponse.data);  // Depuración
+
+        localStorage.setItem('role', roleResponse.data.role);
+
+        // Redirige a la ruta /usuarios
+        navigate('/usuarios');
+    } catch (error) {
+        console.error(error);
+        setMessage(error.response?.data?.message || error.message || 'Error en el login');
+        setIsError(true);
+    }
     };
 
     return (
@@ -54,13 +76,10 @@ const LoginComponent = () => {
                     <Button 
                         type="submit" 
                         sx={{ 
-                            backgroundColor: '#319795', // Verde personalizado
-                            color: 'white', // Texto blanco
-                            '&:hover': { 
-                                backgroundColor: '#2d7a7b' // Color de hover más oscuro
-                            } 
+                            backgroundColor: '#319795',
+                            color: 'white',
+                            '&:hover': { backgroundColor: '#2d7a7b' }
                         }}
-                        className="chakra-button css-1jsinvw"
                         width="full"
                     >
                         Login

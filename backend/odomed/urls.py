@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import cita_detail, crear_citas_automaticas, cita_list, recepcionista_create, recepcionista_detail, recepcionista_list, prescripcion_detail, prescripcion_list, prescripcion_create, tratamiento_costo, tratamiento_detail, tratamiento_list,tratamiento_create, odontologo_detail,odontologo_create,diagnostico_list, diagnostico_create, diagnostico_detail, login, rol_list, rol_detail, rol_create,usuario_list,rol_list_paciente,usuario_detail,usuario_create, odontologo_list, paciente_detail,historial_detail
+from .views import get_usuario_por_email,cita_detail, crear_citas_automaticas, cita_list, recepcionista_create, recepcionista_detail, recepcionista_list, prescripcion_detail, prescripcion_list, prescripcion_create, tratamiento_costo, tratamiento_detail, tratamiento_list,tratamiento_create, odontologo_detail,odontologo_create,diagnostico_list, diagnostico_create, diagnostico_detail, login, rol_list, rol_detail, rol_create,usuario_list,rol_list_paciente,usuario_detail,usuario_create, odontologo_list, paciente_detail,historial_detail
 from django.http import HttpResponse
 
 def odomed_home(request):
@@ -36,6 +36,7 @@ urlpatterns = [
     path('citas/', cita_list, name='cita_list'),  
     path('citas/crear_citas/', crear_citas_automaticas, name='crear_citas_automaticas'),  
     path('citas/<int:id_cita>/', cita_detail, name='cita_detail'),  
+    path('usuario/por-email/', get_usuario_por_email, name='get_usuario_por_email'),
 
     path('login/', login, name='login'),  # Ruta para el login
 

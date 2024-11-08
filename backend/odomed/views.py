@@ -18,6 +18,7 @@ import re
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
+from django.forms.models import model_to_dict
 
 
 
@@ -78,7 +79,13 @@ def rol_detail(request, id_rol):
 
         return JsonResponse({'message': 'Rol actualizado con éxito'})
     elif request.method == 'GET':
-        return JsonResponse(rol)
+        try:
+            rol = Roles.objects.get(id_rol=id_rol)
+            rol_dict = model_to_dict(rol)
+            return JsonResponse(rol_dict, safe=False)
+        except Roles.DoesNotExist:
+            return JsonResponse({"error": "Rol no encontrado"}, status=404)
+
     elif request.method == 'DELETE':
         linked_users = Usuario.objects.filter(rol=rol, activo=True)  # Replace `is_active` with your field for active users
 
@@ -809,7 +816,7 @@ def tratamiento_create(request):
         descripcion = data.get('descripcion', '').upper()
         fecha_tratamiento = data.get('fecha_tratamiento')
         id_historial = data.get('id_historial')
-        monto_costo = data.get('costo', {}).get('monto')
+        monto_costo = data.get('monto')
 
         
         if not (5 <= len(nombre_tratamiento) <= 50):
@@ -1232,7 +1239,7 @@ def crear_citas_automaticas(request):
     citas_omitidas = 0
 
     # Generar citas para los próximos 5 días
-    for dias in range(6):
+    for dias in range(8):
         fecha = fecha_actual + timedelta(days=dias)
 
         for odontologo in odontologos_activos:
@@ -1310,3 +1317,18 @@ def cita_detail(request, id_cita):
         return JsonResponse({'success': 'CITA ELIMINADOS LÓGICAMENTE'}, status=200)
     else:
         return JsonResponse({"error": "Método no permitido"}, status=405)
+@csrf_exempt
+def get_usuario_por_email(request):
+    email = request.GET.get('email', None)
+    if email:
+        try:
+            usuario = Usuario.objects.get(email=email)
+            return JsonResponse({
+                'id_usuario': usuario.id_usuario,
+                'email': usuario.email,
+                'nombres': usuario.nombres,
+                'rol': usuario.rol.id_rol,  # Incluye el nombre del rol si lo necesitas
+            })
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+    return JsonResponse({'error': 'Email no proporcionado'}, status=400)
