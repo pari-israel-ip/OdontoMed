@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,10 +85,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'clinicaodontologica',  # Cambia a tu base de datos
-        'USER': 'root',  # Usuario predeterminado de Laragon
-        'PASSWORD': '',  # Contraseña predeterminada (vacía en Laragon)
-        'HOST': '127.0.0.1',  # Laragon usa localhost
-        'PORT': '3306',  # Puerto predeterminado de MySQL en Laragon
+        'USER': 'avnadmin',  # Usuario predeterminado de Laragon
+        'PASSWORD': 'AVNS_tBI6tsRv8w5s5yMA1f7',  # Contraseña predeterminada (vacía en Laragon)
+        'HOST': 'clinicaodontologica-alvarofredgonza18-47a8.j.aivencloud.com',  # Laragon usa localhost
+        'PORT': '22966',  # Puerto predeterminado de MySQL en Laragon
+        'OPTIONS': {
+            'ssl': { #modicficar la ruta del archivo ca.pem
+                'ca': os.path.join(BASE_DIR, 'certificates', 'C:/Users/LENOVO IDEAPAD/OneDrive - Universidad Privada del Valle/Desktop/no es/OdontoMed/backend/ca.pem'),  # Ruta al archivo .pem
+            }
+        }
     }
 }
 
