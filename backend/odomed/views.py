@@ -141,7 +141,7 @@ def rol_create(request):
 
         return JsonResponse({'message': 'Paciente Creado Correctamente'}, status=201)
 #crud de roles
-
+#create_list es listado de pacientes
 def usuario_list(request):
     if request.method == 'GET':
         # Obtiene todos los pacientes activos

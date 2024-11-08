@@ -97,19 +97,14 @@ const RolesComponent = () => {
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>Roles</Heading>
 
-            {message && (
-                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+            {message && message.type === 'error' && (
+                <Alert status="error" mb={4}>
                     <AlertIcon />
-                    {message.type === 'error' ? (
-                        <>
-                            <AlertTitle>Error:</AlertTitle>
-                            <AlertDescription>{message.text}</AlertDescription>
-                        </>
-                    ) : (
-                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
-                    )}
+                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
+
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
                 Crear Nuevo Rol
