@@ -1,4 +1,3 @@
-// RolesComponent.js
 import React, { useEffect, useState } from 'react';
 import {
     Box,
@@ -15,7 +14,9 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,useToast
+    AlertDescription,
+    Input,
+    useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
@@ -23,8 +24,9 @@ import EditRoleModal from './EditRoleModal';
 import CreateRoleModal from './CreateRoleModal';
 
 const RolesComponent = () => {
-    const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
+    const [message, setMessage] = useState(null);
     const [roles, setRoles] = useState([]);
+    const [filter, setFilter] = useState(''); // Estado para el filtro
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRole, setCurrentRole] = useState(null);
@@ -48,7 +50,7 @@ const RolesComponent = () => {
         if (confirmDelete) {
             try {
                 const response = await roleService.deleteRole(id_rol);
-                setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
+                setMessage({ type: 'success', text: response.data.message });
                 loadRoles();
                 toast({
                     title: "Rol eliminado.",
@@ -58,7 +60,7 @@ const RolesComponent = () => {
                     isClosable: true,
                 });
             } catch (error) {
-                setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el odontólogo' });
+                setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el rol' });
                 console.error('Error deleting role:', error);
             }
         }
@@ -75,9 +77,24 @@ const RolesComponent = () => {
                 nombre_rol: updatedRole.nombre_rol,
                 permisos: updatedRole.permisos
             });
+            toast({
+                title: "Rol actualizado.",
+                description: "El rol ha sido actualizado exitosamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            });
         } catch (error) {
             console.error('Error updating role:', error);
+            toast({
+                title: "Error al actualizar.",
+                description: "No se pudo actualizar el rol.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
         } finally {
+            setIsEditModalOpen(false);
             loadRoles();
         }
     };
@@ -85,13 +102,32 @@ const RolesComponent = () => {
     const handleCreate = async (newRole) => {
         try {
             await roleService.createRole(newRole);
+            toast({
+                title: "Rol creado.",
+                description: "El rol ha sido creado exitosamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            });
         } catch (error) {
             console.error('Error creating role:', error);
-        }
-        finally{
-            loadRoles(); // Recargar los roles después de crear
+            toast({
+                title: "Error al crear.",
+                description: "No se pudo crear el rol.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        } finally {
+            setIsCreateModalOpen(false);
+            loadRoles();
         }
     };
+
+    // Filtra los roles según el término de búsqueda
+    const filteredRoles = roles.filter(role =>
+        role.nombre_rol.toLowerCase().includes(filter.toLowerCase())
+    );
 
     return (
         <Box p={4}>
@@ -104,11 +140,19 @@ const RolesComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
-
-
-            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                CREAR NUEVO ROL
-            </Button>
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>
+                    CREAR NUEVO ROL
+                </Button>
+            <Flex mb={4} justify="space-between">
+                <Input
+                    placeholder="Buscar rol"
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    ml={4}
+                    marginTop={4}
+                />
+                
+            </Flex>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
@@ -118,7 +162,7 @@ const RolesComponent = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {roles.map(role => (
+                    {filteredRoles.map(role => (
                         <Tr key={role.id_rol}>
                             <Td>{role.nombre_rol}</Td>
                             <Td>
@@ -153,10 +197,8 @@ const RolesComponent = () => {
 
             {isCreateModalOpen && (
                 <CreateRoleModal
-                    onClose={() => {setIsCreateModalOpen(false);
-                        loadRoles();
-                    }}
-                    onCreate={()=>handleCreate}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onCreate={handleCreate}
                 />
             )}
         </Box>

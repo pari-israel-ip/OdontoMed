@@ -14,17 +14,21 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,useToast
+    AlertDescription,
+    useToast,
+    Input
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
-import odontologoService from '../services/odontologoService';  // Servicio de odontólogo
-import CreateOdontologoModal from './CreateOdontologoModal'; // Ruta al modal de creación
+import { useNavigate } from 'react-router-dom';
+import odontologoService from '../services/odontologoService';
+import CreateOdontologoModal from './CreateOdontologoModal';
 
 const OdontologosComponent = () => {
     const [odontologos, setOdontologos] = useState([]);
-    const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
-    const navigate = useNavigate(); // Usa useNavigate para redirigir
+    const [filteredOdontologos, setFilteredOdontologos] = useState([]);
+    const [message, setMessage] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');  // Estado para el término de búsqueda
+    const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const toast = useToast();
 
@@ -32,15 +36,29 @@ const OdontologosComponent = () => {
         loadOdontologos();
     }, []);
 
+    useEffect(() => {
+        // Filtra odontólogos en función del término de búsqueda
+        setFilteredOdontologos(
+            odontologos.filter((odontologo) =>
+                odontologo.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                odontologo.ci.toString().includes(searchTerm) ||
+                odontologo.email.toString().includes(searchTerm) ||
+                odontologo.numero_licencia.toString().includes(searchTerm) ||
+                odontologo.especializacion.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        );
+    }, [searchTerm, odontologos]);
+
     const loadOdontologos = async () => {
         try {
             const response = await odontologoService.getOdontologos();
             setOdontologos(response.data);
+            setFilteredOdontologos(response.data);
         } catch (error) {
             console.error('Error fetching odontólogos:', error);
         }
     };
-    
+
     const handleDelete = async (id_odontologo) => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Odontólogo?");
         if (confirmDelete) {
@@ -53,10 +71,9 @@ const OdontologosComponent = () => {
                     isClosable: true,
                 });
                 const response = await odontologoService.deleteOdontologos(id_odontologo);
-                setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
+                setMessage({ type: 'success', text: response.data.message });
                 loadOdontologos();
             } catch (error) {
-                // Captura y muestra el mensaje de error desde el servidor
                 setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el odontólogo' });
                 console.error('Error deleting odontólogo:', error);
             }
@@ -83,10 +100,19 @@ const OdontologosComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
-
-            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                CREAR NUEVO ODONTOLOGO
-            </Button>
+                <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mr={4}>
+                    CREAR NUEVO ODONTOLOGO
+                </Button>
+            <Flex mb={4} justify="space-between">
+                
+                <Input
+                    placeholder="BUSCAR ODONTOLOGO..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    ml={4}
+                    marginTop={4}
+                />
+            </Flex>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
@@ -100,7 +126,7 @@ const OdontologosComponent = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {odontologos.map((odontologo) => (
+                    {filteredOdontologos.map((odontologo) => (
                         <Tr key={odontologo.id_odontologo}>
                             <Td>{odontologo.nombre_completo}</Td>
                             <Td>{odontologo.ci}</Td>

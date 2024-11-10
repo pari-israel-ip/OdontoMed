@@ -1,4 +1,3 @@
-// UsuariosComponent.js
 import React, { useEffect, useState } from 'react';
 import {
     Box,
@@ -11,16 +10,24 @@ import {
     Th,
     Td,
     IconButton,
-    Flex, useToast
+    Flex,
+    useToast,
+    Input,
+    Stack,
+    Select
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
+import { useNavigate } from 'react-router-dom';
 import usuarioService from '../services/usuarioService';
-import CreateUsuarioModal from './CreateUsuarioModal';  // Ruta al modal de creación
+import CreateUsuarioModal from './CreateUsuarioModal';
 
 const UsuariosComponent = () => {
     const [usuarios, setUsuarios] = useState([]);
-    const navigate = useNavigate(); // Usa useNavigate para redirigir
+    const [filteredUsuarios, setFilteredUsuarios] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 1;
+    const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const toast = useToast();
 
@@ -32,11 +39,12 @@ const UsuariosComponent = () => {
         try {
             const response = await usuarioService.getUsuarios();
             setUsuarios(response.data);
+            setFilteredUsuarios(response.data); // Inicialmente sin filtro
         } catch (error) {
             console.error('Error fetching usuarios:', error);
         }
     };
-    
+
     const handleDelete = async (id_usuario) => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Paciente?");
         if (confirmDelete) {
@@ -57,22 +65,48 @@ const UsuariosComponent = () => {
     };
 
     const handleCreate = (newUsuario) => {
-        // Aquí puedes actualizar la lista de usuarios o simplemente volver a cargar
         setUsuarios((prevUsuarios) => [...prevUsuarios, newUsuario]);
-        setIsCreateModalOpen(false); // Cierra el modal
+        setFilteredUsuarios((prevUsuarios) => [...prevUsuarios, newUsuario]);
+        setIsCreateModalOpen(false);
     };
 
     const handleShow = (usuarioId) => {
         navigate(`/usuarios/${usuarioId}`);
     };
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        const filtered = usuarios.filter((usuario) =>
+            Object.values(usuario).some((value) =>
+                value.toString().toLowerCase().includes(e.target.value.toLowerCase())
+            )
+        );
+        setFilteredUsuarios(filtered);
+        setCurrentPage(1); // Resetear a la primera página tras filtrar
+    };
+
+    // Calcular el rango de datos a mostrar en la página actual
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentUsuarios = filteredUsuarios.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage);
+
     return (
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>PACIENTES</Heading>
-
-            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                CREAR NUEVO PACIENTE
-            </Button>
+            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>
+                    CREAR NUEVO PACIENTE
+                </Button>
+            <Flex justify="space-between" mb={4}>
+                
+                <Input
+                    placeholder="BUSCAR PACIENTE..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    ml={4}
+                    marginTop={4}
+                />
+            </Flex>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
@@ -86,7 +120,7 @@ const UsuariosComponent = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {usuarios.map((usuario) => (
+                    {currentUsuarios.map((usuario) => (
                         <Tr key={usuario.id_paciente}>
                             <Td>{usuario.nombre_completo}</Td>
                             <Td>{usuario.ci}</Td>
@@ -99,7 +133,7 @@ const UsuariosComponent = () => {
                                         icon={<InfoIcon />}
                                         colorScheme="cyan"
                                         size="sm"
-                                        onClick={() => handleShow(usuario.id_paciente)}  // Redirigir a la ruta del modal
+                                        onClick={() => handleShow(usuario.id_paciente)}
                                         mr={2}
                                     />
                                     <IconButton
@@ -114,15 +148,30 @@ const UsuariosComponent = () => {
                     ))}
                 </Tbody>
             </Table>
+
+            <Flex justify="space-between" align="center" mt={4} >
+                <Button colorScheme="teal"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    isDisabled={currentPage === 1}
+                >
+                    ANTERIOR
+                </Button>
+                <Box>PAGINA {currentPage} DE {totalPages}</Box>
+                <Button colorScheme="teal"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    isDisabled={currentPage === totalPages}
+                >
+                    SIGUIENTE
+                </Button>
+            </Flex>
+
             {isCreateModalOpen && (
-            <   CreateUsuarioModal 
-                onClose={() => {setIsCreateModalOpen(false)
-                    loadUsuarios()
-                }} 
-                onCreate={handleCreate} />
+                <CreateUsuarioModal
+                    onClose={() => { setIsCreateModalOpen(false); loadUsuarios(); }}
+                    onCreate={handleCreate}
+                />
             )}
         </Box>
-        
     );
 };
 

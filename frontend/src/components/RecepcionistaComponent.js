@@ -14,23 +14,25 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,useToast
+    AlertDescription,
+    Input,
+    useToast
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';  // Importa useNavigate para redirigir
-import recepcionistaService from '../services/recepcionistaService';  // Servicio de odontólogo
-import CreateRecepcionistaModal from './CreateRecepcionistaModal'; // Ruta al modal de creación
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
+import recepcionistaService from '../services/recepcionistaService';
+import CreateRecepcionistaModal from './CreateRecepcionistaModal';
 import EditUsuarioModal from './EditUsuarioModal';
 
 const RecepcionistasComponent = () => {
     const [recepcionistas, setRecepcionistas] = useState([]);
-    const [message, setMessage] = useState(null); // Estado para el mensaje de respuesta
-    const navigate = useNavigate(); // Usa useNavigate para redirigir
+    const [searchTerm, setSearchTerm] = useState("");  // Estado para la búsqueda
+    const [message, setMessage] = useState(null);
+    const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRecepcionista, setCurrentRecepcionista] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const toast = useToast();
-
 
     useEffect(() => {
         loadRecepcionistas();
@@ -49,6 +51,9 @@ const RecepcionistasComponent = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este Recepcionista?");
         if (confirmDelete) {
             try {
+                await recepcionistaService.deleteRecepcionistas(id_recepcionista);
+                setMessage({ type: 'success', text: "Recepcionista eliminado exitosamente." });
+                loadRecepcionistas();
                 toast({
                     title: "Recepcionista eliminado.",
                     description: "El recepcionista ha sido eliminado exitosamente.",
@@ -56,14 +61,9 @@ const RecepcionistasComponent = () => {
                     duration: 3000,
                     isClosable: true,
                 });
-                const response = await recepcionistaService.deleteRecepcionistas(id_recepcionista);
-                setMessage({ type: 'success', text: response.data.message }); // Muestra el mensaje de éxito
-                loadRecepcionistas();
             } catch (error) {
-                // Captura y muestra el mensaje de error desde el servidor
                 setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar el Recepcionista' });
                 console.error('Error deleting Recepcionista:', error);
-                
             }
         }
     };
@@ -78,6 +78,17 @@ const RecepcionistasComponent = () => {
         setIsEditModalOpen(true);
     };
 
+    // Filtrar recepcionistas según el término de búsqueda
+    const filteredRecepcionistas = recepcionistas.filter((recepcionista) => {
+        const searchText = searchTerm.toLowerCase();
+        return (
+            recepcionista.nombre_completo.toLowerCase().includes(searchText) ||
+            recepcionista.ci.toLowerCase().includes(searchText) ||
+            recepcionista.telefono.toLowerCase().includes(searchText) ||
+            recepcionista.email.toLowerCase().includes(searchText)
+        );
+    });
+
     return (
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>RECEPCIONISTAS</Heading>
@@ -89,10 +100,19 @@ const RecepcionistasComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
-
-            <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                CREAR NUEVO RECEPCIONISTA
-            </Button>
+                <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>
+                    CREAR NUEVO RECEPCIONISTA
+                </Button>
+            <Flex mb={4} justify="space-between">
+                
+                <Input
+                    placeholder="BUSCAR RECEPCIONISTA..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    ml={4}
+                    marginTop={4}
+                />
+            </Flex>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
@@ -105,12 +125,12 @@ const RecepcionistasComponent = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {recepcionistas.map((recepcionista) => (
+                    {filteredRecepcionistas.map((recepcionista) => (
                         <Tr key={recepcionista.id_recepcionista}>
                             <Td>{recepcionista.nombre_completo}</Td>
                             <Td>{recepcionista.ci}</Td>
                             <Td>{recepcionista.telefono}</Td>
-                            <Td>{recepcionista.email }</Td>
+                            <Td>{recepcionista.email}</Td>
                             <Td>
                                 <Flex justify="space-between">
                                     <IconButton
@@ -146,7 +166,6 @@ const RecepcionistasComponent = () => {
                     onSave={(updatedUser) => {
                         setIsEditModalOpen(false);
                         loadRecepcionistas();
-    
                     }} 
                 />
             )}
