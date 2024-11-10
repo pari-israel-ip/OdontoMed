@@ -26,7 +26,7 @@ const UsuariosComponent = () => {
     const [filteredUsuarios, setFilteredUsuarios] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 1;
+    const itemsPerPage = 10;
     const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const toast = useToast();

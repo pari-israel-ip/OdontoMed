@@ -91,7 +91,7 @@ DATABASES = {
         'PORT': '22966',  # Puerto predeterminado de MySQL en Laragon
         'OPTIONS': {
             'ssl': { #modicficar la ruta del archivo ca.pem
-                'ca': os.path.join(BASE_DIR, 'certificates', 'C:/Users/LENOVO IDEAPAD/OneDrive - Universidad Privada del Valle/Desktop/no es/OdontoMed/backend/ca.pem'),  # Ruta al archivo .pem
+                'ca': os.path.join(BASE_DIR, 'certificates', 'C:/Users/LENOVO IDEAPAD/OneDrive - Universidad Privada del Valle/Desktop/repo/OdontoMed/backend/ca.pem'),  # Ruta al archivo .pem
             }
         }
     }
@@ -138,3 +138,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'alvarofredgonza2020@gmail.com'  # Cambia esto a tu correo de Gmail
+EMAIL_HOST_PASSWORD = 'wird ojpx auhg ohui'  # Usa una contraseña de aplicaciones

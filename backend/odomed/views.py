@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 from django.forms.models import model_to_dict
-
+from django.core.mail import send_mail
 
 
 
@@ -1281,6 +1281,7 @@ def cita_detail(request, id_cita):
             id_paciente = data.get('id_paciente')
             monto = data.get('monto')
             id_costo = data.get('id_costo')
+            id_horario = data.get('id_horario')
 
             # Actualizar los campos específicos
             if estado_cita:
@@ -1295,6 +1296,32 @@ def cita_detail(request, id_cita):
 
             cita.save()
 
+            if estado_cita == "programada":
+                usuario = Usuario.objects.filter(id_usuario=id_paciente).first() 
+                email_paciente = usuario.email
+                hora = Horarios.objects.filter(id_horario=id_horario).first()
+            
+            # Enviar el correo
+                send_mail(
+                    subject="Confirmación de Cita Programada",
+                    message=f"Su cita ha sido programada correctamente para el dia {cita.fecha} a las {hora.horario}",
+                    from_email="odomed",
+                    recipient_list=[email_paciente],
+                    fail_silently=False,
+                )
+            if estado_cita == "cancelada":
+                usuario = Usuario.objects.filter(id_usuario=id_paciente).first() 
+                email_paciente = usuario.email
+                hora = Horarios.objects.filter(id_horario=id_horario).first()
+            
+            # Enviar el correo
+                send_mail(
+                    subject="Avisa de Cita Cancelada",
+                    message=f"Su cita del dia {cita.fecha} a las {hora.horario} ha sido cancela",
+                    from_email="odomed",
+                    recipient_list=[email_paciente],
+                    fail_silently=False,
+                )
             return JsonResponse({
                 "message": "Cita actualizada correctamente"
             }, status=200)
@@ -1308,7 +1335,6 @@ def cita_detail(request, id_cita):
         cita.activo = False
         cita.save()
         
-
         return JsonResponse({'success': 'CITA ELIMINADOS LÓGICAMENTE'}, status=200)
     else:
         return JsonResponse({"error": "Método no permitido"}, status=405)

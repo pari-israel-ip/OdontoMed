@@ -68,7 +68,8 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                     </FormControl>
                     <FormControl mb={4}>
                         <FormLabel>Paciente</FormLabel>
-                        <Select value={paciente} onChange={(e) => setPaciente(e.target.value)}>
+                        <Select value={paciente} onChange={(e) => setPaciente(e.target.value)}
+                            placeholder="Selecciona un paciente">
                             {pacientes.map((pac) => (
                                 <option key={pac.id_paciente} value={pac.id_paciente}>
                                     {pac.nombres} {pac.apellidos}
