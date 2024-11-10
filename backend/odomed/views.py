@@ -258,12 +258,7 @@ def usuario_detail(request, id_usuario):
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
             errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
 
-        # Validación de contraseña
-        contrasenia = data.get('contrasenia', '')
-        password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
-        if not password_regex.match(contrasenia):
-            errors['contrasenia'] = 'La contraseña debe tener entre 8 y 250 caracteres y contener al menos una letra, un número y un carácter especial.'
-
+       
         if errors:
             return JsonResponse({'errors': errors}, status=400)
         # Actualizar atributos
@@ -274,7 +269,6 @@ def usuario_detail(request, id_usuario):
         usuario.telefono = data.get('telefono', usuario.telefono)
         usuario.fecha_nacimiento = data.get('fecha_nacimiento', usuario.fecha_nacimiento)
         usuario.direccion = data.get('direccion', usuario.direccion).upper()
-        usuario.contrasenia = data.get('contrasenia', usuario.contrasenia)
         
         usuario.save()
         return JsonResponse({'message': 'USUARIO ACTUALIZADO'})
@@ -362,7 +356,7 @@ def usuario_create(request):
         contrasenia = data.get('contrasenia', '')
         password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
         if not password_regex.match(contrasenia):
-            errors['contrasenia'] = 'La contraseña debe tener entre 8 y 250 caracteres y contener al menos una letra, un número y un carácter especial.'
+            errors['contrasenia'] = 'Contraseña insegura: debe tener minimamente 8 caracteres, letra, numeros y simbolos(@$!%*?&).'
 
         # Validación de seguro médico
         seguro_medico = data.get('seguro_medico', '').strip().upper()  # Convertir a mayúsculas
@@ -446,12 +440,13 @@ def odontologo_list(request):
     if request.method == 'GET':
         # Filtrar los odontólogos activos y obtener los datos necesarios desde la tabla Usuarios
         odontologos = Odontologos.objects.filter(activo=True).select_related('id_odontologo').values(
-            'id_odontologo', 'id_odontologo__nombres','id_odontologo__ci','id_odontologo__fecha_nacimiento','id_odontologo__apellidos', 'numero_licencia', 'especializacion', 'activo'
+            'id_odontologo', 'id_odontologo__nombres','id_odontologo__ci','id_odontologo__fecha_nacimiento','id_odontologo__apellidos', 'numero_licencia', 'especializacion', 'activo', 'id_odontologo__email'
         )
 
         # Crear una nueva lista con el nombre completo del odontólogo
         odontologos_con_nombre_completo = [
             {
+                'email': odontologo['id_odontologo__email'],
                 'id_odontologo': odontologo['id_odontologo'],
                 'ci': odontologo['id_odontologo__ci'],
                 'fecha_nacimiento': odontologo['id_odontologo__fecha_nacimiento'],
@@ -504,8 +499,8 @@ def odontologo_create(request):
         if fecha_nacimiento:
             try:
                 fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
-                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 20):
-                    errors['fecha_nacimiento'] = 'La Fecha de nacimiento debe ser entre 80 a 20 años atras a la fecha actual.'
+                if fecha_nacimiento < datetime.now() - timedelta(days=365 * 80) or fecha_nacimiento > datetime.now() - timedelta(days=365 * 25):
+                    errors['fecha_nacimiento'] = 'La Fecha de nacimiento debe ser entre 80 a 25 años atras a la fecha actual.'
             except ValueError:
                 errors['fecha_nacimiento'] = 'Formato incorrecto para la fecha de nacimiento.'
         contrasenia = data.get('contrasenia', '')
@@ -1115,7 +1110,7 @@ def recepcionista_create(request):
         contrasenia = data.get('contrasenia', '')
         password_regex = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,250}$')
         if not password_regex.match(contrasenia):
-            errors['contrasenia'] = 'Contraseña insegura: debe tener entre minimamente 8 caarcteres, letra, numeros y simbolo.'
+            errors['contrasenia'] = 'Contraseña insegura: debe tener minimamente 8 caracteres, letra, numeros y simbolos(@$!%*?&).'
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
         if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):

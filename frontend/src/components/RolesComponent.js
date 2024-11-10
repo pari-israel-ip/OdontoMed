@@ -95,7 +95,7 @@ const RolesComponent = () => {
 
     return (
         <Box p={4}>
-            <Heading as="h2" size="lg" mb={4}>Roles</Heading>
+            <Heading as="h2" size="lg" mb={4}>ROLES</Heading>
 
             {message && message.type === 'error' && (
                 <Alert status="error" mb={4}>
@@ -107,14 +107,14 @@ const RolesComponent = () => {
 
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                Crear Nuevo Rol
+                CREAR NUEVO ROL
             </Button>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
-                        <Th>Nombre del Rol</Th>
-                        <Th>Acciones</Th>
+                        <Th>NOMBRE DEL ROL</Th>
+                        <Th>ACCIONES</Th>
                     </Tr>
                 </Thead>
                 <Tbody>

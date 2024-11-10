@@ -22,7 +22,6 @@ import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import citaService from '../services/citaService';
 import EditCitaModal from './EditCitaModal';
 import CreateCitaModal from './CreateCitaModal';
-import usuarioService from '../services/usuarioService'; // Asegúrate de importar esto si necesitas los odontólogos
 import odontologoService from '../services/odontologoService'
 
 const CitasComponent = () => {
@@ -33,6 +32,7 @@ const CitasComponent = () => {
     const [currentCita, setCurrentCita] = useState(null);
     const [fechaFiltro, setFechaFiltro] = useState(new Date().toISOString().split('T')[0]); // Fecha de hoy
     const [odontologoFiltro, setOdontologoFiltro] = useState('');
+    const [estadoCitaFiltro, setEstadoCitaFiltro] = useState(''); // Nuevo estado de filtro
     const [odontologos, setOdontologos] = useState([]);
 
     useEffect(() => {
@@ -109,13 +109,15 @@ const CitasComponent = () => {
         return citas.filter(cita => {
             const matchesFecha = cita.fecha === fechaFiltro;
             const matchesOdontologo = odontologoFiltro ? cita.odontologo === odontologoFiltro : true;
-            return matchesFecha && matchesOdontologo;
+            const matchesEstado = estadoCitaFiltro ? cita.estado_cita === estadoCitaFiltro : true; // Filtro de estado_cita
+
+            return matchesFecha && matchesOdontologo && matchesEstado;
         });
     };
 
     return (
         <Box p={4}>
-            <Heading as="h2" size="lg" mb={4}>Citas</Heading>
+            <Heading as="h2" size="lg" mb={4}>CITAS</Heading>
 
             {message && (
                 <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
@@ -140,17 +142,28 @@ const CitasComponent = () => {
                     placeholder="Seleccionar fecha"
                 />
                 <Select
-                    placeholder="Seleccionar Odontólogo"
+                    placeholder="SELECCIONAR ODONTOLOGO"
                     value={odontologoFiltro}
                     onChange={(e) => setOdontologoFiltro(e.target.value)}
                     ml={4}
                 >
-                    <option value="">Todos</option>
                     {odontologos.map((odontologo) => (
                         <option key={odontologo.id_odontologo} value={odontologo.nombre_completo}>
                             {odontologo.nombre_completo}
                         </option>
                     ))}
+                </Select>
+                {/* Filtro por estado_cita */}
+                <Select
+                    placeholder="SELECCIONAR ESTADO DE CITA"
+                    value={estadoCitaFiltro}
+                    onChange={(e) => setEstadoCitaFiltro(e.target.value)}
+                    ml={4}
+                >
+                    <option value="programada">PROGRAMADA</option>
+                    <option value="en espera">EN ESPERA</option>
+                    <option value="cancelada">CANCELADA</option>
+                    <option value="completada">COMPLETADA</option>
                 </Select>
             </Flex>
 
@@ -170,9 +183,9 @@ const CitasComponent = () => {
                         <Tr key={cita.id_cita}>
                             <Td>{cita.fecha}</Td>
                             <Td>{cita.horario}</Td>
-                            <Td>{cita.paciente}</Td>
+                            <Td>{cita.paciente === 'None None' ? 'NO ASIGNADO' : cita.paciente}</Td>
                             <Td>{cita.odontologo}</Td>
-                            <Td>{cita.estado_cita}</Td>
+                            <Td>{cita.estado_cita.toUpperCase()}</Td>
                             <Td>
                                 <Flex justify="space-between">
                                     <IconButton

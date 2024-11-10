@@ -80,34 +80,28 @@ const RecepcionistasComponent = () => {
 
     return (
         <Box p={4}>
-            <Heading as="h2" size="lg" mb={4}>Recepcionistas</Heading>
+            <Heading as="h2" size="lg" mb={4}>RECEPCIONISTAS</Heading>
 
-            {message && (
-                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+            {message && message.type === 'error' && (
+                <Alert status="error" mb={4}>
                     <AlertIcon />
-                    {message.type === 'error' ? (
-                        <>
-                            <AlertTitle>Error:</AlertTitle>
-                            <AlertDescription>{message.text}</AlertDescription>
-                        </>
-                    ) : (
-                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
-                    )}
+                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                Crear Nuevo Recepcionista
+                CREAR NUEVO RECEPCIONISTA
             </Button>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
-                        <Th>Nombre Completo</Th>
+                        <Th>NOMBRE COMPLETO</Th>
                         <Th>CI</Th>
-                        <Th>Telefono</Th>
-                        <Th>Correo Electronico</Th>
-                        <Th>Acciones</Th>
+                        <Th>TELEFONO</Th>
+                        <Th>CORREO ELECTRONICO</Th>
+                        <Th>ACCIONES</Th>
                     </Tr>
                 </Thead>
                 <Tbody>

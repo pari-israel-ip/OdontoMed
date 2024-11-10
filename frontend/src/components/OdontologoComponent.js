@@ -46,8 +46,8 @@ const OdontologosComponent = () => {
         if (confirmDelete) {
             try {
                 toast({
-                    title: "Rol eliminado.",
-                    description: "El rol ha sido eliminado exitosamente.",
+                    title: "Odontologo eliminado.",
+                    description: "El odontologo ha sido eliminado exitosamente.",
                     status: "success",
                     duration: 3000,
                     isClosable: true,
@@ -74,34 +74,29 @@ const OdontologosComponent = () => {
 
     return (
         <Box p={4}>
-            <Heading as="h2" size="lg" mb={4}>Odontólogos</Heading>
+            <Heading as="h2" size="lg" mb={4}>ODONTOLOGOS</Heading>
 
-            {message && (
-                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+            {message && message.type === 'error' && (
+                <Alert status="error" mb={4}>
                     <AlertIcon />
-                    {message.type === 'error' ? (
-                        <>
-                            <AlertTitle>Error:</AlertTitle>
-                            <AlertDescription>{message.text}</AlertDescription>
-                        </>
-                    ) : (
-                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
-                    )}
+                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                Crear Nuevo Odontólogo
+                CREAR NUEVO ODONTOLOGO
             </Button>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
-                        <Th>Nombre Completo</Th>
+                        <Th>NOMBRE COMPLETO</Th>
                         <Th>CI</Th>
-                        <Th>Especialización</Th>
-                        <Th>Licencia</Th>
-                        <Th>Acciones</Th>
+                        <Th>CORREO ELECTRONICO</Th>
+                        <Th>ESPECIALIZACION</Th>
+                        <Th>NRO DE LICENCIA</Th>
+                        <Th>ACCIONES</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
@@ -109,6 +104,7 @@ const OdontologosComponent = () => {
                         <Tr key={odontologo.id_odontologo}>
                             <Td>{odontologo.nombre_completo}</Td>
                             <Td>{odontologo.ci}</Td>
+                            <Td>{odontologo.email}</Td>
                             <Td>{odontologo.especializacion}</Td>
                             <Td>{odontologo.numero_licencia }</Td>
                             <Td>

@@ -84,7 +84,7 @@ const ShowOdontologoModal = () => {
             <Modal isOpen={!!odontologo} onClose={onClose} size="full">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Historial Odontológico del Odontólogo</ModalHeader>
+                    <ModalHeader>DATOS DEL ODONTOLOGO</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Grid templateColumns="1fr 1fr" gap={4}>

@@ -115,7 +115,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
         <Modal isOpen={true} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Crear Nuevo Usuario</ModalHeader>
+                <ModalHeader>Crear Nuevo Paciente</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
@@ -308,7 +308,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                 </ModalBody>
                 <ModalFooter>
                     <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
-                        Crear Usuario
+                        Crear Paciente
                     </Button>
                     <Button variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>

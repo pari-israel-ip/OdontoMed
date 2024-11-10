@@ -32,6 +32,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
     const [contrasenia, setContrasenia] = useState(usuario.contrasenia || '');
     const [roles, setRoles] = useState([]);
     const [errors, setErrors] = useState({});
+    
 
     const [loading, setLoading] = useState(false);
     const toast = useToast(); // Para mostrar notificaciones
@@ -61,8 +62,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
             telefono,
             fecha_nacimiento,
             rol,
-            direccion,
-            contrasenia
+            direccion
         };
     
         try {
@@ -187,7 +187,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                 </FormControl>
                             </GridItem>
 
-                            <GridItem>
+                             {/* Campos de Historiales Clínicos<GridItem>
                                 <FormControl isRequired isInvalid={!!errors.contrasenia}>
                                     <FormLabel>Contraseña</FormLabel>
                                     <Input
@@ -197,7 +197,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                     />
                                     {errors.contrasenia && <FormErrorMessage>{errors.contrasenia}</FormErrorMessage>}
                                 </FormControl>
-                            </GridItem>
+                            </GridItem> */}
                         </Grid>
 
                         <ModalFooter>

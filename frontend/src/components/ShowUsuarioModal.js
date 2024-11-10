@@ -304,7 +304,7 @@ const ShowUsuarioModal = () => {
             <Modal isOpen={!!usuario} onClose={onClose} size="full">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Historial Odontologico del Paciente</ModalHeader>
+                    <ModalHeader>HISTORIAL ODONTOLOGICO DEL PACIENTE</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                     <Grid templateColumns="1fr 1fr" gap={4}>
@@ -335,7 +335,7 @@ const ShowUsuarioModal = () => {
                         <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
                         <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
                         <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>
-                            Editar Paciente
+                            Editar Datos del Paciente
                         </Button>
 
                         <Text mt={4}><strong>Historial Clínico:</strong></Text>
@@ -344,7 +344,7 @@ const ShowUsuarioModal = () => {
                                 <Text>Fecha: {historial.fecha_hora_creacion}</Text>
                                 <Text>Notas: {historial.notas_generales}</Text>
                                 <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>
-                                    Editar Historial
+                                    Editar Datos del Historial
                                 </Button>
                                 <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)} >
                                     Crear Nuevo Diagnóstico
@@ -388,7 +388,7 @@ const ShowUsuarioModal = () => {
                                                 <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
                                                 <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
                                                 <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
-                                                <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento}</Text>
+                                                <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
                                                 <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)}>
                                                     Editar Tratamiento
                                                 </Button>

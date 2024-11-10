@@ -68,20 +68,21 @@ const UsuariosComponent = () => {
 
     return (
         <Box p={4}>
-            <Heading as="h2" size="lg" mb={4}>Pacientes</Heading>
+            <Heading as="h2" size="lg" mb={4}>PACIENTES</Heading>
 
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mb={4}>
-                Crear Nuevo Paciente
+                CREAR NUEVO PACIENTE
             </Button>
 
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
-                        <Th>Nombre Completo</Th>
+                        <Th>NOMBRE COMPLETO</Th>
                         <Th>CI</Th>
-                        <Th>Fecha de Nacimiento</Th>
-                        <Th>Seguro Médico</Th>
-                        <Th>Acciones</Th>
+                        <Th>CORREO ELECTRONICO</Th>
+                        <Th>FECHA DE NACIMIENTO</Th>
+                        <Th>CODIGO DE SEGURO MEDICO</Th>
+                        <Th>ACCIONES</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
@@ -89,6 +90,7 @@ const UsuariosComponent = () => {
                         <Tr key={usuario.id_paciente}>
                             <Td>{usuario.nombre_completo}</Td>
                             <Td>{usuario.ci}</Td>
+                            <Td>{usuario.email}</Td>
                             <Td>{usuario.fecha_nacimiento}</Td>
                             <Td>{usuario.seguro_medico}</Td>
                             <Td>
