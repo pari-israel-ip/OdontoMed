@@ -1,4 +1,3 @@
-// EditCitaModal.js
 import React, { useState, useEffect } from 'react';
 import {
     Modal,
@@ -22,6 +21,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     const [paciente, setPaciente] = useState(cita.id_paciente || '');
     const [monto, setMonto] = useState(cita.monto || '');
     const [pacientes, setPacientes] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
 
     useEffect(() => {
@@ -36,8 +36,13 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
         fetchPacientes();
     }, []);
 
+    // Filtrar pacientes según el input de búsqueda
+    const filteredPacientes = pacientes.filter(pac =>
+        `${pac.nombres} ${pac.apellidos}`.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     const handleSave = () => {
-        const updatedCita = { ...cita, estado_cita, id_paciente:paciente, monto };
+        const updatedCita = { ...cita, estado_cita, id_paciente: paciente, monto };
         console.log(updatedCita);
         onSave(updatedCita);
         toast({
@@ -68,9 +73,16 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                     </FormControl>
                     <FormControl mb={4}>
                         <FormLabel>Paciente</FormLabel>
+                        {/* Campo de búsqueda */}
+                        <Input
+                            placeholder="Buscar paciente"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            mb={3}
+                        />
                         <Select value={paciente} onChange={(e) => setPaciente(e.target.value)}
                             placeholder="Selecciona un paciente">
-                            {pacientes.map((pac) => (
+                            {filteredPacientes.map((pac) => (
                                 <option key={pac.id_paciente} value={pac.id_paciente}>
                                     {pac.nombres} {pac.apellidos}
                                 </option>

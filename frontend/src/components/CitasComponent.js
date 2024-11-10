@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    Select,
+    Select, useToast
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import citaService from '../services/citaService';
@@ -34,6 +34,7 @@ const CitasComponent = () => {
     const [odontologoFiltro, setOdontologoFiltro] = useState('');
     const [estadoCitaFiltro, setEstadoCitaFiltro] = useState(''); // Nuevo estado de filtro
     const [odontologos, setOdontologos] = useState([]);
+    const toast = useToast();
 
     useEffect(() => {
         loadCitasAuto();
@@ -74,6 +75,13 @@ const CitasComponent = () => {
                 const response = await citaService.deleteCita(id_cita);
                 setMessage({ type: 'success', text: response.data.message });
                 loadCitas();
+                toast({
+                    title: "Cita eliminada.",
+                    description: "La cita ha sido eliminada exitosamente.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                });
             } catch (error) {
                 setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar la cita' });
                 console.error('Error deleting cita:', error);
@@ -119,17 +127,11 @@ const CitasComponent = () => {
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>CITAS</Heading>
 
-            {message && (
-                <Alert status={message.type === 'success' ? 'success' : 'error'} mb={4}>
+            {message && message.type === 'error' && (
+                <Alert status="error" mb={4}>
                     <AlertIcon />
-                    {message.type === 'error' ? (
-                        <>
-                            <AlertTitle>Error:</AlertTitle>
-                            <AlertDescription>{message.text}</AlertDescription>
-                        </>
-                    ) : (
-                        <AlertDescription>ACCION REALIZADA CORRECTAMENTE</AlertDescription>
-                    )}
+                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
 

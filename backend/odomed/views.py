@@ -1330,7 +1330,10 @@ def cita_detail(request, id_cita):
     if request.method == 'DELETE':
         # Fetch the Usuario instance
         cita = get_object_or_404(Citas, id_cita=id_cita)
-
+        if cita.estado_cita != 'cancelada':
+            return JsonResponse({
+                'error': 'Solo se pueden eliminar citas que esten canceladas.'
+            }, status=400)
     
         cita.activo = False
         cita.save()
