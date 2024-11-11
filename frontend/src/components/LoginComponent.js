@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon, Link } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import loginService from '../services/loginService';
 
@@ -14,12 +14,28 @@ const LoginComponent = () => {
         e.preventDefault();
         try {
             const response = await loginService.login(email, contrasenia);
-            setMessage(response.data.message);
-            setIsError(false);
-            
-            localStorage.setItem('token', response.data.token);
-
-            navigate('/usuarios');
+    
+            console.log("Respuesta del servidor:", response); // Verifica qué datos devuelve el servidor
+    
+            if (response && response.usuario_id) {
+                // Almacena los datos en localStorage
+                localStorage.setItem('usuario_id', response.usuario_id);
+                localStorage.setItem('email', response.email);
+                localStorage.setItem('nombres', response.nombres);
+                localStorage.setItem('apellidos', response.apellidos);
+                localStorage.setItem('telefono', response.telefono);
+                localStorage.setItem('fecha_nacimiento', response.fecha_nacimiento);
+                console.log("Datos guardados en localStorage:", response); // Verificar
+                
+                setMessage('Login exitoso');
+                setIsError(false);
+                
+                // Redirige al usuario a la página de usuarios (o donde necesites)
+                navigate('/usuarios');
+            } else {
+                setMessage('Login fallido');
+                setIsError(true);
+            }
         } catch (error) {
             setMessage(error.response?.data?.message || 'Error en el login');
             setIsError(true);

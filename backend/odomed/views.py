@@ -495,7 +495,7 @@ def usuario_create(request):
         return JsonResponse({
             'message': 'Paciente Creado Correctamente'
         }, status=201)
-
+    
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
@@ -507,13 +507,23 @@ def login(request):
             usuario = Usuario.objects.get(email=email)
             # Verifica la contraseña
             if check_password(contrasenia, usuario.contrasenia):
-                return JsonResponse({'message': 'Login exitoso', 'usuario_id': usuario.id_usuario}, status=200)
+                # Incluir más campos en la respuesta
+                return JsonResponse({
+                    'message': 'Login exitoso', 
+                    'usuario_id': usuario.id_usuario,
+                    'email': usuario.email,
+                    'nombres': usuario.nombres,  
+                    'apellidos': usuario.apellidos,  
+                    'telefono': usuario.telefono,  
+                    'fecha_nacimiento': usuario.fecha_nacimiento,  
+                }, status=200)
             else:
                 return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
         except Usuario.DoesNotExist:
             return JsonResponse({'message': 'Email o contraseña incorrectos'}, status=400)
     
     return JsonResponse({'message': 'Método no permitido'}, status=405)
+
 
 @csrf_exempt
 def odontologo_list(request):
