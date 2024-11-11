@@ -37,15 +37,23 @@ const OdontologosComponent = () => {
     }, []);
 
     useEffect(() => {
-        // Filtra odontólogos en función del término de búsqueda
+        // Filtra odontólogos en función del término de búsqueda, validando que los campos existen antes de aplicar toLowerCase
         setFilteredOdontologos(
-            odontologos.filter((odontologo) =>
-                odontologo.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                odontologo.ci.toString().includes(searchTerm) ||
-                odontologo.email.toString().includes(searchTerm) ||
-                odontologo.numero_licencia.toString().includes(searchTerm) ||
-                odontologo.especializacion.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+            odontologos.filter((odontologo) => {
+                const nombre = odontologo.nombre_completo || '';
+                const ci = odontologo.ci || '';
+                const email = odontologo.email || '';
+                const licencia = odontologo.numero_licencia || '';
+                const especializacion = odontologo.especializacion || '';
+    
+                return (
+                    nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    ci.toString().includes(searchTerm) ||
+                    email.toString().includes(searchTerm) ||
+                    licencia.toString().includes(searchTerm) ||
+                    especializacion.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            })
         );
     }, [searchTerm, odontologos]);
 

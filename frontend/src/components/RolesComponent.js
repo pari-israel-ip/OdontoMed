@@ -101,23 +101,9 @@ const RolesComponent = () => {
 
     const handleCreate = async (newRole) => {
         try {
-            await roleService.createRole(newRole);
-            toast({
-                title: "Rol creado.",
-                description: "El rol ha sido creado exitosamente.",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
+            
         } catch (error) {
-            console.error('Error creating role:', error);
-            toast({
-                title: "Error al crear.",
-                description: "No se pudo crear el rol.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
+            
         } finally {
             setIsCreateModalOpen(false);
             loadRoles();
