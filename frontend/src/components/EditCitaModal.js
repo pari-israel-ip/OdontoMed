@@ -23,6 +23,8 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     const [pacientes, setPacientes] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         const fetchPacientes = async () => {
@@ -42,6 +44,8 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     );
 
     const handleSave = () => {
+        setLoading(true); // Inicia el estado de carga
+
         const updatedCita = { ...cita, estado_cita, id_paciente: paciente, monto };
         console.log(updatedCita);
         onSave(updatedCita);
@@ -53,6 +57,8 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
             isClosable: true,
         });
         onClose();
+        setLoading(false); // Inicia el estado de carga
+
     };
 
     return (
@@ -99,7 +105,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={handleSave}>
+                    <Button colorScheme="blue" onClick={handleSave} isLoading={loading}>
                         Guardar
                     </Button>
                     <Button onClick={onClose} ml={3}>

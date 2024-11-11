@@ -21,12 +21,16 @@ const EditOdontologoModal = ({ odontologo, id, onClose, onSave }) => {
     const [especializacion, setEspecializacion] = useState(odontologo.especializacion || '');
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Submitting with id_odontologo:", id); // Check if id_odontologo is present
 
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/odontologo/${id}/`, {
                 numero_licencia: numeroLicencia,
                 especializacion,
@@ -48,6 +52,8 @@ const EditOdontologoModal = ({ odontologo, id, onClose, onSave }) => {
         } catch (error) {
             const errorMessage = error.response?.data.errors || { general: 'Error al actualizar el odontólogo. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -80,7 +86,7 @@ const EditOdontologoModal = ({ odontologo, id, onClose, onSave }) => {
                             <FormErrorMessage>{errors.especializacion}</FormErrorMessage>
                         </FormControl>
                        
-                        <Button mt={4} colorScheme="blue" type="submit">Guardar</Button>
+                        <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">Guardar</Button>
                         <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>

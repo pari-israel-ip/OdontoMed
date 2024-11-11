@@ -22,6 +22,8 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
     const [descripcion, setDescripcion] = useState('');
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         if (diagnostico) {
@@ -74,6 +76,8 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
         }
 
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await diagnosticoService.updateDiagnostico(diagnostico.id_diagnostico, {
                 nombre_diagnostico: nombreDiagnostico,
                 fecha_diagnostico: fechaDiagnostico,
@@ -101,6 +105,8 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
                 duration: 3000,
                 isClosable: true,
             });
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -140,7 +146,7 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
                             <FormErrorMessage>{errors.descripcion}</FormErrorMessage>
                         </FormControl>
 
-                        <Button mt={4} colorScheme="blue" type="submit">
+                        <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
                             Guardar Cambios
                         </Button>
                     </form>

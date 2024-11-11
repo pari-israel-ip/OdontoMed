@@ -26,6 +26,8 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
     const [estadoTratamiento, setEstadoTratamiento] = useState('');
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         if (tratamiento) {
@@ -109,6 +111,8 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
         }
         setErrors({}); // Limpiar errores previos
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/tratamiento/${tratamiento.id_tratamiento}/`, {
                 nombre_tratamiento: nombreTratamiento,
                 fecha_tratamiento: fechaTratamiento,
@@ -144,6 +148,8 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
                 duration: 3000,
                 isClosable: true,
             });
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -208,7 +214,7 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
 
                         {errors.general && <FormErrorMessage>{errors.general}</FormErrorMessage>}
 
-                        <Button mt={4} colorScheme="blue" type="submit">
+                        <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
                             Guardar
                         </Button>
                         <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>

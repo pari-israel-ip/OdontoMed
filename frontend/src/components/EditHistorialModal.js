@@ -23,6 +23,8 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
     const [selectedOdontologo, setSelectedOdontologo] = useState(historial.id_odontologo?.id_odontologo || '');
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         const fetchOdontologos = async () => {
@@ -39,6 +41,8 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/historial/${historial.id_historial}/`, {
                 notas_generales: notasGenerales,
                 id_odontologo: selectedOdontologo
@@ -67,6 +71,8 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
                 duration: 3000,
                 isClosable: true,
             });
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -104,7 +110,7 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
                             <FormErrorMessage>{errors.id_odontologo}</FormErrorMessage>
                         </FormControl>
 
-                        <Button mt={4} colorScheme="blue" type="submit">Guardar</Button>
+                        <Button mt={4} isLoading={loading} colorScheme="blue" type="submit">Guardar</Button>
                         <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>

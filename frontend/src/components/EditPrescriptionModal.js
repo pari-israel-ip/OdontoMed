@@ -23,6 +23,8 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
     const [initialFechaInicio, setInitialFechaInicio] = useState(''); // Store original start date
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         if (prescripcion) {
@@ -80,6 +82,8 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
         setErrors({}); // Clear previous errors
 
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/prescripcion/${prescripcion.id_medicamento}/`, {
                 nombre_medicamento: nombreMedicamento,
                 dosis,
@@ -112,6 +116,8 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
                 duration: 3000,
                 isClosable: true,
             });
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -165,7 +171,7 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
                             <FormErrorMessage mb={4}>{errors.general}</FormErrorMessage>
                         )}
 
-                        <Button mt={4} colorScheme="blue" type="submit">
+                        <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
                             Guardar
                         </Button>
                         <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>

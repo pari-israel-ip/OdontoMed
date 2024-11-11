@@ -22,11 +22,15 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
     const [antecedentesMedicos, setAntecedentesMedicos] = useState(paciente.antecedentes_medicos || '');
     const [errors, setErrors] = useState({});
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/paciente/${paciente.id_usuario}/`, {
                 seguro_medico: seguroMedico,
                 alergias,
@@ -49,6 +53,8 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
         } catch (error) {
             const errorMessage = error.response?.data.errors || { general: 'Error al actualizar el paciente. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
+            setLoading(false); // Inicia el estado de carga
+
         }
     };
 
@@ -88,7 +94,7 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
                             />
                             <FormErrorMessage>{errors.antecedentes_medicos}</FormErrorMessage>
                         </FormControl>
-                        <Button mt={4} colorScheme="blue" type="submit">Guardar</Button>
+                        <Button mt={4} isLoading={loading} colorScheme="blue" type="submit">Guardar</Button>
                         <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>

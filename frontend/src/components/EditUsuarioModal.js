@@ -66,6 +66,8 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
         };
     
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.put(`http://127.0.0.1:8000/odomed/usuario/${usuario.id_usuario}/`, updatedUsuario);
     
             // Si hay errores específicos en la respuesta
@@ -201,7 +203,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                         </Grid>
 
                         <ModalFooter>
-                            <Button colorScheme="blue" mr={3} type="submit">
+                            <Button isLoading={loading} colorScheme="blue" mr={3} type="submit">
                                 Guardar
                             </Button>
                             <Button variant="ghost" onClick={onClose}>Cancelar</Button>
