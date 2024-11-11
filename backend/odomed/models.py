@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
-
+import random
 
 
 # Model for Roles table
@@ -34,7 +34,11 @@ class Usuario(models.Model):
         if self.contrasenia and not self.contrasenia.startswith('pbkdf2_sha256$'):
             self.contrasenia = make_password(self.contrasenia)
         super().save(*args, **kwargs)
-
+    def generar_codigo_recuperacion(self):
+        # Generar un código de recuperación aleatorio de 5 dígitos
+        codigo_aleatorio = str(random.randint(10000, 99999))
+        self.codigo = codigo_aleatorio  # Guardar el código en el atributo "codigo"
+        self.save()  # Guardar cambios en la base de datos
     class Meta:
         db_table = 'usuarios'
         managed = False

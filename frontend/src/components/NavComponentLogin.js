@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Flex, Text, Button, Link, Image, IconButton, Collapse, VStack } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Menu, MenuButton, Avatar, MenuList, MenuItem,Modal, ModalContent, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody,Box, Flex, Text, Button, Link, Image, IconButton, Collapse, VStack } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,14 +8,37 @@ const NavComponentLogin = () => {
     const userRole = localStorage.getItem('role');
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [email, setEmail] = useState(null); // Estado para guardar el email
+    const [nombres, setNombres] = useState(null); // Estado para los nombres
+    const [apellidos, setApellidos] = useState(null); // Estado para los apellidos
+    useEffect(() => {
+        const storedEmail = localStorage.getItem('email');
+        const storedNombres = localStorage.getItem('nombres');
+        const storedApellidos = localStorage.getItem('apellidos');
+        
+        if (storedEmail) setEmail(storedEmail); 
+        if (storedNombres) setNombres(storedNombres);
+        if (storedApellidos) setApellidos(storedApellidos);
+    }, []);
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
-
+        localStorage.removeItem('email');
+        localStorage.removeItem('nombres');
+        localStorage.removeItem('apellidos');
+        localStorage.removeItem('usuario_id');
         // Redirige al usuario a la página de inicio de sesión
         navigate('/login');
     }
+    const handleAccountInfo = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
         <Box bg="white" px={4} boxShadow="sm">
             <Flex h={16} alignItems="center" justifyContent="space-between">
@@ -63,8 +86,16 @@ const NavComponentLogin = () => {
                     </Link>}
                     
                     <Text></Text>
-                    <Button onClick={handleLogout} colorScheme="teal">Cerrar sesión</Button>
                 </Flex>
+                <Box flex="1" display="flex" justifyContent="flex-end">
+                    <Menu>
+                        <MenuButton as={IconButton} icon={<Avatar size="sm" src={" "} />} />
+                        <MenuList>
+                            <MenuItem onClick={handleAccountInfo}>Información de cuenta</MenuItem>
+                            <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
+                        </MenuList>
+                    </Menu>
+                </Box>
             </Flex>
 
             {/* Menú desplegable para pantallas pequeñas */}
@@ -96,6 +127,18 @@ const NavComponentLogin = () => {
                     <Button onClick={handleLogout} colorScheme="teal" width="100%">Cerrar sesión</Button>
                 </VStack>
             </Collapse>
+            <Modal isOpen={isModalOpen} onClose={closeModal}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Información de la cuenta</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Text><strong>Email:</strong> {email}</Text>
+                        <Text><strong>Nombres:</strong> {nombres}</Text>
+                        <Text><strong>Apellidos:</strong> {apellidos}</Text>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 };
