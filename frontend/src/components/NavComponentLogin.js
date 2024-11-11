@@ -69,7 +69,7 @@ const NavComponentLogin = () => {
                     flex="2"
                     justifyContent="center" // Centra los enlaces
                 >
-                    {(userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO') && <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    {(userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO'||userRole === 'RECEPCIONISTA') && <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Pacientes</Text>
                     </Link>}
                     {(userRole === 'ADMINISTRADOR'||userRole==='RECEPCIONISTA') &&<Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}>
