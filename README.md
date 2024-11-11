@@ -13,13 +13,14 @@ https://univalleedu-my.sharepoint.com/:u:/g/personal/gaa2025817_est_univalle_edu
 
 crear carpetas del env
 + python3 -m venv nombre-env
-
++ .\env\Scripts\Activate   
++ python manage.py runserver 
 
 pip install tools from Back End 
 + pip install mysqlclient
 + pip install djangorestframework   
 + pip install django-cors-headers 
-+ pip install djangop  
++ pip install django 
 
 
 npm install tools form Front End

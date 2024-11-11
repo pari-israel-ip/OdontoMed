@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
-
-
+import random
 
 # Model for Roles table
 class Roles(models.Model):
@@ -25,19 +24,27 @@ class Usuario(models.Model):
     telefono = models.CharField(max_length=20, null=True, blank=True)
     fecha_nacimiento = models.DateField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
-    rol = models.ForeignKey(Roles, on_delete=models.CASCADE, db_column='rol_id')  # ForeignKey to Roles
+    rol = models.ForeignKey('Roles', on_delete=models.CASCADE, db_column='rol_id')  # ForeignKey to Roles
     contrasenia = models.CharField(max_length=255)
     activo = models.BooleanField(default=True)
-    codigo = models.IntegerField(default=0)
+    codigo = models.CharField(max_length=5, blank=True, null=True)  # Reutilizamos el campo `codigo` para el código de recuperación
+
     def save(self, *args, **kwargs):
         # Encripta la contraseña antes de guardar
         if self.contrasenia and not self.contrasenia.startswith('pbkdf2_sha256$'):
             self.contrasenia = make_password(self.contrasenia)
         super().save(*args, **kwargs)
 
+    def generar_codigo_recuperacion(self):
+        # Generar un código de recuperación aleatorio de 5 dígitos
+        codigo_aleatorio = str(random.randint(10000, 99999))
+        self.codigo = codigo_aleatorio  # Guardar el código en el atributo "codigo"
+        self.save()  # Guardar cambios en la base de datos
+        
     class Meta:
         db_table = 'usuarios'
         managed = False
+
 
 # Model for Citas table
 class Citas(models.Model):

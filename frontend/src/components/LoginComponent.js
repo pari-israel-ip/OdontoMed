@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';  // Importa useNavigate
+import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon, Link } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import loginService from '../services/loginService';
 
 const LoginComponent = () => {
@@ -8,7 +8,7 @@ const LoginComponent = () => {
     const [contrasenia, setContrasenia] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-    const navigate = useNavigate();  // Inicializa useNavigate
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -17,10 +17,8 @@ const LoginComponent = () => {
             setMessage(response.data.message);
             setIsError(false);
             
-            // Guardar el token en el local storage
-            localStorage.setItem('token', response.data.token);  // Asumiendo que el token se envía en la respuesta
+            localStorage.setItem('token', response.data.token);
 
-            // Redirige a la ruta /usuarios después del inicio de sesión exitoso
             navigate('/usuarios');
         } catch (error) {
             setMessage(error.response?.data?.message || 'Error en el login');
@@ -52,18 +50,24 @@ const LoginComponent = () => {
                         />
                     </FormControl>
                     <Button 
-                        type="submit" 
+                        type="submit"
                         sx={{ 
-                            backgroundColor: '#319795', // Verde personalizado
-                            color: 'white', // Texto blanco
+                            backgroundColor: '#319795',
+                            color: 'white',
                             '&:hover': { 
-                                backgroundColor: '#2d7a7b' // Color de hover más oscuro
+                                backgroundColor: '#2d7a7b'
                             } 
                         }}
-                        className="chakra-button css-1jsinvw"
                         width="full"
                     >
                         Login
+                    </Button>
+                    <Button 
+                        variant="link" 
+                        onClick={() => navigate('/recuperar-contrasena')}
+                        colorScheme="teal"
+                    >
+                        ¿Olvidaste tu contraseña?
                     </Button>
                 </VStack>
             </form>

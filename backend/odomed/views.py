@@ -19,8 +19,89 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Usuario
+from django.contrib.auth.hashers import make_password
 
+from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import traceback  # Para obtener un seguimiento de errores
 
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password
+from .models import Usuario
+import traceback
+@csrf_exempt
+def recuperar_contrasena(request):
+    if request.method == 'GET':  # Cambiamos a GET
+        email = request.GET.get('email')  # Obtenemos el email desde los parámetros de la URL
+
+        if not email:
+            return JsonResponse({'message': 'Por favor proporciona un email.'}, status=400)
+
+        try:
+            usuario = Usuario.objects.get(email__iexact=email)  # Búsqueda sin importar mayúsculas/minúsculas
+            usuario.generar_codigo_recuperacion()
+            
+            send_mail(
+                'Código de Recuperación de Contraseña',
+                f'Tu código de recuperación es: {usuario.codigo}',
+                'tu_email@dominio.com',  # Cambia a tu email
+                [email],
+                fail_silently=False,
+            )
+            return JsonResponse({'message': 'Código de recuperación enviado con éxito.'}, status=200)
+
+        except Usuario.DoesNotExist:
+            return JsonResponse({'message': 'El usuario no existe.'}, status=404)
+
+        except Exception as e:
+            # Mostrar información del error en la consola y enviarlo en la respuesta
+            traceback_str = traceback.format_exc()  # Obtener el error completo
+            print("Error:", traceback_str)
+            return JsonResponse({'message': 'Error al enviar el código de recuperación.', 'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'message': 'Método no permitido.'}, status=405)
+
+@csrf_exempt
+def cambiar_contrasena(request):
+    if request.method == 'POST':
+        try:
+            # Leer el JSON desde el cuerpo de la solicitud
+            body = json.loads(request.body)
+            codigo = body.get('codigo')
+            nueva_contrasena = body.get('nueva_contrasena')
+
+            if not codigo or not nueva_contrasena:
+                return JsonResponse({'message': 'Por favor proporciona el código y la nueva contraseña.'}, status=400)
+
+            # Intentar encontrar al usuario con el código de recuperación
+            usuario = Usuario.objects.get(codigo=codigo)
+            usuario.contrasenia = make_password(nueva_contrasena)  # Encripta la nueva contraseña
+            usuario.codigo = None  # Opcional: limpia el código después de usarlo
+            usuario.save()
+
+            return JsonResponse({'message': 'Contraseña cambiada exitosamente.'}, status=200)
+
+        except Usuario.DoesNotExist:
+            return JsonResponse({'message': 'Código de recuperación inválido.'}, status=404)
+
+        except Exception as e:
+            # Captura el traceback del error y lo imprime en consola
+            traceback_str = traceback.format_exc()
+            print("Error en cambiar_contrasena:", traceback_str)
+            return JsonResponse({
+                'message': 'Error al cambiar la contraseña.',
+                'error': str(e)
+            }, status=500)
+
+    else:
+        return JsonResponse({'message': 'Método no permitido.'}, status=405)
 
 def home(request):
     return HttpResponse("Bienvenido a la API de Odomed.")
