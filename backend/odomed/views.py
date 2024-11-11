@@ -1448,3 +1448,37 @@ def get_usuario_por_email(request):
         except Usuario.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
     return JsonResponse({'error': 'Email no proporcionado'}, status=400)
+
+@csrf_exempt
+def verify_password(request):
+    if request.method == 'POST':
+        try:
+            # Carga los datos de la solicitud JSON
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
+
+            # Verifica si se proporcionaron ambos campos
+            if not email or not password:
+                return JsonResponse({'message': 'Email y contraseña son requeridos.'}, status=400)
+
+            # Intenta obtener el usuario con el email proporcionado
+            try:
+                usuario = Usuario.objects.get(email=email)
+            except Usuario.DoesNotExist:
+                return JsonResponse({'message': 'Usuario no encontrado.'}, status=404)
+
+            # Verifica la contraseña usando `check_password`
+            if check_password(password, usuario.contrasenia):
+                return JsonResponse({'message': 'Contraseña correcta.', 'status': 'success'}, status=200)
+            else:
+                return JsonResponse({'message': 'Contraseña incorrecta.', 'status': 'error'}, status=401)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'message': 'Datos de solicitud inválidos.'}, status=400)
+        except Exception as e:
+            traceback_str = traceback.format_exc()
+            print("Error:", traceback_str)
+            return JsonResponse({'message': 'Error al verificar la contraseña.', 'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'message': 'Método no permitido.'}, status=405)
