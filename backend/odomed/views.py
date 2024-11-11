@@ -938,6 +938,8 @@ def tratamiento_detail(request, id_tratamiento):
         }, status=200)
     
     elif request.method == 'DELETE':
+        if tratamiento.estado_tratamiento == 'finalizado':
+            return JsonResponse({'error': 'NO SE PUEDE ELIMINAR UN TRATAMIENTO FINALIZADO'}, status=400)
         tratamiento.activo = False  # Eliminación lógica
         tratamiento.save()
         return JsonResponse({"message": "Tratamiento eliminado exitosamente."})

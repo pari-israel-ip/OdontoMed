@@ -8,7 +8,7 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid, IconButton, useToast, Select
+    Box, Grid, IconButton, useToast, Select, Flex
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import jsPDF from 'jspdf';
@@ -49,6 +49,67 @@ const ShowUsuarioModal = () => {
     const [isCreatePrescriptionOpen, setIsCreatePrescriptionOpen] = useState(false); // Estado para modal de prescripción
     const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const toast = useToast();
+    const [currentPage, setCurrentPage] = useState(1);
+    const diagnosticosPerPage = 3;
+
+    // Calcular diagnósticos actuales a mostrar
+    const indexOfLastDiagnostico = currentPage * diagnosticosPerPage;
+    const indexOfFirstDiagnostico = indexOfLastDiagnostico - diagnosticosPerPage;
+    const currentDiagnosticos = diagnosticos.length > 0 
+    ? diagnosticos.slice(indexOfFirstDiagnostico, indexOfLastDiagnostico) 
+    : [];    
+    const [currentTratamientosPage, setCurrentTratamientosPage] = useState(1);
+    const [currentPrescripcionesPage, setCurrentPrescripcionesPage] = useState(1);
+    const itemsPerPage = 4;
+
+    // Paginación de tratamientos
+    const indexOfLastTratamiento = currentTratamientosPage * itemsPerPage;
+    const indexOfFirstTratamiento = indexOfLastTratamiento - itemsPerPage;
+    const currentTratamientos = tratamientos.length > 0 
+    ? tratamientos.slice(indexOfFirstTratamiento, indexOfLastTratamiento) 
+    : [];
+    // Paginación de prescripciones
+    const indexOfLastPrescripcion = currentPrescripcionesPage * itemsPerPage;
+    const indexOfFirstPrescripcion = indexOfLastPrescripcion - itemsPerPage;
+    const currentPrescripciones = prescripciones.length > 0 
+    ? prescripciones.slice(indexOfFirstPrescripcion, indexOfLastPrescripcion) 
+    : [];
+    // Cambiar de página
+    const handleNextTratamientosPage = () => {
+        if (currentTratamientosPage < Math.ceil(tratamientos.length / itemsPerPage)) {
+            setCurrentTratamientosPage(currentTratamientosPage + 1);
+        }
+    };
+
+    const handlePreviousTratamientosPage = () => {
+        if (currentTratamientosPage > 1) {
+            setCurrentTratamientosPage(currentTratamientosPage - 1);
+        }
+    };
+
+    const handleNextPrescripcionesPage = () => {
+        if (currentPrescripcionesPage < Math.ceil(prescripciones.length / itemsPerPage)) {
+            setCurrentPrescripcionesPage(currentPrescripcionesPage + 1);
+        }
+    };
+
+    const handlePreviousPrescripcionesPage = () => {
+        if (currentPrescripcionesPage > 1) {
+            setCurrentPrescripcionesPage(currentPrescripcionesPage - 1);
+        }
+    };
+    // Cambiar de página
+    const handleNextPage = () => {
+        if (currentPage < Math.ceil(diagnosticos.length / diagnosticosPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
     const downloadHistorial = (format) => {
         const data = {
             usuario: {
@@ -236,6 +297,9 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
         if (confirmDelete) {
             try {
+                
+                await diagnosticoService.deleteDiagnostico(id_diagnostico);
+                loadDiagnosticos(idHistorial);
                 toast({
                     title: "Diagnostico eliminado.",
                     description: "El diagnostico ha sido eliminado exitosamente.",
@@ -243,10 +307,15 @@ const ShowUsuarioModal = () => {
                     duration: 3000,
                     isClosable: true,
                 });
-                await diagnosticoService.deleteDiagnostico(id_diagnostico);
-                loadDiagnosticos(idHistorial);
             } catch (error) {
                 console.error('Error deleting diagnostico:', error);
+                toast({
+                    title: 'Error al eliminar diagnóstico.',
+                    description: error.response?.data?.error || 'Ocurrió un error inesperado.',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
             }
         }
     };
@@ -255,6 +324,9 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
         if (confirmDelete) {
             try {
+                
+                await tratamientoService.deleteTratamiento(id_tratamiento);
+                loadTratamientos(idHistorial);
                 toast({
                     title: "Tratamiento eliminado.",
                     description: "El tratamiento ha sido eliminado exitosamente.",
@@ -262,10 +334,15 @@ const ShowUsuarioModal = () => {
                     duration: 3000,
                     isClosable: true,
                 });
-                await tratamientoService.deleteTratamiento(id_tratamiento);
-                loadTratamientos(idHistorial);
             } catch (error) {
                 console.error('Error deleting diagnostico:', error);
+                toast({
+                    title: 'Error al eliminar Tratamieto.',
+                    description: error.response?.data?.error || 'Ocurrió un error inesperado.',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                });
             }
         }
     };
@@ -274,15 +351,15 @@ const ShowUsuarioModal = () => {
         const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar esta prescripcion?");
         if (confirmDelete) {
             try {
+                await prescripcionService.deletePrescripcion(id_medicamento);
+                loadPrescripciones(idHistorial);
                 toast({
                     title: "Medicamento eliminado.",
-                    description: "El tratamiento ha sido eliminado exitosamente.",
+                    description: "El medicamento ha sido eliminado exitosamente.",
                     status: "success",
                     duration: 3000,
                     isClosable: true,
                 });
-                await prescripcionService.deletePrescripcion(id_medicamento);
-                loadPrescripciones(idHistorial);
             } catch (error) {
                 console.error('Error deleting diagnostico:', error);
             }
@@ -315,18 +392,7 @@ const ShowUsuarioModal = () => {
                         <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
                         <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
                         <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-                        <Select mt={4} onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
-            <option value="json">JSON</option>
-            <option value="xml">XML</option>
-            <option value="pdf">PDF</option>
-        </Select>
-        <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>
-            Descargar Historial
-        </Button>
-                                <Button as="label" colorScheme="teal" mt={4}>
-                                    Cargar Historial (JSON)
-                                    <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
-                                </Button>
+                        
                         <Button colorScheme="blue" mt={4} onClick={handleEdit}>
                             Editar Datos Personales
                         </Button>
@@ -350,46 +416,77 @@ const ShowUsuarioModal = () => {
                                     Crear Nuevo Diagnóstico
                                 </Button>
 
-                                {/* Mostrar los diagnósticos asociados al historial */}
-                                {diagnosticos.length > 0 && (
-                                    <Box mt={4}>
-                                        <Text><strong>Diagnósticos:</strong></Text>
-                                        {diagnosticos.map(diagnostico => (
-                                            <Box key={diagnostico.id_diagnostico} p={2} border="1px solid teal" borderRadius="md">
-                                                <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
-                                                <Text><strong>Fceha:</strong> {diagnostico.fecha_diagnostico}</Text>
-                                                <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
-                                                <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)}>
-                                                    Editar Diagnóstico
-                                                </Button>
-                                                <IconButton
-                                                    icon={<DeleteIcon />}
-                                                    colorScheme="red"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)}
-                                                />
-                                            </Box>
-                                        ))}
+                                <Text><strong>Diagnósticos:</strong></Text>
+                                {currentDiagnosticos.map(diagnostico => (
+                                    <Box key={diagnostico.id_diagnostico} p={2} border="1px solid teal" borderRadius="md" mt={2}>
+                                        <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
+                                        <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
+                                        <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
+                                        <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>
+                                            Editar Diagnóstico
+                                        </Button>
+                                        <IconButton
+                                            icon={<DeleteIcon />}
+                                            colorScheme="red"
+                                            size="sm"
+                                            onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)}
+                                        />
                                     </Box>
-                                )}
+                                ))}
+
+                                {/* Controles de paginación */}
+                                <Flex justify="space-between" align="center" mt={4}>
+                                    <Button
+                                        onClick={handlePreviousPage}
+                                        disabled={currentPage === 1}
+                                        colorScheme="teal"
+                                        mr={2}
+                                    >
+                                        Anterior
+                                    </Button>
+                                    <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
+                                    <Button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}
+                                        colorScheme="teal"
+                                    >
+                                        Siguiente
+                                    </Button>
+                                </Flex>
 
                             </div>
                         ))}
                         </Box>
-                            <Box>
-                                <Button colorScheme="green" onClick={() => setIsCreateTratamientoOpen(true)}>
-                                    Crear Nuevo Tratamiento
+                        <Box>
+                                
+                        <Select  onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
+                                    <option value="json">JSON</option>
+                                    <option value="xml">XML</option>
+                                    <option value="pdf">PDF</option>
+                                </Select>
+                                <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>
+                                    Descargar Historial
                                 </Button>
-                                {tratamientos.length > 0 && (
-                                    <Box mt={4}>
+                                <Button as="label" colorScheme="teal" mt={4}>
+                                    Cargar Historial (JSON)
+                                    <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
+                                </Button>
+
+                                <Flex mt={2} gap={4}>
+                                    
+                                    {/* Listado de Tratamientos */}
+                                    <Box flex="1">
+                                    <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>
+                                        Crear Nuevo Tratamiento
+                                    </Button>
                                         <Text><strong>Tratamientos:</strong></Text>
-                                        {tratamientos.map(tratamiento => (
-                                            <Box key={tratamiento.id_tratamiento} p={2} border="1px solid teal" borderRadius="md">
+                                        {currentTratamientos.map(tratamiento => (
+                                            <Box key={tratamiento.id_tratamiento} p={2} border="1px solid teal" borderRadius="md" mt={2}>
                                                 <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
                                                 <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
                                                 <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
                                                 <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
-                                                <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)}>
+                                                <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>
                                                     Editar Tratamiento
                                                 </Button>
                                                 <IconButton
@@ -398,25 +495,44 @@ const ShowUsuarioModal = () => {
                                                     size="sm"
                                                     onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)}
                                                 />
-                                                
                                             </Box>
                                         ))}
+                                        {/* Controles de paginación de tratamientos */}
+                                        <Flex justify="space-between" align="center" mt={4}>
+                                            <Button
+                                                onClick={handlePreviousTratamientosPage}
+                                                disabled={currentTratamientosPage === 1}
+                                                colorScheme="teal"
+                                                mr={2}
+                                            >
+                                                Anterior
+                                            </Button>
+                                            <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
+
+                                            <Button
+                                                onClick={handleNextTratamientosPage}
+                                                disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}
+                                                colorScheme="teal"
+                                            >
+                                                Siguiente
+                                            </Button>
+                                        </Flex>
                                     </Box>
-                                )}
-                                <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>
-                                    Crear Nueva Prescripción
-                                </Button>
-                                {prescripciones.length > 0 && (
-                                    <Box mt={4}>
+
+                                    {/* Listado de Prescripciones */}
+                                    <Box flex="1">
+                                        <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>
+                                            Crear Nueva Prescripción
+                                        </Button>
                                         <Text><strong>Prescripciones:</strong></Text>
-                                        {prescripciones.map(prescripcion => (
-                                            <Box key={prescripcion.id_medicamento} p={2} border="1px solid teal" borderRadius="md">
+                                        {currentPrescripciones.map(prescripcion => (
+                                            <Box key={prescripcion.id_medicamento} p={2} border="1px solid teal" borderRadius="md" mt={2}>
                                                 <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
                                                 <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
                                                 <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
                                                 <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
-                                                <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)}>
-                                                    Editar Prescripcion
+                                                <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>
+                                                    Editar Prescripción
                                                 </Button>
                                                 <IconButton
                                                     icon={<DeleteIcon />}
@@ -424,15 +540,32 @@ const ShowUsuarioModal = () => {
                                                     size="sm"
                                                     onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)}
                                                 />
-                                                
                                             </Box>
                                         ))}
+                                        {/* Controles de paginación de prescripciones */}
+                                        <Flex justify="space-between" align="center" mt={4}>
+                                            <Button
+                                                onClick={handlePreviousPrescripcionesPage}
+                                                disabled={currentPrescripcionesPage === 1}
+                                                colorScheme="teal"
+                                                mr={2}
+                                            >
+                                                Anterior
+                                            </Button>
+                                            <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
+
+                                            <Button
+                                                onClick={handleNextPrescripcionesPage}
+                                                disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}
+                                                colorScheme="teal"
+                                            >
+                                                Siguiente
+                                            </Button>
+                                        </Flex>
                                     </Box>
-                                )}
+                                </Flex>
                             </Box>
-                            <Box>
-                                
-                            </Box>
+                            
                             
                         </Grid>
                     </ModalBody>
