@@ -91,7 +91,7 @@ DATABASES = {
         'PORT': '22966',  # Puerto predeterminado de MySQL en Laragon
         'OPTIONS': {
             'ssl': { #modicficar la ruta del archivo ca.pem
-                'ca': os.path.join(BASE_DIR, 'certificates', 'C:/Users/LENOVO IDEAPAD/OneDrive - Universidad Privada del Valle/Desktop/repo/OdontoMed/backend/ca.pem'),  # Ruta al archivo .pem
+                'ca': os.path.join(BASE_DIR, 'ca.pem'),  # Ruta al archivo .pem
             }
         }
     }

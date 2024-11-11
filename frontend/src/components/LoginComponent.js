@@ -39,7 +39,7 @@ const LoginComponent = () => {
         const roleResponse = await roleService.getRole(roleID);
         console.log('ROLE Response:', roleResponse.data);  // Depuración
 
-        localStorage.setItem('role', roleResponse.data.role);
+        localStorage.setItem('role', roleResponse.data.nombre_rol);
 
         // Redirige a la ruta /usuarios
         navigate('/usuarios');

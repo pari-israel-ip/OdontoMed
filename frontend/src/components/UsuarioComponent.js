@@ -90,6 +90,7 @@ const UsuariosComponent = () => {
     const endIndex = startIndex + itemsPerPage;
     const currentUsuarios = filteredUsuarios.slice(startIndex, endIndex);
     const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage);
+    const userRole = localStorage.getItem('role');
 
     return (
         <Box p={4}>
@@ -129,6 +130,7 @@ const UsuariosComponent = () => {
                             <Td>{usuario.seguro_medico}</Td>
                             <Td>
                                 <Flex justify="space-between">
+                                
                                     <IconButton
                                         icon={<InfoIcon />}
                                         colorScheme="cyan"
@@ -136,12 +138,12 @@ const UsuariosComponent = () => {
                                         onClick={() => handleShow(usuario.id_paciente)}
                                         mr={2}
                                     />
-                                    <IconButton
+                                     {(userRole === 'ADMINISTRADOR'||userRole==='RECEPCIONISTA') &&<IconButton
                                         icon={<DeleteIcon />}
                                         colorScheme="red"
                                         size="sm"
                                         onClick={() => handleDelete(usuario.id_paciente)}
-                                    />
+                                    />}
                                 </Flex>
                             </Td>
                         </Tr>

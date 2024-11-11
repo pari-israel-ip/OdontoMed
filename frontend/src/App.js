@@ -40,20 +40,34 @@ function App() {
             <div className="App">
                 <Layout>
                     <Routes>
-                        <Route path="/unauthorized" element={<Unauthorized />} />
-
+                    <Route path="/unauthorized" element={<Unauthorized />} />
                         <Route path="/login" element={<LoginComponent />} />
-                        <Route path="/usuarios" element={ 
-                            <UsuariosComponent />
+                        
+                        <Route path="/usuarios" element={
+                            <ProtectedRoute roles={['RECEPCIONISTA','ODONTOLOGO','ADMINISTRADOR']}>
+                                <UsuariosComponent />
+                            </ProtectedRoute>
                         } />
-                        <Route path="/odontologos" element={<OdontologosComponent />} />
-                        <Route path="/roles" element={<RolesComponent />} />
-                        <Route path="/recepcionistas" element={<RecepcionistasComponent />} />
-                        <Route path="/citas" element={<CitasComponent />} />
+                        <Route path="/odontologos" element={<ProtectedRoute roles={['RECEPCIONISTA','ADMINISTRADOR']}>
+                                <OdontologosComponent />
+                            </ProtectedRoute>} />
+                        <Route path="/roles" element={<ProtectedRoute roles={['ADMINISTRADOR']}>
+                                <RolesComponent />
+                            </ProtectedRoute>} />
+                        <Route path="/recepcionistas" element={<ProtectedRoute roles={['ODONTOLOGO','ADMINISTRADOR']}>
+                                <RecepcionistasComponent />
+                            </ProtectedRoute>} />
+                        <Route path="/citas" element={ <ProtectedRoute roles={['RECEPCIONISTA','ODONTOLOGO','ADMINISTRADOR']}>
+                                <CitasComponent />
+                            </ProtectedRoute>} />
 
-                        <Route path="/odontologos/:id" element={<ShowOdontologoModal />} /> 
+                        <Route path="/odontologos/:id" element={<ProtectedRoute roles={['ADMINISTRADOR']}>
+                                <ShowOdontologoModal />
+                            </ProtectedRoute>} /> 
 
-                        <Route path="/usuarios/:id" element={<ShowUsuarioModal />} /> 
+                        <Route path="/usuarios/:id" element={ <ProtectedRoute roles={['RECEPCIONISTA','ODONTOLOGO','ADMINISTRADOR']}>
+                                <ShowUsuarioModal />
+                            </ProtectedRoute>} /> 
 
                         {/* Otras rutas si es necesario */}
                     </Routes>

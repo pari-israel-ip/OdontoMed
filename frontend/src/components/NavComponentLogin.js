@@ -3,16 +3,19 @@ import { Box, Flex, Text, Button, Link, Image, IconButton, Collapse, VStack } fr
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 
+
 const NavComponentLogin = () => {
+    const userRole = localStorage.getItem('role');
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Aquí puedes agregar la lógica para cerrar sesión
-        // Por ejemplo, eliminar el token de autenticación
-        navigate('/login'); // Redirigir al login después de cerrar sesión
-    };
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
 
+        // Redirige al usuario a la página de inicio de sesión
+        navigate('/login');
+    }
     return (
         <Box bg="white" px={4} boxShadow="sm">
             <Flex h={16} alignItems="center" justifyContent="space-between">
@@ -43,21 +46,21 @@ const NavComponentLogin = () => {
                     flex="2"
                     justifyContent="center" // Centra los enlaces
                 >
-                    <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    {(userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO') && <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Pacientes</Text>
-                    </Link>
-                    <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    </Link>}
+                    {(userRole === 'ADMINISTRADOR'||userRole==='RECEPCIONISTA') &&<Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Odontologos</Text>
-                    </Link>
-                    <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    </Link>}
+                    {userRole === 'ADMINISTRADOR' &&<Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Roles</Text>
-                    </Link>
-                    <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    </Link>}
+                    {(userRole === 'ADMINISTRADOR'|| userRole==='ODONTOLOGO') &&<Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Recepcionistas</Text>
-                    </Link>
-                    <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}>
+                    </Link>}
+                   { (userRole==='RECEPCIONISTA'||userRole === 'ADMINISTRADOR'|| userRole==='ODONTOLOGO') &&<Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}>
                         <Text>Citas</Text>
-                    </Link>
+                    </Link>}
                     
                     <Text></Text>
                     <Button onClick={handleLogout} colorScheme="teal">Cerrar sesión</Button>
