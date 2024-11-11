@@ -15,6 +15,8 @@ import RecepcionistasComponent from './components/RecepcionistaComponent';
 import CitasComponent from './components/CitasComponent';
 import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorized from './components/unauthorized';
+import RecuperarContrasenaComponent from './components/RecuperarContrasenaComponent';
+import VerificarCodigoComponent from './components/VerificarCodigoComponent'; // Importar el componente
 
 function Layout({ children }) {
     const location = useLocation();
@@ -22,14 +24,15 @@ function Layout({ children }) {
     const isLoginPage = location.pathname === '/login';
     const isUserOrRolesPage = location.pathname === '/usuarios' || location.pathname === '/roles' || location.pathname === '/citas' || location.pathname === '/odontologos'
     || location.pathname === '/usuarios:id' || location.pathname === '/recepcionistas';
-
+    const isRecoveryPage = location.pathname === '/recuperar-contrasena';
+    const isRecoveryPage2 = location.pathname === '/verificar-codigo';
     return (
         <>
-            {!isLoginPage && !isUserOrRolesPage && <NavComponent />}
+            {!isLoginPage && !isUserOrRolesPage && !isRecoveryPage && !isRecoveryPage2  &&<NavComponent />}
             {isUserOrRolesPage && <NavComponentLogin />}
-            {!isUserOrRolesPage && !isLoginPage && <BodyComponent />}
+            {!isUserOrRolesPage && !isLoginPage && !isRecoveryPage && !isRecoveryPage2  && <BodyComponent />}
             {children}
-            {!isUserOrRolesPage && !isLoginPage && <FooterComponent />}
+            {!isUserOrRolesPage && !isLoginPage && !isRecoveryPage && !isRecoveryPage2  &&<FooterComponent />}
         </>
     );
 }
@@ -42,6 +45,8 @@ function App() {
                     <Routes>
                     <Route path="/unauthorized" element={<Unauthorized />} />
                         <Route path="/login" element={<LoginComponent />} />
+                        <Route path="/recuperar-contrasena" element={<RecuperarContrasenaComponent />} />
+                        <Route path="/verificar-codigo" element={<VerificarCodigoComponent />} /> {/* Nueva ruta */}
                         
                         <Route path="/usuarios" element={
                             <ProtectedRoute roles={['RECEPCIONISTA','ODONTOLOGO','ADMINISTRADOR']}>
