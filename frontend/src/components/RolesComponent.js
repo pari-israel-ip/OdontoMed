@@ -77,22 +77,10 @@ const RolesComponent = () => {
                 nombre_rol: updatedRole.nombre_rol,
                 permisos: updatedRole.permisos
             });
-            toast({
-                title: "Rol actualizado.",
-                description: "El rol ha sido actualizado exitosamente.",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
+            
         } catch (error) {
             console.error('Error updating role:', error);
-            toast({
-                title: "Error al actualizar.",
-                description: "No se pudo actualizar el rol.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
+            
         } finally {
             setIsEditModalOpen(false);
             loadRoles();
