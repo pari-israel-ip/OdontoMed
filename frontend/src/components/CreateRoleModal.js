@@ -159,6 +159,14 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
         } catch (error) {
             const errorMessage = error.response?.data.errors || { general: 'Error al crear el rol. Inténtelo de nuevo más tarde.' };
             setErrors(errorMessage);
+            console.error('Error creating role:', error);
+            toast({
+                title: "Error al crear.",
+                description: "No se pudo crear el rol.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
         } finally {
             setLoading(false);
         }
