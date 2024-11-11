@@ -79,7 +79,6 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
             return;
         }
     
-        setLoading(true); // Inicia el estado de carga
 
         const newUsuario = { 
             nombres, apellidos, ci, email, telefono, fecha_nacimiento, rol, direccion, contrasenia, 
@@ -88,6 +87,8 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
     
     
         try {
+            setLoading(true); // Inicia el estado de carga
+
             const response = await axios.post('http://127.0.0.1:8000/odomed/usuario/create/', newUsuario);
             if (response.data.errors) {
                 setErrors(response.data.errors);
@@ -307,7 +308,7 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
                     </form>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="teal" mr={3} onClick={handleSubmit}>
+                    <Button colorScheme="teal" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear Paciente
                     </Button>
                     <Button variant="ghost" onClick={onClose}>Cancelar</Button>

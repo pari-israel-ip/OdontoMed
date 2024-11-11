@@ -28,6 +28,8 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
     const [errorNombre, setErrorNombre] = useState('');
     const [errorFechaFin, setErrorFechaFin] = useState('');
     const toast = useToast();
+    const [loading, setLoading] = useState(false);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -78,6 +80,8 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
 
     const handleSavePrescriptions = async () => {
         try {
+            setLoading(true);
+
             await axios.post('http://127.0.0.1:8000/odomed/prescripcion/create/', {
                 id_historial: idHistorial,
                 prescripciones: listaMedicamentos,
@@ -94,6 +98,8 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
             setListaMedicamentos([]);
         } catch (error) {
             console.error("Error al crear las prescripciones:", error);
+            setLoading(false);
+
         }
     };
 
@@ -155,7 +161,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                     </List>
                 </ModalBody>
                 <ModalCloseButton />
-                <Button colorScheme="blue" onClick={handleSavePrescriptions} mt={4}>
+                <Button colorScheme="blue" onClick={handleSavePrescriptions} isLoading={loading} mt={4}>
                     Crear Prescripción
                 </Button>
             </ModalContent>

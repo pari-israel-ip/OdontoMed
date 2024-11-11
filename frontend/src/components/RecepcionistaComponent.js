@@ -82,10 +82,10 @@ const RecepcionistasComponent = () => {
     const filteredRecepcionistas = recepcionistas.filter((recepcionista) => {
         const searchText = searchTerm.toLowerCase();
         return (
-            recepcionista.nombre_completo.toLowerCase().includes(searchText) ||
-            recepcionista.ci.toLowerCase().includes(searchText) ||
-            recepcionista.telefono.toLowerCase().includes(searchText) ||
-            recepcionista.email.toLowerCase().includes(searchText)
+            recepcionista.nombre_completo?.toLowerCase().includes(searchText) ||
+            recepcionista.ci?.toLowerCase().includes(searchText) ||
+            recepcionista.telefono?.toLowerCase().includes(searchText) ||
+            recepcionista.email?.toLowerCase().includes(searchText)
         );
     });
 

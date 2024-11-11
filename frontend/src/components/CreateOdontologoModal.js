@@ -72,7 +72,6 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
             return;
         }
 
-        setLoading(true); // Inicia el estado de carga
 
         // Datos del nuevo usuario
         const newUsuario = {
@@ -107,6 +106,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
             // Enviar datos del usuario
             /*const usuarioResponse = await axios.post('http://127.0.0.1:8000/odomed/usuario/create/', newUsuario);
             const idUsuario = usuarioResponse.data.id_usuario; // Asume que la respuesta incluye el ID del nuevo usuario*/
+            setLoading(true); // Inicia el estado de carga
 
             // Enviar datos del odontólogo usando el ID del nuevo usuario
             const odontologoResponse = await axios.post('http://127.0.0.1:8000/odomed/odontologo/create/', {

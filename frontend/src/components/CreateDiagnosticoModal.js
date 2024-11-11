@@ -26,6 +26,8 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
         const nuevoDiagnostico = {
             id_historial: idHistorial,  // Usar el id_historial proporcionado
             nombre_diagnostico: nombreDiagnostico,
