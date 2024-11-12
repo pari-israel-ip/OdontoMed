@@ -1,34 +1,45 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    Text,
+    VStack,
+    Alert,
+    AlertIcon,
+    HStack,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import loginService from '../services/loginService';
 import usuarioService from '../services/usuarioService';
 import roleService from '../services/roleService';
- 
+
 const LoginComponent = () => {
     const [email, setEmail] = useState('');
     const [contrasenia, setContrasenia] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
- 
+
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const response = await loginService.login(email, contrasenia);
             console.log("Respuesta del servidor:", response);
- 
+
             if (response && response.data) {
                 setMessage(response.data.message);
                 setIsError(false);
- 
+
                 // Guardar el token y otros datos en localStorage
                 localStorage.setItem('token', response.data.token);
- 
+
                 // Obtener el usuario por email
                 const userResponse = await usuarioService.getUsuarioPorEmail(email);
                 console.log('Usuario Response:', userResponse.data);
- 
+                console.log('id USUARIO',userResponse.data.id_usuario)
                 const userId = userResponse.data.id_usuario;
                 if (!userId) {
                     throw new Error('ID de usuario no encontrado');
@@ -37,19 +48,19 @@ const LoginComponent = () => {
                 if (!roleID) {
                     throw new Error('ID de rol no encontrado');
                 }
- 
+
                 // Obtener y almacenar el rol del usuario
                 const roleResponse = await roleService.getRole(roleID);
                 console.log('ROLE Response:', roleResponse.data);
- 
+
                 localStorage.setItem('role', roleResponse.data.nombre_rol);
-                localStorage.setItem('usuario_id', response.data.id_usuario);
+                localStorage.setItem('usuario_id', userResponse.data.id_usuario);
                 localStorage.setItem('email', response.data.email);
                 localStorage.setItem('nombres', response.data.nombres);
                 localStorage.setItem('apellidos', response.data.apellidos);
                 localStorage.setItem('telefono', response.data.telefono);
                 localStorage.setItem('fecha_nacimiento', response.data.fecha_nacimiento);
- 
+
                 // Redirige a la ruta /usuarios
                 navigate('/usuarios');
             } else {
@@ -62,9 +73,17 @@ const LoginComponent = () => {
             setIsError(true);
         }
     };
- 
+
     return (
         <Box maxW="md" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="lg" boxShadow="md">
+            {/* Barra de navegación */}
+            <HStack spacing={4} mb={4}>
+                <Button onClick={() => navigate(-1)} colorScheme="teal">
+                    Atrás
+                </Button>
+               
+            </HStack>
+
             <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">Login</Text>
             <form onSubmit={handleLogin}>
                 <VStack spacing={4}>
@@ -117,5 +136,5 @@ const LoginComponent = () => {
         </Box>
     );
 };
- 
+
 export default LoginComponent;

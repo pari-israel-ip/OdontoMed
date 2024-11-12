@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Text, VStack, Alert, AlertIcon,HStack } from '@chakra-ui/react';
 import recoveryService from '../services/recoveryService';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,9 +38,17 @@ const RecuperarContrasenaComponent = () => {
     };
 
     return (
+        
         <Box maxW="md" mx="auto" mt={8} p={6} borderWidth="1px" borderRadius="lg" boxShadow="md">
+            <HStack spacing={4} mb={4}>
+                <Button onClick={() => navigate(-1)} colorScheme="teal">
+                    Atrás
+                </Button>
+               
+            </HStack>
             <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">Recuperar Contraseña</Text>
             <VStack spacing={4}>
+            
                 <FormControl isRequired>
                     <FormLabel>Correo Electrónico:</FormLabel>
                     <Input
