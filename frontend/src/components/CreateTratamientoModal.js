@@ -30,11 +30,18 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
         e.preventDefault();
         setLoading(true);
         
+        let validationErrors = {};
+
         if (monto < 0) {
-            setErrors(prevErrors => ({
-                ...prevErrors,
-                monto: "EL MONTO DEBE SER MAYOR O IGUAL A CERO."
-            }));
+            validationErrors.monto = "EL MONTO DEBE SER MAYOR O IGUAL A CERO.";
+        }
+
+        if (!fechaTratamiento) {
+            validationErrors.fecha_tratamiento = "LA FECHA DEL TRATAMIENTO ES OBLIGATORIA.";
+        }
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             setLoading(false);
             return;
         }
@@ -49,7 +56,7 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
 
         try {
             const response = await tratamientoService.createTratamiento(nuevoTratamiento);
-            console.log(nuevoTratamiento)
+            console.log(nuevoTratamiento);
 
             if (response.data.errors) {
                 setErrors(response.data.errors);
@@ -113,7 +120,7 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                             type="number"
                             step="0.01"
                             value={monto}
-                            onChange={(e) => setMonto(e.target.value)|| 0}
+                            onChange={(e) => setMonto(e.target.value || '0')}
                         />
                         {errors.monto && <FormErrorMessage>{errors.monto}</FormErrorMessage>}
                     </FormControl>
