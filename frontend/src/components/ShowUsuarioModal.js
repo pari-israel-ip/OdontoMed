@@ -168,22 +168,100 @@ const ShowUsuarioModal = () => {
             doc.save(`historial_${usuario.nombre_completo}.pdf`);
         }
     };
-    const handleFileUpload = (event) => {
+    const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 try {
-                    const json = JSON.parse(e.target.result);
-                    // Aquí podrías hacer algo con los datos JSON cargados
-                    console.log(json);
+                    const data = JSON.parse(e.target.result);
+    
+                    // Datos del usuario, paciente y historial clínico
+                    const usuarioData = {
+                        nombres: data.usuario.nombres.trim().toUpperCase(),
+                        apellidos: data.usuario.apellidos.trim().toUpperCase(),
+                        ci: data.usuario.ci.trim(),
+                        fecha_nacimiento: data.usuario.fecha_nacimiento,
+                        email: data.usuario.email.trim().toUpperCase(),
+                        direccion: data.usuario.direccion.trim().toUpperCase(),
+                        telefono: data.usuario.telefono.trim(),
+                        contrasenia: data.usuario.contrasenia,
+                        seguro_medico: data.usuario.seguro_medico.trim().toUpperCase(),
+
+                        alergias: data.usuario.alergias.trim().toUpperCase(),
+                        antecedentes_medicos: data.usuario.antecedentes_medicos.trim().toUpperCase(),
+                        id_odontologo: data.historial_clinico.id_odontologo, // ID del odontólogo
+                        notas_generales: data.historial_clinico.notas_generales.trim().toUpperCase()
+                    };
+    
+                    // Realizar la solicitud de creación al backend
+                    try {
+                        
+                        const response = await usuarioService.createUsuario(usuarioData);
+                        console.log('Paciente creado correctamente:', response.data);
+                
+                        // Obtener el id_historial utilizando el email del usuario recién creado
+                        const userResponse = await usuarioService.getIDPorEmail(data.usuario.email);
+                        console.log('ID USUARIO:', userResponse.data.id_usuario);
+                
+                        // Asumimos que el backend devuelve el id_historial asociado al usuario creado
+                        const historialId = userResponse.data.id_historial; // ID del historial clínico
+                
+                        // Ahora puedes usar historialId para asociarlo con otros objetos o realizar más operaciones
+                        console.log('ID Historial:', historialId);
+    
+                        // Crear diagnósticos
+                        if (data.diagnosticos && data.diagnosticos.length > 0) {
+                            for (const diagnostico of data.diagnosticos) {
+                                const diagnosticoData = {
+                                    ...diagnostico,
+                                    id_historial: historialId // Asociar al historial clínico creado
+                                };
+                                await diagnosticoService.createDiagnostico(diagnosticoData);
+                            }
+                        }
+    
+                        // Crear tratamientos
+                        if (data.tratamientos && data.tratamientos.length > 0) {
+                            for (const tratamiento of data.tratamientos) {
+                                const tratamientoData = {
+                                    ...tratamiento,
+                                    id_historial: historialId // Asociar al historial clínico creado
+                                };
+                                await tratamientoService.createTratamiento(tratamientoData);
+                            }
+                        }
+    
+                        // Crear prescripciones
+                        if (data.prescripciones && data.prescripciones.length > 0) {
+                            for (const prescripcion of data.prescripciones) {
+                                const prescripcionData = {
+                                    ...prescripcion,
+                                    id_historial: historialId // Asociar al historial clínico creado
+                                };
+                                await prescripcionService.createPrescripcion(prescripcionData);
+                            }
+                        }
+    
+                        console.log('Usuario, historial clínico y registros asociados subidos exitosamente');
+                    } catch (error) {
+                        if (error.response && error.response.data.errors) {
+                            // Si el backend devuelve errores de validación, los mostramos en consola
+                            console.error('Errores de validación:', error.response.data.errors);
+                        } else {
+                            console.error('Error al crear el usuario:', error);
+                        }
+                    }
                 } catch (error) {
-                    console.error('Error parsing JSON:', error);
+                    console.error('Error al procesar el archivo JSON:', error);
                 }
             };
             reader.readAsText(file);
         }
     };
+    
+    
+    
     const navigate = useNavigate();
     
     useEffect(() => {

@@ -9,7 +9,9 @@ const usuarioService = {
     getUsuarioPorEmail: (email) => axios.get(`${API_URL}por-email/`, { params: { email } }),
     createUsuario: (usuarioData) => axios.post(`${API_URL}create/`, usuarioData),
     updateUsuario: (id, usuarioData) => axios.put(`${API_URL}${id}/`, usuarioData),
-    deleteUsuario: (id) => axios.delete(`${API_URL}${id}/`)
+    deleteUsuario: (id) => axios.delete(`${API_URL}${id}/`),
+    getIDPorEmail: (email) => axios.get(`${API_URL}por-id/`, { params: { email } }), // Nueva función para obtener id_historial
+
     
 };
 

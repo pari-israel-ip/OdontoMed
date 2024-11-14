@@ -1448,3 +1448,32 @@ def get_usuario_por_email(request):
         except Usuario.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
     return JsonResponse({'error': 'Email no proporcionado'}, status=400)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Usuario, HistorialesClinicos
+
+@csrf_exempt 
+def get_idHistorial_por_email(request):
+    email = request.GET.get('email', None)
+    if email:
+        try:
+            # Obtener el usuario por email
+            usuario = Usuario.objects.get(email=email)
+
+            # Buscar el historial clínico relacionado usando id_usuario como id_paciente
+            historial = HistorialesClinicos.objects.get(id_paciente=usuario.id_usuario)
+
+            # Devolver la información del usuario junto con el id_historial
+            return JsonResponse({
+                'id_usuario': usuario.id_usuario,
+                'email': usuario.email,
+                'nombres': usuario.nombres,
+                'rol': usuario.rol.id_rol, 
+                'id_historial': historial.id_historial  # Incluye el id_historial encontrado
+            })
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+        except HistorialesClinicos.DoesNotExist:
+            return JsonResponse({'error': 'Historial clínico no encontrado para este usuario'}, status=404)
+    return JsonResponse({'error': 'Email no proporcionado'}, status=400)
