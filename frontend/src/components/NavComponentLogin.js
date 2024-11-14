@@ -143,14 +143,14 @@ const NavComponentLogin = () => {
                         <Text><strong>Email:</strong> {email}</Text>
                         <Text><strong>Nombres:</strong> {nombres}</Text>
                         <Text><strong>Apellidos:</strong> {apellidos}</Text>
-                        <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
+                        <Button colorScheme="blue" variant='link' onClick={handleEdit}>EDITAR DATOS PERSONALES</Button>
                         <Button
-                        variant="link"
-                        onClick={() => navigate('/recuperar-contrasena')}
-                        colorScheme="teal"
-                    >
-                        CAMBIAR CONTRASEÑA
-                    </Button>
+                            variant="link"
+                            onClick={() => navigate('/recuperar-contrasena')}
+                            colorScheme="teal"
+                        >
+                            CAMBIAR CONTRASEÑA
+                        </Button>
                     </ModalBody>
                 </ModalContent>
             </Modal>

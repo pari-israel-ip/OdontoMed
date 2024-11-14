@@ -76,11 +76,16 @@ const UsuariosComponent = () => {
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
+        const searchTermLower = e.target.value.toLowerCase();
+    
         const filtered = usuarios.filter((usuario) =>
-            Object.values(usuario).some((value) =>
-                value.toString().toLowerCase().includes(e.target.value.toLowerCase())
-            )
+            usuario.nombre_completo.toLowerCase().includes(searchTermLower) ||
+            usuario.ci.toString().toLowerCase().includes(searchTermLower) ||
+            usuario.seguro_medico.toString().toLowerCase().includes(searchTermLower) ||
+            usuario.fecha_nacimiento.toString().toLowerCase().includes(searchTermLower) ||
+            usuario.email.toLowerCase().includes(searchTermLower)
         );
+    
         setFilteredUsuarios(filtered);
         setCurrentPage(1); // Resetear a la primera página tras filtrar
     };

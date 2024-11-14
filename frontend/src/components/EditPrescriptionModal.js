@@ -58,6 +58,8 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
             newErrors.fecha_inicio = "La fecha de inicio es obligatoria.";
         } else if (start < originalStart) {
             newErrors.fecha_inicio = "La fecha de inicio no puede ser anterior a la fecha de inicio original.";
+        } else if (start > new Date(originalStart).setDate(new Date(originalStart).getDate() + 30)) {
+            newErrors.fecha_inicio = `La fecha de inicio no puede ser posterior a 30 días después de la fecha establecida inicialmente.`;
         }
 
         // Fecha Fin Validation

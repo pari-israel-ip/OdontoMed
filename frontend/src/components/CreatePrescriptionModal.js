@@ -26,6 +26,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
     });
     const [listaMedicamentos, setListaMedicamentos] = useState([]);
     const [errorNombre, setErrorNombre] = useState('');
+    const [errorDosis, setErrorDosis] = useState('');
     const [errorFechaFin, setErrorFechaFin] = useState('');
     const toast = useToast();
     const [loading, setLoading] = useState(false);
@@ -42,16 +43,23 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
         if (name === 'fecha_fin') {
             setErrorFechaFin('');
         }
+        if (name === 'dosis') {
+            setErrorDosis('');
+        }
     };
 
     const addMedicamento = () => {
-        const { nombre_medicamento, fecha_fin } = medicamento;
+        const { nombre_medicamento,dosis, fecha_fin } = medicamento;
         const nombreMedicamentoRegex = /^[A-Za-z0-9 ]{5,}$/; // Expresión regular para letras, números y espacios
         let hasError = false;
 
         // Validaciones
         if (!nombreMedicamentoRegex.test(nombre_medicamento)) {
             setErrorNombre('El nombre del medicamento debe tener al menos 5 caracteres y solo contener letras, números y espacios.');
+            hasError = true;
+        }
+        if (!nombreMedicamentoRegex.test(dosis)) {
+            setErrorDosis('La dosis debe tener al menos 5 caracteres y solo contener letras, números y espacios.');
             hasError = true;
         }
 
@@ -61,7 +69,11 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
         const daysDifference = Math.ceil((selectedDate - currentDate) / (1000 * 60 * 60 * 24));
 
         if (daysDifference < 0 || daysDifference > 30) {
-            setErrorFechaFin('La fecha fin debe estar entre hoy y los próximos 30 días.');
+            setErrorFechaFin('La fecha de finalizacion debe estar entre hoy y los próximos 30 días.');
+            hasError = true;
+        }
+        if (!fecha_fin) {
+            setErrorFechaFin('La fecha en obligatoria');
             hasError = true;
         }
 
@@ -121,7 +133,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                         />
                         <FormErrorMessage>{errorNombre}</FormErrorMessage>
                     </FormControl>
-                    <FormControl mb={4}>
+                    <FormControl mb={4} isInvalid={!!errorDosis}>
                         <FormLabel>Dosis</FormLabel>
                         <Input
                             type="text"
@@ -130,6 +142,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                             onChange={handleChange}
                             required
                         />
+                        <FormErrorMessage>{errorDosis}</FormErrorMessage>
                     </FormControl>
                     <FormControl mb={4} isInvalid={!!errorFechaFin}>
                         <FormLabel>Fecha Fin</FormLabel>
@@ -138,6 +151,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                             name="fecha_fin"
                             value={medicamento.fecha_fin}
                             onChange={handleChange}
+                            required
                         />
                         <FormErrorMessage>{errorFechaFin}</FormErrorMessage>
                     </FormControl>

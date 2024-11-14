@@ -22,7 +22,7 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
     const [nombreTratamiento, setNombreTratamiento] = useState('');
     const [fechaTratamiento, setFechaTratamiento] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [monto, setMonto] = useState('0');
+    const [monto, setMonto] = useState(0);
     const [estadoTratamiento, setEstadoTratamiento] = useState('');
     const [errors, setErrors] = useState({});
     const toast = useToast();
