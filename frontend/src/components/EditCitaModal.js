@@ -11,7 +11,8 @@ import {
     FormControl,
     FormLabel,
     Select,
-    Input, useToast
+    Input,
+    useToast
 } from '@chakra-ui/react';
 import citaService from '../services/citaService';
 import usuarioService from '../services/usuarioService';
@@ -25,7 +26,6 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     const toast = useToast();
     const [loading, setLoading] = useState(false);
 
-
     useEffect(() => {
         const fetchPacientes = async () => {
             try {
@@ -38,16 +38,39 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
         fetchPacientes();
     }, []);
 
-    // Filtrar pacientes según el input de búsqueda
     const filteredPacientes = pacientes.filter(pac =>
         `${pac.nombres} ${pac.apellidos}`.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleSave = () => {
-        setLoading(true); // Inicia el estado de carga
+    const handleMontoChange = (e) => {
+        const value = parseFloat(e.target.value);
+        if (value >= 0 || e.target.value === "") {
+            setMonto(e.target.value);
+        } else {
+            toast({
+                title: "Monto inválido.",
+                description: "El monto no puede ser menor que cero.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    };
 
+    const handleSave = () => {
+        if (!paciente) {
+            toast({
+                title: "Paciente no seleccionado.",
+                description: "Debes seleccionar un paciente para continuar.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        setLoading(true);
         const updatedCita = { ...cita, estado_cita, id_paciente: paciente, monto };
-        console.log(updatedCita);
         onSave(updatedCita);
         toast({
             title: "Cita actualizada.",
@@ -57,8 +80,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
             isClosable: true,
         });
         onClose();
-        setLoading(false); // Inicia el estado de carga
-
+        setLoading(false);
     };
 
     return (
@@ -77,17 +99,19 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                             <option value="en espera">En Espera</option>
                         </Select>
                     </FormControl>
-                    <FormControl mb={4}>
+                    <FormControl mb={4} isRequired>
                         <FormLabel>Paciente</FormLabel>
-                        {/* Campo de búsqueda */}
                         <Input
                             placeholder="Buscar paciente"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             mb={3}
                         />
-                        <Select value={paciente} onChange={(e) => setPaciente(e.target.value)}
-                            placeholder="Selecciona un paciente">
+                        <Select
+                            value={paciente}
+                            onChange={(e) => setPaciente(e.target.value)}
+                            placeholder="Selecciona un paciente"
+                        >
                             {filteredPacientes.map((pac) => (
                                 <option key={pac.id_paciente} value={pac.id_paciente}>
                                     {pac.nombres} {pac.apellidos}
@@ -100,7 +124,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                         <Input
                             type="number"
                             value={monto}
-                            onChange={(e) => setMonto(e.target.value)}
+                            onChange={handleMontoChange}
                         />
                     </FormControl>
                 </ModalBody>
