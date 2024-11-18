@@ -10,7 +10,7 @@ import {
     Button,
     Box, Grid, IconButton, useToast, Select, Flex
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import {  DeleteIcon } from '@chakra-ui/icons';
 import jsPDF from 'jspdf';
 import { useParams, useNavigate } from 'react-router-dom';  
 import usuarioService from '../services/usuarioService';

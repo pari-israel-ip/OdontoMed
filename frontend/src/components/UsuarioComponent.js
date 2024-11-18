@@ -13,10 +13,9 @@ import {
     Flex,
     useToast,
     Input,
-    Stack,
-    Select
+   
 } from '@chakra-ui/react';
-import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
+import {  DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import usuarioService from '../services/usuarioService';
 import CreateUsuarioModal from './CreateUsuarioModal';
