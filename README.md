@@ -26,3 +26,5 @@ npm install tools form Front End
 + npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
 + npm install @chakra-ui/icons
 + npm install react-router-dom
++ npm install react-icons
+
