@@ -93,6 +93,7 @@ function ServicesCollection() {
         >
             <Container maxW="container.xl">
                 <MotionBox
+                
                     bg="rgba(255, 255, 255, 0.9)"
                     p={10}
                     borderRadius="md"

@@ -255,6 +255,7 @@ const ShowUsuarioModal = () => {
                 } catch (error) {
                     console.error('Error al procesar el archivo JSON:', error);
                 }
+              
             };
             reader.readAsText(file);
         }
@@ -457,198 +458,132 @@ const ShowUsuarioModal = () => {
     return (
         <>
             <Modal isOpen={!!usuario} onClose={onClose} size="full">
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>HISTORIAL ODONTOLOGICO DEL PACIENTE</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                    <Grid templateColumns="1fr 1fr" gap={4}>
-                    <Box>
-                        <Text><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
-                        <Text><strong>CI:</strong> {usuario.ci}</Text>
-                        <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
-                        <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
-                        <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
-                        <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-                        
-                        <Button colorScheme="blue" mt={4} onClick={handleEdit}>
-                            Editar Datos Personales
-                        </Button>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader textAlign="center">HISTORIAL ODONTOLOGICO DEL PACIENTE</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Grid templateColumns="1fr 1fr" gap={6}>
+            <Box
+              border="1px solid #319795"
+              borderRadius="lg"
+              p={5}
+              boxShadow="sm"
+              bg="white"
+            >
+              <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
+              <Text><strong>CI:</strong> {usuario.ci}</Text>
+              <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
+              <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
+              <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
+              <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
+              <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
+            </Box>
 
-                        <Text mt={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
-                        <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
-                        <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
-                        <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>
-                            Editar Datos del Paciente
-                        </Button>
+            <Box
+              border="1px solid #319795"
+              borderRadius="lg"
+              p={5}
+              boxShadow="sm"
+              bg="white"
+            >
+              <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
+              <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
+              <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
+              <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos del Paciente</Button>
+            </Box>
+          </Grid>
 
-                        <Text mt={4}><strong>Historial Clínico:</strong></Text>
-                        {usuario.historiales.map(historial => (
-                            <div key={historial.id_historial}>
-                                <Text>Fecha: {historial.fecha_hora_creacion}</Text>
-                                <Text>Notas: {historial.notas_generales}</Text>
-                                <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>
-                                    Editar Datos del Historial
-                                </Button>
-                                <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)} >
-                                    Crear Nuevo Diagnóstico
-                                </Button>
+          <Text fontSize="2xl" mt={6}><strong>Historial Clínico:</strong></Text>
+          {usuario.historiales.map(historial => (
+            <Box key={historial.id_historial} border="1px solid #319795" borderRadius="lg" p={4} mt={4} bg="white">
+              <Text><strong>Fecha:</strong> {historial.fecha_hora_creacion}</Text>
+              <Text><strong>Notas:</strong> {historial.notas_generales}</Text>
+              <Flex justify="space-between" mt={4}>
+                <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>Editar Datos del Historial</Button>
+                <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)}>Crear Nuevo Diagnóstico</Button>
+              </Flex>
 
-                                <Text><strong>Diagnósticos:</strong></Text>
-                                {currentDiagnosticos.map(diagnostico => (
-                                    <Box key={diagnostico.id_diagnostico} p={2} border="1px solid teal" borderRadius="md" mt={2}>
-                                        <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
-                                        <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
-                                        <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
-                                        <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>
-                                            Editar Diagnóstico
-                                        </Button>
-                                        <IconButton
-                                            icon={<DeleteIcon />}
-                                            colorScheme="red"
-                                            size="sm"
-                                            onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)}
-                                        />
-                                    </Box>
-                                ))}
+              <Text fontSize="lg" mt={4}><strong>Diagnósticos:</strong></Text>
+              {currentDiagnosticos.map(diagnostico => (
+                <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
+                  <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
+                  <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
+                  <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
+                  <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+                  <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                </Box>
+              ))}
+            </Box>
+          ))}
+          
+          <Flex justify="space-between" align="center" mt={6}>
+            <Button colorScheme="teal" onClick={handlePreviousPage} disabled={currentPage === 1}>Anterior</Button>
+            <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
+            <Button colorScheme="teal" onClick={handleNextPage} disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}>Siguiente</Button>
+          </Flex>
 
-                                {/* Controles de paginación */}
-                                <Flex justify="space-between" align="center" mt={4}>
-                                    <Button
-                                        onClick={handlePreviousPage}
-                                        disabled={currentPage === 1}
-                                        colorScheme="teal"
-                                        mr={2}
-                                    >
-                                        Anterior
-                                    </Button>
-                                    <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
-                                    <Button
-                                        onClick={handleNextPage}
-                                        disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}
-                                        colorScheme="teal"
-                                    >
-                                        Siguiente
-                                    </Button>
-                                </Flex>
+          <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+            <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
+              <option value="json">JSON</option>
+              <option value="xml">XML</option>
+              <option value="pdf">PDF</option>
+            </Select>
+            <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>Descargar Historial</Button>
+            <Button as="label" colorScheme="teal" mt={4}>Cargar Historial (JSON)
+              <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
+            </Button>
+          </Box>
 
-                            </div>
-                        ))}
-                        </Box>
-                        <Box>
-                                
-                        <Select  onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
-                                    <option value="json">JSON</option>
-                                    <option value="xml">XML</option>
-                                    <option value="pdf">PDF</option>
-                                </Select>
-                                <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>
-                                    Descargar Historial
-                                </Button>
-                                <Button as="label" colorScheme="teal" mt={4}>
-                                    Cargar Historial (JSON)
-                                    <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
-                                </Button>
+          <Flex mt={4} gap={6}>
+  {/* Tratamientos */}
+  <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+    <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
+    <Text><strong>Tratamientos:</strong></Text>
+    {currentTratamientos.map(tratamiento => (
+      <Box key={tratamiento.id_tratamiento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
+        <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
+        <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
+        <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
+        <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
+        <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
+        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
+      </Box>
+    ))}
+    {/* Paginación de Tratamientos */}
+    <Flex justify="space-between" align="center" mt={6}>
+      <Button colorScheme="teal" onClick={handlePreviousTratamientosPage} disabled={currentTratamientosPage === 1}>Anterior</Button>
+      <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
+      <Button colorScheme="teal" onClick={handleNextTratamientosPage} disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}>Siguiente</Button>
+    </Flex>
+  </Box>
 
-                                <Flex mt={2} gap={4}>
-                                    
-                                    {/* Listado de Tratamientos */}
-                                    <Box flex="1">
-                                    <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>
-                                        Crear Nuevo Tratamiento
-                                    </Button>
-                                        <Text><strong>Tratamientos:</strong></Text>
-                                        {currentTratamientos.map(tratamiento => (
-                                            <Box key={tratamiento.id_tratamiento} p={2} border="1px solid teal" borderRadius="md" mt={2}>
-                                                <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
-                                                <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
-                                                <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
-                                                <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
-                                                <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>
-                                                    Editar Tratamiento
-                                                </Button>
-                                                <IconButton
-                                                    icon={<DeleteIcon />}
-                                                    colorScheme="red"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)}
-                                                />
-                                            </Box>
-                                        ))}
-                                        {/* Controles de paginación de tratamientos */}
-                                        <Flex justify="space-between" align="center" mt={4}>
-                                            <Button
-                                                onClick={handlePreviousTratamientosPage}
-                                                disabled={currentTratamientosPage === 1}
-                                                colorScheme="teal"
-                                                mr={2}
-                                            >
-                                                Anterior
-                                            </Button>
-                                            <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
+  {/* Prescripciones */}
+  <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+    <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
+    <Text><strong>Prescripciones:</strong></Text>
+    {currentPrescripciones.map(prescripcion => (
+      <Box key={prescripcion.id_medicamento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
+        <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
+        <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
+        <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
+        <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
+        <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
+        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
+      </Box>
+    ))}
+    {/* Paginación de Prescripciones */}
+    <Flex justify="space-between" align="center" mt={6}>
+      <Button colorScheme="teal" onClick={handlePreviousPrescripcionesPage} disabled={currentPrescripcionesPage === 1}>Anterior</Button>
+      <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
+      <Button colorScheme="teal" onClick={handleNextPrescripcionesPage} disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}>Siguiente</Button>
+    </Flex>
+  </Box>
+</Flex>
 
-                                            <Button
-                                                onClick={handleNextTratamientosPage}
-                                                disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}
-                                                colorScheme="teal"
-                                            >
-                                                Siguiente
-                                            </Button>
-                                        </Flex>
-                                    </Box>
-
-                                    {/* Listado de Prescripciones */}
-                                    <Box flex="1">
-                                        <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>
-                                            Crear Nueva Prescripción
-                                        </Button>
-                                        <Text><strong>Prescripciones:</strong></Text>
-                                        {currentPrescripciones.map(prescripcion => (
-                                            <Box key={prescripcion.id_medicamento} p={2} border="1px solid teal" borderRadius="md" mt={2}>
-                                                <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
-                                                <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
-                                                <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
-                                                <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
-                                                <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>
-                                                    Editar Prescripción
-                                                </Button>
-                                                <IconButton
-                                                    icon={<DeleteIcon />}
-                                                    colorScheme="red"
-                                                    size="sm"
-                                                    onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)}
-                                                />
-                                            </Box>
-                                        ))}
-                                        {/* Controles de paginación de prescripciones */}
-                                        <Flex justify="space-between" align="center" mt={4}>
-                                            <Button
-                                                onClick={handlePreviousPrescripcionesPage}
-                                                disabled={currentPrescripcionesPage === 1}
-                                                colorScheme="teal"
-                                                mr={2}
-                                            >
-                                                Anterior
-                                            </Button>
-                                            <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
-
-                                            <Button
-                                                onClick={handleNextPrescripcionesPage}
-                                                disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}
-                                                colorScheme="teal"
-                                            >
-                                                Siguiente
-                                            </Button>
-                                        </Flex>
-                                    </Box>
-                                </Flex>
-                            </Box>
-                            
-                            
-                        </Grid>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
 
            
             {isCreatePrescriptionOpen && (
