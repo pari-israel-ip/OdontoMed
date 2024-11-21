@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import NavComponent from './components/NavComponent';
 import NavComponentLogin from './components/NavComponentLogin';
 import BodyComponent from './components/BodyComponent';
+
 import FooterComponent from './components/FooterComponent';
 import LoginComponent from './components/LoginComponent';
 import RolesComponent from './components/RolesComponent';
@@ -16,40 +17,45 @@ import CitasComponent from './components/CitasComponent';
 import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorized from './components/unauthorized';
 import RecuperarContrasenaComponent from './components/RecuperarContrasenaComponent';
-import VerificarCodigoComponent from './components/VerificarCodigoComponent'; // Importar el componente
-import RurteOfControl from './components/rurte_ofcontrol'; // Importa el componente de rutas fuera de control
-import NotFoundPage from './components/rurte_ofcontrol';
+import VerificarCodigoComponent from './components/VerificarCodigoComponent';
+import PageNotFound from './components/PageNotFound'; // Importar el componente 404
+
+import { useEffect, useState } from 'react';
 
 function Layout({ children }) {
     const location = useLocation();
 
-    const isLoginPage = location.pathname === '/login';
-    const isUnauthorizedPage = location.pathname === '/unauthorized' || location.pathname === NotFoundPage; // Nueva excepción
-    const isUserOrRolesPage =
-        location.pathname === '/usuarios' ||
-        location.pathname === '/roles' ||
-        location.pathname === '/citas' ||
-        location.pathname === '/odontologos' ||
-        location.pathname.startsWith('/odontologos/') || // Compara si comienza con '/odontologos/'
-        location.pathname.startsWith('/usuarios/') || // Compara si comienza con '/odontologos/'
-        location.pathname === '/recepcionistas';
-    const isRecoveryPage = location.pathname === '/recuperar-contrasena';
-    const isRecoveryPage2 = location.pathname === '/verificar-codigo';
+    // Verifica si estamos en una página especial
+    const isSpecialPage =
+        location.pathname === '/login' ||
+        location.pathname === '/unauthorized' ||
+        location.pathname === '/recuperar-contrasena' ||
+        location.pathname === '/verificar-codigo' ||
+        location.pathname === '*' || // Esto asegura que captura cualquier ruta no válida
+        location.pathname === '/404'; // Página 404
 
-    if (isLoginPage || isUnauthorizedPage || isRecoveryPage || isRecoveryPage2) {
-        return <>{children}</>; // Sin Nav, Body ni Footer
+    // Si estamos en una página especial, no renderizamos el Nav ni el Footer
+    if (isSpecialPage) {
+        return <>{children}</>; // Solo renderiza el contenido (sin Nav ni Footer)
     }
 
+    // Renderizado normal (con Navbar y Footer)
     return (
         <>
-            {!isUserOrRolesPage && <NavComponent />}
-            {isUserOrRolesPage && <NavComponentLogin />}
-            {!isUserOrRolesPage && <BodyComponent />}
+            {location.pathname.startsWith('/usuarios') || location.pathname.startsWith('/roles') || location.pathname.startsWith('/odontologos') ? (
+                <NavComponentLogin />
+            ) : (
+                <NavComponent />
+            )}
             {children}
-            {!isUserOrRolesPage && <FooterComponent />}
+            <FooterComponent />
         </>
     );
 }
+
+
+
+
 
 function App() {
     return (
@@ -57,72 +63,51 @@ function App() {
             <div className="App">
                 <Layout>
                     <Routes>
-                        {/* Rutas definidas */}
+                        {/* Rutas principales */}
+                        <Route path="/" element={<BodyComponent />} />
                         <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="*" element={<PageNotFound />} />
                         <Route path="/login" element={<LoginComponent />} />
                         <Route path="/recuperar-contrasena" element={<RecuperarContrasenaComponent />} />
                         <Route path="/verificar-codigo" element={<VerificarCodigoComponent />} />
+                        
+                        {/* Rutas protegidas */}
                         <Route
                             path="/usuarios"
                             element={
-                               
                                 <ProtectedRoute permisoRequerido="Ver Pacientes">
-                                <UsuariosComponent />
+                                    <UsuariosComponent />
                                 </ProtectedRoute>
-                               
                             }
                         />
                         <Route
                             path="/odontologos"
                             element={
                                 <ProtectedRoute permisoRequerido="Ver Odontólogos">
-
                                     <OdontologosComponent />
-                             </ProtectedRoute>
+                                </ProtectedRoute>
                             }
                         />
-                        <Route
-                            path="/roles"
-                            element={
-                                
-                                    <RolesComponent />
-                                    
-                            }
-                        />
+                        <Route path="/roles" element={<RolesComponent />} />
                         <Route
                             path="/recepcionistas"
                             element={
-                               <ProtectedRoute permisoRequerido="Ver Recepcionistas">
+                                <ProtectedRoute permisoRequerido="Ver Recepcionistas">
                                     <RecepcionistasComponent />
-                                    </ProtectedRoute>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/citas"
                             element={
-                               <ProtectedRoute permisoRequerido="Ver citas">
+                                <ProtectedRoute permisoRequerido="Ver citas">
                                     <CitasComponent />
-                                    </ProtectedRoute>
+                                </ProtectedRoute>
                             }
                         />
-                        <Route
-                            path="/odontologos/:id"
-                            element={
-                              
-                                    <ShowOdontologoModal />
-                         
-                            }
-                        />
-                        <Route
-                            path="/usuarios/:id"
-                            element={
-                               
-                                    <ShowUsuarioModal />
-                             
-                            }
-                        />
-                        {/* Ruta para manejar páginas no encontradas */}
-                        <Route path="*" element={<RurteOfControl />} />
+                        <Route path="/odontologos/:id" element={<ShowOdontologoModal />} />
+                        <Route path="/usuarios/:id" element={<ShowUsuarioModal />} />
+
                     </Routes>
                 </Layout>
             </div>

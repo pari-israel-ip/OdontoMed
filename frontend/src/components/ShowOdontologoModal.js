@@ -11,7 +11,7 @@ import {
     Box,
     Grid,
     Spinner, // Importa Spinner de Chakra UI
-    Center,
+    Center,Tabs, TabList, TabPanels, TabPanel, Tab,Flex,
 } from '@chakra-ui/react';
 import { useParams, useNavigate } from 'react-router-dom';  
 import odontologoService from '../services/odontologoService';
@@ -45,7 +45,7 @@ const ShowOdontologoModal = () => {
     
         fetchUsuarioYOdontologo();
     }, [id]);
-
+    const [activeTab, setActiveTab] = useState(1);
     const loadUsuarioYOdontologo = async () => {
         setIsLoading(true);
         try {
@@ -89,46 +89,48 @@ const ShowOdontologoModal = () => {
 
     return (
         <>
-            <Modal isOpen={!!odontologo} onClose={onClose} size="full">
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>DATOS DEL ODONTÓLOGO</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Grid templateColumns="1fr 1fr" gap={4}>
-                            <Box>
-                                {/* Información del usuario */}
-                                <Text><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
-                                <Text><strong>CI:</strong> {usuario.ci}</Text>
-                                <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
-                                <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
-                                <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
-                                <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-                                <ConPermiso permiso='Editar Datos Personales'>
-                                <Button colorScheme="blue" mt={4} onClick={handleEditUsuario}>
-                                    Editar Datos Personales
-                                </Button>
-                                </ConPermiso>
-                                {/* Información específica del odontólogo */}
-                                <Text mt={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
-                                <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
-                                <Text><strong>Activo:</strong> {odontologo.activo ? 'Sí' : 'No'}</Text>
-                                <ConPermiso permiso='Editar Datos de Odontólogo'>
-                                <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>
-                                    Editar Datos del Odontólogo
-                                </Button>
-                                </ConPermiso>
+           <Modal isOpen={!!odontologo} onClose={onClose} size="full">
+  <ModalOverlay />
+  <ModalContent>
+    <ModalHeader textAlign="center">DATOS DEL ODONTÓLOGO</ModalHeader>
+    <ModalCloseButton />
+    <ModalBody>
+      {/* Barra de pestañas */}
+      <Flex justify="center" mb={4}>
+        <Button colorScheme={activeTab === 1 ? "teal" : "gray"} onClick={() => setActiveTab(1)}>Datos Personales</Button>
+        
+        {/*<Button colorScheme={activeTab === 2 ? "teal" : "gray"} onClick={() => setActiveTab(2)}>Licencia y Especialización</Button>*/}
+      </Flex>
 
-                             
-                            </Box>
-                            <Box>
-                                {/* Información adicional en la columna derecha */}
-                                <Text></Text>
-                            </Box>
-                        </Grid>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+      {/* Contenido de las pestañas */}
+      {activeTab === 1 && (
+        <Grid templateColumns="1fr 1fr" gap={6}>
+          <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+            <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {odontologo.nombre_completo}</Text>
+            <Text><strong>CI:</strong> {odontologo.ci}</Text>
+            <Text><strong>Fecha de Nacimiento:</strong> {odontologo.fecha_nacimiento}</Text>
+            <Text><strong>Correo Electrónico:</strong> {odontologo.email}</Text>
+            <Text><strong>Dirección:</strong> {odontologo.direccion}</Text>
+            <Text><strong>Teléfono:</strong> {odontologo.telefono}</Text>
+            <ConPermiso permiso='Editar Datos Personales'>
+              <Button colorScheme="blue" mt={4} onClick={handleEditUsuario}>Editar Datos Personales</Button>
+            </ConPermiso>
+          </Box>
+
+          <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+            <Text fontSize="xl" mb={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
+            <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
+            <Text><strong>Activo:</strong> {odontologo.activo ? 'Sí' : 'No'}</Text>
+            <ConPermiso permiso='Editar Datos de Odontólogo'>
+              <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>Editar Datos del Odontólogo</Button>
+            </ConPermiso>
+          </Box>
+        </Grid>
+      )}
+    </ModalBody>
+  </ModalContent>
+</Modal>
+
 
             {/* Modal para editar el usuario */}
             {isEditUsuarioOpen && (

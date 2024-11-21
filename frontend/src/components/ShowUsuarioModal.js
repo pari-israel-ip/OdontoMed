@@ -8,7 +8,7 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid, IconButton, useToast, Select, Flex,Spinner,Center
+    Box, Grid, IconButton, useToast, Select, Flex,Spinner,Center,Tabs, TabList, TabPanels, TabPanel, Tab
 } from '@chakra-ui/react';
 import {  DeleteIcon } from '@chakra-ui/icons';
 import jsPDF from 'jspdf';
@@ -296,6 +296,7 @@ const ShowUsuarioModal = () => {
             console.error('Error fetching usuarios:', error);
         }
     };
+    const [activeTab, setActiveTab] = useState(1);  // 0 es el índice de la primera pestaña
 
     const loadDiagnosticos = async (historialId) => {
         try {
@@ -464,157 +465,159 @@ const ShowUsuarioModal = () => {
             </Center>
         );
     }
+
+
+
+    
+    
     return (
         <>
-            <Modal isOpen={!!usuario} onClose={onClose} size="full">
+           <Modal isOpen={!!usuario} onClose={onClose} size="full">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader textAlign="center">HISTORIAL ODONTOLOGICO DEL PACIENTE</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Grid templateColumns="1fr 1fr" gap={6}>
-            <Box
-              border="1px solid #319795"
-              borderRadius="lg"
-              p={5}
-              boxShadow="sm"
-              bg="white"
-            >
-              <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
-              <Text><strong>CI:</strong> {usuario.ci}</Text>
-              <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
-              <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
-              <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
-              <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-              <ConPermiso permiso='Editar Datos Personales'>
-              <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
-            </ConPermiso>
-            </Box>
+          {/* Barra de pestañas */}
+          <Flex justify="center" mb={4}>
+            <Button colorScheme={activeTab === 1 ? "teal" : "gray"} onClick={() => setActiveTab(1)}>Datos Personales</Button>
+            <Button colorScheme={activeTab === 2 ? "teal" : "gray"} onClick={() => setActiveTab(2)}>Historial Clínico</Button>
+            <Button colorScheme={activeTab === 3 ? "teal" : "gray"} onClick={() => setActiveTab(3)}>Tratamientos</Button>
+            <Button colorScheme={activeTab === 4 ? "teal" : "gray"} onClick={() => setActiveTab(4)}>Prescripciones</Button>
+            <Button colorScheme={activeTab === 5 ? "teal" : "gray"} onClick={() => setActiveTab(5)}>Descargar Historial</Button>
+          </Flex>
 
-
-            <Box
-              border="1px solid #319795"
-              borderRadius="lg"
-              p={5}
-              boxShadow="sm"
-              bg="white"
-            >
-              <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
-              <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
-              <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
-              <ConPermiso permiso='Editar Datos del Paciente'>
-              <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos del Paciente</Button>
-            </ConPermiso>
-            </Box>
-          </Grid>
-          <ConPermiso permiso="Ver Historial de Paciente">
-
-          <Text fontSize="2xl" mt={6}><strong>Historial Clínico:</strong></Text>
-          {usuario.historiales.map(historial => (
-            <Box key={historial.id_historial} border="1px solid #319795" borderRadius="lg" p={4} mt={4} bg="white">
-              <Text><strong>Fecha:</strong> {historial.fecha_hora_creacion}</Text>
-              <Text><strong>Notas:</strong> {historial.notas_generales}</Text>
-              <Flex justify="space-between" mt={4}>
-              <ConPermiso permiso='Editar Datos del Historial'>
-                <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>Editar Datos del Historial</Button>
+          {/* Contenido de las pestañas */}
+          {activeTab === 1 && (
+            <Grid templateColumns="1fr 1fr" gap={6}>
+              <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+                <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
+                <Text><strong>CI:</strong> {usuario.ci}</Text>
+                <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
+                <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
+                <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
+                <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
+                <ConPermiso permiso='Editar Datos Personales'>
+                  <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
                 </ConPermiso>
-                <ConPermiso permiso='Crear Diagnostico'>
-                <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)}>Crear Nuevo Diagnóstico</Button>
-                </ConPermiso>
-              </Flex>
+              </Box>
 
-              <Text fontSize="lg" mt={4}><strong>Diagnósticos:</strong></Text>
-              {currentDiagnosticos.map(diagnostico => (
-                <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
-                  <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
-                  <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
-                 
-                  <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
-                  <ConPermiso permiso='Editar Diagnostico'>
-                  <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+              <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+                <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
+                <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
+                <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
+                <ConPermiso permiso='Editar Datos del Paciente'>
+                  <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos del Paciente</Button>
+                </ConPermiso>
+              </Box>
+            </Grid>
+          )}
+
+          {activeTab === 2 && (
+            <ConPermiso permiso="Ver Historial de Paciente">
+              <Text fontSize="2xl" mt={6}><strong>Historial Clínico:</strong></Text>
+              {usuario.historiales.map(historial => (
+                <Box key={historial.id_historial} border="1px solid #319795" borderRadius="lg" p={4} mt={4} bg="white">
+                  <Text><strong>Fecha:</strong> {historial.fecha_hora_creacion}</Text>
+                  <Text><strong>Notas:</strong> {historial.notas_generales}</Text>
+                  <Flex justify="space-between" mt={4}>
+                    <ConPermiso permiso='Editar Datos del Historial'>
+                      <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>Editar Datos del Historial</Button>
+                    </ConPermiso>
+                    <ConPermiso permiso='Crear Diagnostico'>
+                      <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)}>Crear Nuevo Diagnóstico</Button>
+                    </ConPermiso>
+                  </Flex>
+
+                  <Text fontSize="lg" mt={4}><strong>Diagnósticos:</strong></Text>
+                  {currentDiagnosticos.map(diagnostico => (
+                    <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
+                      <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
+                      <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
+                      <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
+                      <ConPermiso permiso='Editar Diagnostico'>
+                        <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+                      </ConPermiso>
+                      <ConPermiso permiso='Eliminar Diagnostico'>
+                        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                      </ConPermiso>
+                    </Box>
+                  ))}
+                </Box>
+              ))}
+            </ConPermiso>
+          )}
+
+          {activeTab === 3 && (
+            <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+              <ConPermiso permiso='Crear Tratamiento'>
+                <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
+              </ConPermiso>
+              <Text><strong>Tratamientos:</strong></Text>
+              {currentTratamientos.map(tratamiento => (
+                <Box key={tratamiento.id_tratamiento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
+                  <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
+                  <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
+                  <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
+                  <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
+                  <ConPermiso permiso='Editar Tratamiento'>
+                    <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
                   </ConPermiso>
-                  <ConPermiso permiso='Eliminar Diagnostico'>
-                  <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                  <ConPermiso permiso='Eliminar Tratamiento'>
+                    <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
                   </ConPermiso>
                 </Box>
               ))}
+              {/* Paginación de Tratamientos */}
+              <Flex justify="space-between" align="center" mt={6}>
+                <Button colorScheme="teal" onClick={handlePreviousTratamientosPage} disabled={currentTratamientosPage === 1}>Anterior</Button>
+                <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
+                <Button colorScheme="teal" onClick={handleNextTratamientosPage} disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}>Siguiente</Button>
+              </Flex>
             </Box>
-          ))}
-          
-          <Flex justify="space-between" align="center" mt={6}>
-            <Button colorScheme="teal" onClick={handlePreviousPage} disabled={currentPage === 1}>Anterior</Button>
-            <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
-            <Button colorScheme="teal" onClick={handleNextPage} disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}>Siguiente</Button>
-          </Flex>
-          <ConPermiso permiso='Descargar Historial'>
-          <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-            <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
-              <option value="json">JSON</option>
-              <option value="xml">XML</option>
-              <option value="pdf">PDF</option>
-            </Select>
-            <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>Descargar Historial</Button>
-           
-          </Box>
-          </ConPermiso>
-          <Flex mt={4} gap={6}>
-  {/* Tratamientos */}
-  <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-    <ConPermiso permiso='Crear Tratamiento'>
-    <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
-    </ConPermiso>
-    <Text><strong>Tratamientos:</strong></Text>
-    {currentTratamientos.map(tratamiento => (
-      <Box key={tratamiento.id_tratamiento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
-        <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
-        <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
-        <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
-        <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
-        <ConPermiso permiso='Editar Tratamiento'>
-        <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
-        </ConPermiso>
-        <ConPermiso permiso='Eliminar Tratamiento'>
-        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
-        </ConPermiso>
-      </Box>
-    ))}
-    {/* Paginación de Tratamientos */}
-    <Flex justify="space-between" align="center" mt={6}>
-      <Button colorScheme="teal" onClick={handlePreviousTratamientosPage} disabled={currentTratamientosPage === 1}>Anterior</Button>
-      <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
-      <Button colorScheme="teal" onClick={handleNextTratamientosPage} disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}>Siguiente</Button>
-    </Flex>
-  </Box>
+          )}
 
-  {/* Prescripciones */}
-  <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-   <ConPermiso permiso='Crear Prescripcion'>
-    <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
-    </ConPermiso>
-    <Text><strong>Prescripciones:</strong></Text>
-    {currentPrescripciones.map(prescripcion => (
-      <Box key={prescripcion.id_medicamento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
-        <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
-        <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
-        <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
-        <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
-       <ConPermiso permiso='Editar Prescripcion'>
-        <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
-        </ConPermiso>
-        <ConPermiso permiso='Eliminar Prescripcion'>
-        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
-        </ConPermiso>
-      </Box>
-    ))}
-    {/* Paginación de Prescripciones */}
-    <Flex justify="space-between" align="center" mt={6}>
-      <Button colorScheme="teal" onClick={handlePreviousPrescripcionesPage} disabled={currentPrescripcionesPage === 1}>Anterior</Button>
-      <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
-      <Button colorScheme="teal" onClick={handleNextPrescripcionesPage} disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}>Siguiente</Button>
-    </Flex>
-  </Box>
-</Flex>
-</ConPermiso>
+          {activeTab === 4 && (
+            <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+              <ConPermiso permiso='Crear Prescripcion'>
+                <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
+              </ConPermiso>
+              <Text><strong>Prescripciones:</strong></Text>
+              {currentPrescripciones.map(prescripcion => (
+                <Box key={prescripcion.id_medicamento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
+                  <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
+                  <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
+                  <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
+                  <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
+                  <ConPermiso permiso='Editar Prescripcion'>
+                    <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
+                  </ConPermiso>
+                  <ConPermiso permiso='Eliminar Prescripcion'>
+                    <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
+                  </ConPermiso>
+                </Box>
+              ))}
+              {/* Paginación de Prescripciones */}
+              <Flex justify="space-between" align="center" mt={6}>
+                <Button colorScheme="teal" onClick={handlePreviousPrescripcionesPage} disabled={currentPrescripcionesPage === 1}>Anterior</Button>
+                <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
+                <Button colorScheme="teal" onClick={handleNextPrescripcionesPage} disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}>Siguiente</Button>
+              </Flex>
+            </Box>
+          )}
+
+          {activeTab === 5 && (
+            <ConPermiso permiso='Descargar Historial'>
+              <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+                <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
+                  <option value="json">JSON</option>
+                  <option value="xml">XML</option>
+                  <option value="pdf">PDF</option>
+                </Select>
+                <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>Descargar Historial</Button>
+              </Box>
+            </ConPermiso>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>
