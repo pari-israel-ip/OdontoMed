@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    useToast
+    useToast,Spinner,Center
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +32,9 @@ const RecepcionistasComponent = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRecepcionista, setCurrentRecepcionista] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const toast = useToast();
+    const toast = useToast();    
+    const [isLoading, setIsLoading] = useState(false); // Estado de carga inicializado en true
+
 
     useEffect(() => {
         loadRecepcionistas();
@@ -40,10 +42,15 @@ const RecepcionistasComponent = () => {
 
     const loadRecepcionistas = async () => {
         try {
+            setIsLoading(true);
+
             const response = await recepcionistaService.getRecepcionistas();
             setRecepcionistas(response.data);
         } catch (error) {
             console.error('Error fetching Recepcionistas:', error);
+        }finally{
+            setIsLoading(false);
+
         }
     };
     
@@ -115,7 +122,11 @@ const RecepcionistasComponent = () => {
                     marginTop={4}
                 />
             </Flex>
-
+            {isLoading ? ( // Mostrar spinner mientras se cargan los detalles
+                <Center mt={4}>
+                    <Spinner size="xl" color="teal.500" />
+                </Center>
+            ) : (
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
@@ -157,7 +168,7 @@ const RecepcionistasComponent = () => {
                         </Tr>
                     ))}
                 </Tbody>
-            </Table>
+            </Table>)}
 
             {isCreateModalOpen && (
                 <CreateRecepcionistaModal 

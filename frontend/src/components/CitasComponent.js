@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    Select, useToast
+    Select, useToast,Spinner,Center
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import citaService from '../services/citaService';
@@ -35,6 +35,7 @@ const CitasComponent = () => {
     const [estadoCitaFiltro, setEstadoCitaFiltro] = useState(''); // Nuevo estado de filtro
     const [odontologos, setOdontologos] = useState([]);
     const toast = useToast();
+    const [isLoading, setIsLoading] = useState(false); // Estado de carga inicializado en true
 
     useEffect(() => {
         loadCitasAuto();
@@ -44,10 +45,13 @@ const CitasComponent = () => {
 
     const loadCitas = async () => {
         try {
+            setIsLoading(true);
             const response = await citaService.getCitas();
             setCitas(response.data);
         } catch (error) {
             console.error('Error fetching citas:', error);
+        }finally{
+            setIsLoading(false);
         }
     };
 
@@ -168,7 +172,11 @@ const CitasComponent = () => {
                     <option value="completada">COMPLETADA</option>
                 </Select>
             </Flex>
-
+            {isLoading ? ( // Mostrar spinner mientras se cargan los detalles
+                <Center mt={4}>
+                    <Spinner size="xl" color="teal.500" />
+                </Center>
+            ) : (
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
@@ -212,7 +220,7 @@ const CitasComponent = () => {
                         </Tr>
                     ))}
                 </Tbody>
-            </Table>
+            </Table>)}
 
             {isEditModalOpen && (
                 <EditCitaModal
