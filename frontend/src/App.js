@@ -42,7 +42,7 @@ function Layout({ children }) {
     // Renderizado normal (con Navbar y Footer)
     return (
         <>
-            {location.pathname.startsWith('/usuarios') || location.pathname.startsWith('/roles') || location.pathname.startsWith('/odontologos') ? (
+            {location.pathname.startsWith('/recepcionistas') ||location.pathname.startsWith('/citas') ||location.pathname.startsWith('/usuarios') || location.pathname.startsWith('/roles') || location.pathname.startsWith('/odontologos') ? (
                 <NavComponentLogin />
             ) : (
                 <NavComponent />
