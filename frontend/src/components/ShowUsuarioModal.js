@@ -26,7 +26,7 @@ import EditTratamientoModal from './EditTratamientoModal.js';
 import CreatePrescriptionModal from './CreatePrescriptionModal';
 import prescripcionService from '../services/prescripcionService.js'
 import EditPrescriptionModal from './EditPrescriptionModal.js';
-
+import ConPermiso from './ConPermiso.js';
 
 const ShowUsuarioModal = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -168,99 +168,7 @@ const ShowUsuarioModal = () => {
             doc.save(`historial_${usuario.nombre_completo}.pdf`);
         }
     };
-    const handleFileUpload = async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-    
-                    // Datos del usuario, paciente y historial clínico
-                    const usuarioData = {
-                        nombres: data.usuario.nombres.trim().toUpperCase(),
-                        apellidos: data.usuario.apellidos.trim().toUpperCase(),
-                        ci: data.usuario.ci.trim(),
-                        fecha_nacimiento: data.usuario.fecha_nacimiento,
-                        email: data.usuario.email.trim().toUpperCase(),
-                        direccion: data.usuario.direccion.trim().toUpperCase(),
-                        telefono: data.usuario.telefono.trim(),
-                        contrasenia: data.usuario.contrasenia,
-                        seguro_medico: data.usuario.seguro_medico.trim().toUpperCase(),
-
-                        alergias: data.usuario.alergias.trim().toUpperCase(),
-                        antecedentes_medicos: data.usuario.antecedentes_medicos.trim().toUpperCase(),
-                        id_odontologo: data.historial_clinico.id_odontologo, // ID del odontólogo
-                        notas_generales: data.historial_clinico.notas_generales.trim().toUpperCase()
-                    };
-    
-                    // Realizar la solicitud de creación al backend
-                    try {
-                        
-                        const response = await usuarioService.createUsuario(usuarioData);
-                        console.log('Paciente creado correctamente:', response.data);
-                
-                        // Obtener el id_historial utilizando el email del usuario recién creado
-                        const userResponse = await usuarioService.getIDPorEmail(data.usuario.email);
-                        console.log('ID USUARIO:', userResponse.data.id_usuario);
-                
-                        // Asumimos que el backend devuelve el id_historial asociado al usuario creado
-                        const historialId = userResponse.data.id_historial; // ID del historial clínico
-                
-                        // Ahora puedes usar historialId para asociarlo con otros objetos o realizar más operaciones
-                        console.log('ID Historial:', historialId);
-    
-                        // Crear diagnósticos
-                        if (data.diagnosticos && data.diagnosticos.length > 0) {
-                            for (const diagnostico of data.diagnosticos) {
-                                const diagnosticoData = {
-                                    ...diagnostico,
-                                    id_historial: historialId // Asociar al historial clínico creado
-                                };
-                                await diagnosticoService.createDiagnostico(diagnosticoData);
-                            }
-                        }
-    
-                        // Crear tratamientos
-                        if (data.tratamientos && data.tratamientos.length > 0) {
-                            for (const tratamiento of data.tratamientos) {
-                                const tratamientoData = {
-                                    ...tratamiento,
-                                    id_historial: historialId // Asociar al historial clínico creado
-                                };
-                                await tratamientoService.createTratamiento(tratamientoData);
-                            }
-                        }
-    
-                        // Crear prescripciones
-                        if (data.prescripciones && data.prescripciones.length > 0) {
-                            for (const prescripcion of data.prescripciones) {
-                                const prescripcionData = {
-                                    ...prescripcion,
-                                    id_historial: historialId // Asociar al historial clínico creado
-                                };
-                                await prescripcionService.createPrescripcion(prescripcionData);
-                            }
-                        }
-    
-                        console.log('Usuario, historial clínico y registros asociados subidos exitosamente');
-                    } catch (error) {
-                        if (error.response && error.response.data.errors) {
-                            // Si el backend devuelve errores de validación, los mostramos en consola
-                            console.error('Errores de validación:', error.response.data.errors);
-                        } else {
-                            console.error('Error al crear el usuario:', error);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error al procesar el archivo JSON:', error);
-                }
-              
-            };
-            reader.readAsText(file);
-        }
-    };
-    
+   
     
     
     const navigate = useNavigate();
@@ -477,8 +385,11 @@ const ShowUsuarioModal = () => {
               <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
               <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
               <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
+              <ConPermiso permiso='Editar Datos Personales'>
               <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
+            </ConPermiso>
             </Box>
+
 
             <Box
               border="1px solid #319795"
@@ -490,9 +401,12 @@ const ShowUsuarioModal = () => {
               <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
               <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
               <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
+              <ConPermiso permiso='Editar Datos del Paciente'>
               <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos del Paciente</Button>
+            </ConPermiso>
             </Box>
           </Grid>
+          <ConPermiso permiso="Ver Historial de Paciente">
 
           <Text fontSize="2xl" mt={6}><strong>Historial Clínico:</strong></Text>
           {usuario.historiales.map(historial => (
@@ -500,8 +414,12 @@ const ShowUsuarioModal = () => {
               <Text><strong>Fecha:</strong> {historial.fecha_hora_creacion}</Text>
               <Text><strong>Notas:</strong> {historial.notas_generales}</Text>
               <Flex justify="space-between" mt={4}>
+              <ConPermiso permiso='Editar Datos del Historial'>
                 <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>Editar Datos del Historial</Button>
+                </ConPermiso>
+                <ConPermiso permiso='Crear Diagnostico'>
                 <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)}>Crear Nuevo Diagnóstico</Button>
+                </ConPermiso>
               </Flex>
 
               <Text fontSize="lg" mt={4}><strong>Diagnósticos:</strong></Text>
@@ -509,9 +427,14 @@ const ShowUsuarioModal = () => {
                 <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
                   <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
                   <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
+                 
                   <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
+                  <ConPermiso permiso='Editar Diagnostico'>
                   <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+                  </ConPermiso>
+                  <ConPermiso permiso='Eliminar Diagnostico'>
                   <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                  </ConPermiso>
                 </Box>
               ))}
             </Box>
@@ -522,7 +445,7 @@ const ShowUsuarioModal = () => {
             <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
             <Button colorScheme="teal" onClick={handleNextPage} disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}>Siguiente</Button>
           </Flex>
-
+          <ConPermiso permiso='Descargar Historial'>
           <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
             <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
               <option value="json">JSON</option>
@@ -530,15 +453,15 @@ const ShowUsuarioModal = () => {
               <option value="pdf">PDF</option>
             </Select>
             <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>Descargar Historial</Button>
-            <Button as="label" colorScheme="teal" mt={4}>Cargar Historial (JSON)
-              <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
-            </Button>
+           
           </Box>
-
+          </ConPermiso>
           <Flex mt={4} gap={6}>
   {/* Tratamientos */}
   <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+    <ConPermiso permiso='Crear Tratamiento'>
     <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
+    </ConPermiso>
     <Text><strong>Tratamientos:</strong></Text>
     {currentTratamientos.map(tratamiento => (
       <Box key={tratamiento.id_tratamiento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
@@ -546,8 +469,12 @@ const ShowUsuarioModal = () => {
         <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
         <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
         <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
+        <ConPermiso permiso='Editar Tratamiento'>
         <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
+        </ConPermiso>
+        <ConPermiso permiso='Eliminar Tratamiento'>
         <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
+        </ConPermiso>
       </Box>
     ))}
     {/* Paginación de Tratamientos */}
@@ -560,7 +487,9 @@ const ShowUsuarioModal = () => {
 
   {/* Prescripciones */}
   <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+   <ConPermiso permiso='Crear Prescripcion'>
     <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
+    </ConPermiso>
     <Text><strong>Prescripciones:</strong></Text>
     {currentPrescripciones.map(prescripcion => (
       <Box key={prescripcion.id_medicamento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
@@ -568,8 +497,12 @@ const ShowUsuarioModal = () => {
         <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
         <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
         <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
+       <ConPermiso permiso='Editar Prescripcion'>
         <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
+        </ConPermiso>
+        <ConPermiso permiso='Eliminar Prescripcion'>
         <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
+        </ConPermiso>
       </Box>
     ))}
     {/* Paginación de Prescripciones */}
@@ -580,7 +513,7 @@ const ShowUsuarioModal = () => {
     </Flex>
   </Box>
 </Flex>
-
+</ConPermiso>
         </ModalBody>
       </ModalContent>
     </Modal>

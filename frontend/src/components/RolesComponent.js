@@ -22,6 +22,7 @@ import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
 import EditRoleModal from './EditRoleModal';
 import CreateRoleModal from './CreateRoleModal';
+import ProtectedRoute from './ProtectedRoute';
 
 const RolesComponent = () => {
     const [message, setMessage] = useState(null);
@@ -102,7 +103,11 @@ const RolesComponent = () => {
     const filteredRoles = roles.filter(role =>
         role.nombre_rol.toLowerCase().includes(filter.toLowerCase())
     );
-
+    const tienePermiso = (permisoRequerido) => {
+        const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+        return permisos.includes(permisoRequerido);
+    };
+    
     return (
         <Box p={4}>
             <Heading as="h2" size="lg" mb={4}>ROLES</Heading>
@@ -114,9 +119,10 @@ const RolesComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
+            {tienePermiso('Crear rol') && (
             <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>
                     CREAR NUEVO ROL
-                </Button>
+                </Button>)}
             <Flex mb={4} justify="space-between">
                 <Input
                     placeholder="Buscar rol"
@@ -141,19 +147,22 @@ const RolesComponent = () => {
                             <Td>{role.nombre_rol}</Td>
                             <Td>
                                 <Flex justify="space-between">
+                                {tienePermiso('Editar rol') && (
                                     <IconButton
                                         icon={<EditIcon />}
                                         colorScheme="blue"
                                         size="sm"
                                         onClick={() => handleEdit(role)}
                                         mr={2}
-                                    />
+                                    />)}
+                                {tienePermiso('Eliminar rol') && (
                                     <IconButton
                                         icon={<DeleteIcon />}
                                         colorScheme="red"
                                         size="sm"
                                         onClick={() => handleDelete(role.id_rol)}
-                                    />
+                                    />)}
+                                    
                                 </Flex>
                             </Td>
                         </Tr>

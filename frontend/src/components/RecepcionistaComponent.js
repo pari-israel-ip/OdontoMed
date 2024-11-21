@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import recepcionistaService from '../services/recepcionistaService';
 import CreateRecepcionistaModal from './CreateRecepcionistaModal';
 import EditUsuarioModal from './EditUsuarioModal';
-
+import ConPermiso from './ConPermiso';
 const RecepcionistasComponent = () => {
     const [recepcionistas, setRecepcionistas] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");  // Estado para la búsqueda
@@ -100,9 +100,11 @@ const RecepcionistasComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
+            <ConPermiso permiso='Crear Recepcionista'>
                 <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)}>
                     CREAR NUEVO RECEPCIONISTA
                 </Button>
+                </ConPermiso>
             <Flex mb={4} justify="space-between">
                 
                 <Input
@@ -133,6 +135,7 @@ const RecepcionistasComponent = () => {
                             <Td>{recepcionista.email}</Td>
                             <Td>
                                 <Flex justify="space-between">
+                                    <ConPermiso permiso='Editar Recepcionista'>
                                     <IconButton
                                         icon={<EditIcon />}
                                         colorScheme="cyan"
@@ -140,12 +143,15 @@ const RecepcionistasComponent = () => {
                                         onClick={() => handleEdit(recepcionista)}
                                         mr={2}
                                     />
+                                    </ConPermiso>
+                                    <ConPermiso permiso='Eliminar Recepcionista'>
                                     <IconButton
                                         icon={<DeleteIcon />}
                                         colorScheme="red"
                                         size="sm"
                                         onClick={() => handleDelete(recepcionista.id_recepcionista)}
                                     />
+                                    </ConPermiso>
                                 </Flex>
                             </Td>
                         </Tr>

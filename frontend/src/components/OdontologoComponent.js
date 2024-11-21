@@ -22,7 +22,7 @@ import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import odontologoService from '../services/odontologoService';
 import CreateOdontologoModal from './CreateOdontologoModal';
-
+import ConPermiso from './ConPermiso'
 const OdontologosComponent = () => {
     const [odontologos, setOdontologos] = useState([]);
     const [filteredOdontologos, setFilteredOdontologos] = useState([]);
@@ -108,9 +108,11 @@ const OdontologosComponent = () => {
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
+            <ConPermiso permiso='Crear odontólogo'>
                 <Button colorScheme="teal" onClick={() => setIsCreateModalOpen(true)} mr={4}>
                     CREAR NUEVO ODONTOLOGO
                 </Button>
+                </ConPermiso>
             <Flex mb={4} justify="space-between">
                 
                 <Input
@@ -150,12 +152,14 @@ const OdontologosComponent = () => {
                                         onClick={() => handleShow(odontologo.id_odontologo)}
                                         mr={2}
                                     />
+                                    <ConPermiso permiso='Eliminar odontólogo'>
                                     <IconButton
                                         icon={<DeleteIcon />}
                                         colorScheme="red"
                                         size="sm"
                                         onClick={() => handleDelete(odontologo.id_odontologo)}
                                     />
+                                    </ConPermiso>
                                 </Flex>
                             </Td>
                         </Tr>

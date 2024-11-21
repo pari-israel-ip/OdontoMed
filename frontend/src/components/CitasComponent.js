@@ -23,7 +23,7 @@ import citaService from '../services/citaService';
 import EditCitaModal from './EditCitaModal';
 import CreateCitaModal from './CreateCitaModal';
 import odontologoService from '../services/odontologoService'
-
+import ConPermiso from './ConPermiso';
 const CitasComponent = () => {
     const [message, setMessage] = useState(null);
     const [citas, setCitas] = useState([]);
@@ -190,6 +190,7 @@ const CitasComponent = () => {
                             <Td>{cita.estado_cita.toUpperCase()}</Td>
                             <Td>
                                 <Flex justify="space-between">
+                                    <ConPermiso permiso='Editar cita'>
                                     <IconButton
                                         icon={<EditIcon />}
                                         colorScheme="blue"
@@ -197,12 +198,15 @@ const CitasComponent = () => {
                                         onClick={() => handleEdit(cita)}
                                         mr={2}
                                     />
+                                    </ConPermiso>
+                                    <ConPermiso permiso='Eliminar cita'>
                                     <IconButton
                                         icon={<DeleteIcon />}
                                         colorScheme="red"
                                         size="sm"
                                         onClick={() => handleDelete(cita.id_cita)}
                                     />
+                                    </ConPermiso>
                                 </Flex>
                             </Td>
                         </Tr>

@@ -63,57 +63,60 @@ function App() {
                         <Route
                             path="/usuarios"
                             element={
-                                <ProtectedRoute roles={['RECEPCIONISTA', 'ODONTOLOGO', 'ADMINISTRADOR']}>
-                                    <UsuariosComponent />
+                               
+                                <ProtectedRoute permisoRequerido="Ver Pacientes">
+                                <UsuariosComponent />
                                 </ProtectedRoute>
+                               
                             }
                         />
                         <Route
                             path="/odontologos"
                             element={
-                                <ProtectedRoute roles={['RECEPCIONISTA', 'ADMINISTRADOR']}>
+                                <ProtectedRoute permisoRequerido="Ver Odontólogos">
+
                                     <OdontologosComponent />
-                                </ProtectedRoute>
+                             </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/roles"
                             element={
-                                <ProtectedRoute roles={['ADMINISTRADOR']}>
+                                
                                     <RolesComponent />
-                                </ProtectedRoute>
+                                    
                             }
                         />
                         <Route
                             path="/recepcionistas"
                             element={
-                                <ProtectedRoute roles={['ODONTOLOGO', 'ADMINISTRADOR']}>
+                               <ProtectedRoute permisoRequerido="Ver Recepcionistas">
                                     <RecepcionistasComponent />
-                                </ProtectedRoute>
+                                    </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/citas"
                             element={
-                                <ProtectedRoute roles={['RECEPCIONISTA', 'ODONTOLOGO', 'ADMINISTRADOR']}>
+                               <ProtectedRoute permisoRequerido="Ver citas">
                                     <CitasComponent />
-                                </ProtectedRoute>
+                                    </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/odontologos/:id"
                             element={
-                                <ProtectedRoute roles={['ADMINISTRADOR']}>
+                              
                                     <ShowOdontologoModal />
-                                </ProtectedRoute>
+                         
                             }
                         />
                         <Route
                             path="/usuarios/:id"
                             element={
-                                <ProtectedRoute roles={['RECEPCIONISTA', 'ODONTOLOGO', 'ADMINISTRADOR']}>
+                               
                                     <ShowUsuarioModal />
-                                </ProtectedRoute>
+                             
                             }
                         />
                         {/* Ruta para manejar páginas no encontradas */}

@@ -16,7 +16,7 @@ import odontologoService from '../services/odontologoService';
 import usuarioService from '../services/usuarioService';  // Servicio de usuario
 import EditUsuarioModal from './EditUsuarioModal';  // Modal de edición de usuario
 import EditOdontologoModal from './EditOdontologoModal'; // Modal de edición de odontólogo
-
+import ConPermiso from './ConPermiso'
 const ShowOdontologoModal = () => {
     const [isEditUsuarioOpen, setIsEditUsuarioOpen] = useState(false);
     const [isEditOdontologoOpen, setIsEditOdontologoOpen] = useState(false);
@@ -96,18 +96,21 @@ const ShowOdontologoModal = () => {
                                 <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
                                 <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
                                 <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
+                                <ConPermiso permiso='Editar Datos Personales'>
                                 <Button colorScheme="blue" mt={4} onClick={handleEditUsuario}>
                                     Editar Datos Personales
                                 </Button>
-
+                                </ConPermiso>
                                 {/* Información específica del odontólogo */}
                                
                                 <Text mt={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
                                 <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
                                 <Text><strong>Activo:</strong> {odontologo.activo ? 'Sí' : 'No'}</Text>
+                                <ConPermiso permiso='Editar Datos de Odontólogo'>
                                 <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>
                                     Editar Datos del Odontólogo
                                 </Button>
+                                </ConPermiso>
 
                              
                             </Box>

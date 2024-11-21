@@ -4,7 +4,7 @@ import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import usuarioService from '../services/usuarioService';
 import EditUsuarioModal from './EditUsuarioModal';
-
+import ConPermiso from './ConPermiso';
 const NavComponentLogin = () => {
     const userRole = localStorage.getItem('role');
     const [isOpen, setIsOpen] = useState(false);
@@ -38,13 +38,14 @@ const NavComponentLogin = () => {
     };
 
     const handleLogout = () => {
+        localStorage.removeItem('permisos')
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('email');
         localStorage.removeItem('nombres');
         localStorage.removeItem('apellidos');
         localStorage.removeItem('usuario_id');
-        navigate('/login');
+        navigate('/');
     }
 
     const loadUsuario = async () => {
@@ -92,11 +93,21 @@ const NavComponentLogin = () => {
 
                 {/* Enlaces de navegación */}
                 <Flex display={{ base: 'none', md: 'flex' }} alignItems="center" gap={6} flex="2" justifyContent="center">
-                    {(userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO' || userRole === 'RECEPCIONISTA') && <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Pacientes</Text></Link>}
-                    {(userRole === 'ADMINISTRADOR' || userRole === 'RECEPCIONISTA') && <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Odontologos</Text></Link>}
-                    {userRole === 'ADMINISTRADOR' && <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Roles</Text></Link>}
-                    {(userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO') && <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Recepcionistas</Text></Link>}
-                    {(userRole === 'RECEPCIONISTA' || userRole === 'ADMINISTRADOR' || userRole === 'ODONTOLOGO') && <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Citas</Text></Link>}
+                    <ConPermiso permiso='Ver Pacientes'>
+                    <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Pacientes</Text></Link>
+                    </ConPermiso>
+                    <ConPermiso permiso='Ver Odontólogos'>
+                    <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Odontologos</Text></Link>
+                    </ConPermiso>
+                    <ConPermiso permiso='Ver roles'>
+                    <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Roles</Text></Link>
+                    </ConPermiso>
+                    <ConPermiso permiso='Ver Recepcionistas'>
+                   <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Recepcionistas</Text></Link>
+                   </ConPermiso>
+                   <ConPermiso permiso='Ver citas'>
+                   <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Citas</Text></Link>
+                   </ConPermiso>
                 </Flex>
 
                 <Box flex="1" display="flex" justifyContent="flex-end">

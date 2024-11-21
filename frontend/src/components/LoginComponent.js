@@ -22,7 +22,43 @@ const LoginComponent = () => {
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
-
+    const permisosMap = {
+        1: 'Crear rol',
+        2: 'Editar rol',
+        3: 'Eliminar rol',
+        4: 'Ver roles',
+        8:'Descargar Historial',
+        9:'Importar Paciente',
+        10: 'Eliminar Paciente',
+        11: 'Ver Pacientes',
+        12: 'Crear Paciente',
+        13: 'Ver Historial de Paciente',
+        14: 'Editar Datos Personales',
+        15: 'Editar Datos del Paciente',
+        16: 'Editar Datos del Historial',
+        17: 'Crear Diagnostico',
+        18: 'Editar Diagnostico',
+        19: 'Eliminar Diagnostico',
+        20: 'Crear Tratamiento',
+        21: 'Editar Tratamiento',
+        22: 'Eliminar Tratamiento',
+        23: 'Crear Prescripcion',
+        24: 'Editar Prescripcion',
+        25: 'Eliminar Prescripcion',
+        31: 'Ver Odontólogos',
+        32: 'Crear odontólogo',
+        33: 'Eliminar odontólogo',
+        34: 'Editar Datos Personales',
+        35: 'Editar Datos de Odontólogo',
+        41: 'Ver citas',
+        42: 'Editar cita',
+        43: 'Eliminar cita',
+        51: 'Ver Recepcionistas',
+        54:'Crear Recepcionista',
+        52: 'Editar Recepcionista',
+        53: 'Eliminar Recepcionista',
+    };
+    
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -48,11 +84,14 @@ const LoginComponent = () => {
                 if (!roleID) {
                     throw new Error('ID de rol no encontrado');
                 }
+               
 
                 // Obtener y almacenar el rol del usuario
                 const roleResponse = await roleService.getRole(roleID);
+                const permisosIds = roleResponse.data.permisos.split(',').map(Number); // Convertimos a array de números
+                const permisos = permisosIds.map(id => permisosMap[id]).filter(Boolean); // Mapeamos a labels y filtramos valores no encontrados
                 console.log('ROLE Response:', roleResponse.data);
-
+                localStorage.setItem('permisos', JSON.stringify(permisos));
                 localStorage.setItem('role', roleResponse.data.nombre_rol);
                 localStorage.setItem('usuario_id', userResponse.data.id_usuario);
                 localStorage.setItem('email', response.data.email);
