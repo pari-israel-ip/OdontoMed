@@ -36,7 +36,7 @@ const ShowUsuarioModal = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const { id } = useParams();  
     const [usuario, setUsuario] = useState(null);
-    const [idHistorial, setIdHistorial] = useState(null);  // Variable para guardar el id del historial
+    const [idHistorial, setIdHistorial] = useState(null);
     const [diagnosticos, setDiagnosticos] = useState([]); // Estado para diagnosticos
     const [tratamientos, setTratamientos] = useState([]); // Estado para diagnosticos
     const [prescripciones, setPrescripciones] = useState([]); // Estado para diagnosticos
@@ -112,65 +112,156 @@ const ShowUsuarioModal = () => {
             setCurrentPage(currentPage - 1);
         }
     };
-    const downloadHistorial = (format) => {
-        const data = {
-            usuario: {
-                nombre_completo: usuario.nombre_completo,
-                ci: usuario.ci,
-                fecha_nacimiento: usuario.fecha_nacimiento,
-                email: usuario.email,
-                direccion: usuario.direccion,
-                telefono: usuario.telefono,
-                seguro_medico: usuario.seguro_medico,
-                alergias: usuario.alergias,
-                antecedentes_medicos: usuario.antecedentes_medicos,
-            },
-            diagnosticos,
-            tratamientos,
-            prescripciones,
-        };
+    const downloadHistorial = async (format) => {
+        try {
+            // Construir los datos del usuario y del historial
+            const data = {
+                usuario: {
+                    nombres: usuario.nombre_completo.trim().split(' ')[0].toUpperCase(),
+                    apellidos: usuario.nombre_completo.trim().split(' ').slice(1).join(' ').toUpperCase(),
+                    ci: usuario.ci.trim(),
+                    fecha_nacimiento: usuario.fecha_nacimiento,
+                    email: usuario.email.trim().toUpperCase(),
+                    direccion: usuario.direccion.trim().toUpperCase(),
+                    telefono: usuario.telefono.trim(),
+                    contrasenia: '123456', // Valor ficticio para garantizar compatibilidad
+                    seguro_medico: usuario.seguro_medico.trim().toUpperCase(),
+                    alergias: usuario.alergias.trim().toUpperCase(),
+                    antecedentes_medicos: usuario.antecedentes_medicos.trim().toUpperCase(),
+                },
+                historial_clinico: {
+                    id_odontologo: usuario.historiales.id_odontologo || 1, // Valor ficticio si falta
+                    notas_generales: usuario.historiales.notas_generales || 'No especificado',
+                   
+                },
+                diagnosticos: diagnosticos.map((d) => ({
+                    id: d.id,
+                    nombre: d.nombre,
+                    descripcion: d.descripcion,
+                    fecha: d.fecha,
+                })),
+                tratamientos: tratamientos.map((t) => ({
+                    id: t.id,
+                    nombre: t.nombre,
+                    descripcion: t.descripcion,
+                    fecha_inicio: t.fecha_inicio,
+                    fecha_fin: t.fecha_fin,
+                })),
+                prescripciones: prescripciones.map((p) => ({
+                    id: p.id,
+                    medicamento: p.medicamento,
+                    dosis: p.dosis,
+                    frecuencia: p.frecuencia,
+                    duracion: p.duracion,
+                })),
+            };
     
-        if (format === 'json') {
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `historial_${usuario.nombre_completo}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-        } else if (format === 'xml') {
-            const xmlData = `
-                <historial>
-                    <usuario>
-                        <nombre_completo>${usuario.nombre_completo}</nombre_completo>
-                        <ci>${usuario.ci}</ci>
-                        <fecha_nacimiento>${usuario.fecha_nacimiento}</fecha_nacimiento>
-                        <email>${usuario.email}</email>
-                        <direccion>${usuario.direccion}</direccion>
-                        <telefono>${usuario.telefono}</telefono>
-                        <seguro_medico>${usuario.seguro_medico}</seguro_medico>
-                        <alergias>${usuario.alergias}</alergias>
-                        <antecedentes_medicos>${usuario.antecedentes_medicos}</antecedentes_medicos>
-                    </usuario>
-                    <!-- Agregar diagnosticos, tratamientos y prescripciones en XML -->
-                </historial>
-            `;
-            const blob = new Blob([xmlData], { type: 'application/xml' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `historial_${usuario.nombre_completo}.xml`;
-            link.click();
-            URL.revokeObjectURL(url);
-        } else if (format === 'pdf') {
-            const doc = new jsPDF();
-            doc.text(`Historial Odontológico de ${usuario.nombre_completo}`, 10, 10);
-            doc.text(`CI: ${usuario.ci}`, 10, 20);
-            // Agrega más detalles como diagnóstico, tratamientos y prescripciones
-            doc.save(`historial_${usuario.nombre_completo}.pdf`);
+            if (format === 'json') {
+                // Exportar como JSON
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+            } else if (format === 'xml') {
+                // Construir y exportar como XML
+                const xmlData = `
+                    <historial>
+                        <usuario>
+                            <nombres>${data.usuario.nombres}</nombres>
+                            <apellidos>${data.usuario.apellidos}</apellidos>
+                            <ci>${data.usuario.ci}</ci>
+                            <fecha_nacimiento>${data.usuario.fecha_nacimiento}</fecha_nacimiento>
+                            <email>${data.usuario.email}</email>
+                            <direccion>${data.usuario.direccion}</direccion>
+                            <telefono>${data.usuario.telefono}</telefono>
+                            <seguro_medico>${data.usuario.seguro_medico}</seguro_medico>
+                            <alergias>${data.usuario.alergias}</alergias>
+                            <antecedentes_medicos>${data.usuario.antecedentes_medicos}</antecedentes_medicos>
+                        </usuario>
+                        <historial_clinico>
+                            <id_odontologo>${data.historial_clinico.id_odontologo}</id_odontologo>
+                            <notas_generales>${data.historial_clinico.notas_generales}</notas_generales>
+                        </historial_clinico>
+                        <diagnosticos>
+                            ${data.diagnosticos
+                                .map((d) => `<diagnostico><id>${d.id}</id><descripcion>${d.descripcion}</descripcion><fecha>${d.fecha}</fecha></diagnostico>`)
+                                .join('')}
+                        </diagnosticos>
+                        <tratamientos>
+                            ${data.tratamientos
+                                .map((t) => `<tratamiento><id>${t.id}</id><nombre>${t.nombre}</nombre><descripcion>${t.descripcion}</descripcion><fecha_inicio>${t.fecha_inicio}</fecha_inicio><fecha_fin>${t.fecha_fin}</fecha_fin></tratamiento>`)
+                                .join('')}
+                        </tratamientos>
+                        <prescripciones>
+                            ${data.prescripciones
+                                .map((p) => `<prescripcion><id>${p.id}</id><medicamento>${p.medicamento}</medicamento><dosis>${p.dosis}</dosis><frecuencia>${p.frecuencia}</frecuencia><duracion>${p.duracion}</duracion></prescripcion>`)
+                                .join('')}
+                        </prescripciones>
+                    </historial>
+                `;
+                const blob = new Blob([xmlData], { type: 'application/xml' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.xml`;
+                link.click();
+                URL.revokeObjectURL(url);
+            } else if (format === 'pdf') {
+                // Crear y exportar como PDF usando jsPDF
+                const doc = new jsPDF();
+                doc.text(`Historial Odontológico de ${usuario.nombre_completo.trim().toUpperCase()}`, 10, 10);
+                doc.text(`CI: ${usuario.ci.trim()}`, 10, 20);
+                doc.text(`Fecha de Nacimiento: ${usuario.fecha_nacimiento}`, 10, 30);
+                doc.text(`Email: ${usuario.email.trim().toUpperCase()}`, 10, 40);
+                doc.text(`Dirección: ${usuario.direccion.trim().toUpperCase()}`, 10, 50);
+                doc.text(`Teléfono: ${usuario.telefono.trim()}`, 10, 60);
+                doc.text(`Seguro Médico: ${usuario.seguro_medico.trim().toUpperCase()}`, 10, 70);
+                doc.text(`Alergias: ${usuario.alergias.trim().toUpperCase()}`, 10, 80);
+                doc.text(`Antecedentes Médicos: ${usuario.antecedentes_medicos.trim().toUpperCase()}`, 10, 90);
+    
+                // Agregar diagnósticos
+                let yOffset = 100;
+                if (data.diagnosticos.length > 0) {
+                    doc.text('Diagnósticos:', 10, yOffset);
+                    data.diagnosticos.forEach((d, i) => {
+                        yOffset += 10;
+                        doc.text(`${i + 1}. ${d.descripcion} (Fecha: ${d.fecha})`, 10, yOffset);
+                    });
+                }
+    
+                // Agregar tratamientos
+                if (data.tratamientos.length > 0) {
+                    yOffset += 20;
+                    doc.text('Tratamientos:', 10, yOffset);
+                    data.tratamientos.forEach((t, i) => {
+                        yOffset += 10;
+                        doc.text(`${i + 1}. ${t.nombre}: ${t.descripcion} (Inicio: ${t.fecha_inicio}, Fin: ${t.fecha_fin})`, 10, yOffset);
+                    });
+                }
+    
+                // Agregar prescripciones
+                if (data.prescripciones.length > 0) {
+                    yOffset += 20;
+                    doc.text('Prescripciones:', 10, yOffset);
+                    data.prescripciones.forEach((p, i) => {
+                        yOffset += 10;
+                        doc.text(`${i + 1}. ${p.medicamento} (${p.dosis}, ${p.frecuencia}, ${p.duracion})`, 10, yOffset);
+                    });
+                }
+    
+                doc.save(`historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.pdf`);
+            } else {
+                console.error('Formato no soportado:', format);
+            }
+        } catch (error) {
+            console.error('Error al descargar el historial:', error);
         }
     };
-   
+    
+    
     
     
     const navigate = useNavigate();
@@ -215,7 +306,7 @@ const ShowUsuarioModal = () => {
             setDiagnosticos({});
         }
     };
-
+   
     const loadTratamientos = async (historialId) => {
         try {
             const response = await tratamientoService.getTratamientosHistorial(historialId);
