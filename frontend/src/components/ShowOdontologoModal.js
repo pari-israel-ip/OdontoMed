@@ -1,4 +1,3 @@
-// src/components/ShowOdontologoModal.js
 import React, { useEffect, useState } from 'react';
 import {
     Modal,
@@ -9,7 +8,10 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid
+    Box,
+    Grid,
+    Spinner, // Importa Spinner de Chakra UI
+    Center,
 } from '@chakra-ui/react';
 import { useParams, useNavigate } from 'react-router-dom';  
 import odontologoService from '../services/odontologoService';
@@ -23,8 +25,8 @@ const ShowOdontologoModal = () => {
     const { id } = useParams();  
     const [usuario, setUsuario] = useState(null);
     const [odontologo, setOdontologo] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // Estado de carga inicializado en true
     
-
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -32,11 +34,12 @@ const ShowOdontologoModal = () => {
             try {
                 const usuarioResponse = await usuarioService.getUsuario(id);
                 const odontologoResponse = await odontologoService.getOdontologo(id);
-                console.log('Fetched odontologo:', odontologoResponse.data); // Check for id_odontologo here
                 setUsuario(usuarioResponse.data);
                 setOdontologo(odontologoResponse.data);
             } catch (error) {
                 console.error('Error fetching usuario o odontólogo:', error);
+            } finally {
+                setIsLoading(false); // Finaliza la carga
             }
         };
     
@@ -44,6 +47,7 @@ const ShowOdontologoModal = () => {
     }, [id]);
 
     const loadUsuarioYOdontologo = async () => {
+        setIsLoading(true);
         try {
             const usuarioResponse = await usuarioService.getUsuario(id);
             const odontologoResponse = await odontologoService.getOdontologo(id);
@@ -51,32 +55,36 @@ const ShowOdontologoModal = () => {
             setOdontologo(odontologoResponse.data);
         } catch (error) {
             console.error('Error fetching usuario o odontólogo:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    
     const handleEditUsuario = () => {
         setIsEditUsuarioOpen(true);
         loadUsuarioYOdontologo();
     };
 
     const handleEditOdontologo = () => {
-        console.log("Editing odontologo with ID:", id); // Log before opening modal
         setIsEditOdontologoOpen(true);
         loadUsuarioYOdontologo();
     };
-    
-
-    
-
-
 
     const onClose = () => {
         navigate('/odontologos');
     };
 
+    // Mostrar spinner mientras se cargan los datos
+    if (isLoading) {
+        return (
+            <Center h="100vh">
+                <Spinner size="xl" color="teal.500" />
+            </Center>
+        );
+    }
+
     if (!usuario || !odontologo) {
-        return null; // Puedes agregar un loader aquí si lo prefieres
+        return null; // Si no hay datos, no muestra nada (esto se puede personalizar)
     }
 
     return (
@@ -84,7 +92,7 @@ const ShowOdontologoModal = () => {
             <Modal isOpen={!!odontologo} onClose={onClose} size="full">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>DATOS DEL ODONTOLOGO</ModalHeader>
+                    <ModalHeader>DATOS DEL ODONTÓLOGO</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Grid templateColumns="1fr 1fr" gap={4}>
@@ -101,15 +109,12 @@ const ShowOdontologoModal = () => {
                                 </Button>
 
                                 {/* Información específica del odontólogo */}
-                               
                                 <Text mt={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
                                 <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
                                 <Text><strong>Activo:</strong> {odontologo.activo ? 'Sí' : 'No'}</Text>
                                 <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>
                                     Editar Datos del Odontólogo
                                 </Button>
-
-                             
                             </Box>
                             <Box>
                                 {/* Información adicional en la columna derecha */}
@@ -122,29 +127,28 @@ const ShowOdontologoModal = () => {
 
             {/* Modal para editar el usuario */}
             {isEditUsuarioOpen && (
-                <EditUsuarioModal usuario={usuario} onClose={() => setIsEditUsuarioOpen(false)} 
-                onSave={(updatedUser) => {
-                    setIsEditUsuarioOpen(false);
-                    loadUsuarioYOdontologo();
-                }} />
+                <EditUsuarioModal 
+                    usuario={usuario} 
+                    onClose={() => setIsEditUsuarioOpen(false)} 
+                    onSave={(updatedUser) => {
+                        setIsEditUsuarioOpen(false);
+                        loadUsuarioYOdontologo();
+                    }} 
+                />
             )}
 
             {/* Modal para editar el odontólogo */}
             {isEditOdontologoOpen && (
-    <EditOdontologoModal 
-        odontologo={odontologo} 
-        id={id} // Ensure this is the right id
-        onClose={() => setIsEditOdontologoOpen(false)}
-        onSave={(updatedOdontologo) => {
-            setIsEditOdontologoOpen(false);
-            loadUsuarioYOdontologo();
-        }} 
-    />
-)}  
-
-
-
-       
+                <EditOdontologoModal 
+                    odontologo={odontologo} 
+                    id={id}
+                    onClose={() => setIsEditOdontologoOpen(false)}
+                    onSave={(updatedOdontologo) => {
+                        setIsEditOdontologoOpen(false);
+                        loadUsuarioYOdontologo();
+                    }} 
+                />
+            )}
         </>
     );
 };

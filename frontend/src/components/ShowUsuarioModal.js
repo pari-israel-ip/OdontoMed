@@ -8,7 +8,7 @@ import {
     ModalCloseButton,
     Text,
     Button,
-    Box, Grid, IconButton, useToast, Select, Flex
+    Box, Grid, IconButton, useToast, Select, Flex,Spinner,Center
 } from '@chakra-ui/react';
 import {  DeleteIcon } from '@chakra-ui/icons';
 import jsPDF from 'jspdf';
@@ -51,6 +51,8 @@ const ShowUsuarioModal = () => {
     const toast = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const diagnosticosPerPage = 3;
+    const [isLoading, setIsLoading] = useState(true); // Estado de carga inicializado en true
+
 
     // Calcular diagnósticos actuales a mostrar
     const indexOfLastDiagnostico = currentPage * diagnosticosPerPage;
@@ -279,6 +281,8 @@ const ShowUsuarioModal = () => {
                 }
             } catch (error) {
                 console.error('Error fetching usuario:', error);
+            }finally{
+                setIsLoading(false);
             }
         };
 
@@ -454,7 +458,13 @@ const ShowUsuarioModal = () => {
         return null; // Puedes agregar un loader aquí si lo prefieres
     }
   
-
+    if (isLoading) {
+        return (
+            <Center h="100vh">
+                <Spinner size="xl" color="teal.500" />
+            </Center>
+        );
+    }
     return (
         <>
             <Modal isOpen={!!usuario} onClose={onClose} size="full">

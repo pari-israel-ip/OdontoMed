@@ -18,18 +18,20 @@ import Unauthorized from './components/unauthorized';
 import RecuperarContrasenaComponent from './components/RecuperarContrasenaComponent';
 import VerificarCodigoComponent from './components/VerificarCodigoComponent'; // Importar el componente
 import RurteOfControl from './components/rurte_ofcontrol'; // Importa el componente de rutas fuera de control
+import NotFoundPage from './components/rurte_ofcontrol';
 
 function Layout({ children }) {
     const location = useLocation();
 
     const isLoginPage = location.pathname === '/login';
-    const isUnauthorizedPage = location.pathname === '/unauthorized'; // Nueva excepción
+    const isUnauthorizedPage = location.pathname === '/unauthorized' || location.pathname === NotFoundPage; // Nueva excepción
     const isUserOrRolesPage =
         location.pathname === '/usuarios' ||
         location.pathname === '/roles' ||
         location.pathname === '/citas' ||
         location.pathname === '/odontologos' ||
-        location.pathname === '/usuarios:id' ||
+        location.pathname.startsWith('/odontologos/') || // Compara si comienza con '/odontologos/'
+        location.pathname.startsWith('/usuarios/') || // Compara si comienza con '/odontologos/'
         location.pathname === '/recepcionistas';
     const isRecoveryPage = location.pathname === '/recuperar-contrasena';
     const isRecoveryPage2 = location.pathname === '/verificar-codigo';

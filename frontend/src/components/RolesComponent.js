@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    useToast
+    useToast,Spinner,Center
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import roleService from '../services/roleService';
@@ -31,6 +31,8 @@ const RolesComponent = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [currentRole, setCurrentRole] = useState(null);
     const toast = useToast();
+    const [isLoading, setIsLoading] = useState(false); // Estado de carga inicializado en true
+
 
     useEffect(() => {
         loadRoles();
@@ -38,10 +40,13 @@ const RolesComponent = () => {
 
     const loadRoles = async () => {
         try {
+            setIsLoading(true);
             const response = await roleService.getRoles();
             setRoles(response.data);
         } catch (error) {
             console.error('Error fetching roles:', error);
+        }finally{
+            setIsLoading(false);
         }
     };
 
@@ -127,7 +132,11 @@ const RolesComponent = () => {
                 />
                 
             </Flex>
-
+            {isLoading ? ( // Mostrar spinner mientras se cargan los detalles
+                <Center mt={4}>
+                    <Spinner size="xl" color="teal.500" />
+                </Center>
+            ) : (
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
@@ -159,7 +168,8 @@ const RolesComponent = () => {
                         </Tr>
                     ))}
                 </Tbody>
-            </Table>
+            </Table>)
+            }
 
             {isEditModalOpen && (
                 <EditRoleModal

@@ -13,7 +13,7 @@ import {
     Flex,
     useToast,
     Input,
-   
+    Spinner, Center
 } from '@chakra-ui/react';
 import {  DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,8 @@ const UsuariosComponent = () => {
     const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const toast = useToast();
+    const [isLoading, setIsLoading] = useState(false); // Estado de carga para detalles del odontólogo
+
 
     useEffect(() => {
         loadUsuarios();
@@ -36,11 +38,17 @@ const UsuariosComponent = () => {
 
     const loadUsuarios = async () => {
         try {
+            setIsLoading(true); // Finaliza el estado de carga
+
             const response = await usuarioService.getUsuarios();
             setUsuarios(response.data);
             setFilteredUsuarios(response.data); // Inicialmente sin filtro
         } catch (error) {
             console.error('Error fetching usuarios:', error);
+        }
+        finally{
+            setIsLoading(false); // Finaliza el estado de carga
+
         }
     };
 
@@ -70,7 +78,14 @@ const UsuariosComponent = () => {
     };
 
     const handleShow = (usuarioId) => {
-        navigate(`/usuarios/${usuarioId}`);
+        setIsLoading(true); // Finaliza el estado de carga
+        try {
+            navigate(`/usuarios/${usuarioId}`);
+        } 
+        finally{
+            setIsLoading(false); // Finaliza el estado de carga
+        }
+        
     };
 
     const handleSearch = (e) => {
@@ -112,7 +127,11 @@ const UsuariosComponent = () => {
                     marginTop={4}
                 />
             </Flex>
-
+            {isLoading ? ( // Mostrar spinner mientras se cargan los detalles
+                <Center mt={4}>
+                    <Spinner size="xl" color="teal.500" />
+                </Center>
+            ) : (
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
@@ -153,7 +172,7 @@ const UsuariosComponent = () => {
                         </Tr>
                     ))}
                 </Tbody>
-            </Table>
+            </Table> )}
 
             <Flex justify="space-between" align="center" mt={4} >
                 <Button colorScheme="teal"
