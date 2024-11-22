@@ -19,6 +19,8 @@ import Unauthorized from './components/unauthorized';
 import RecuperarContrasenaComponent from './components/RecuperarContrasenaComponent';
 import VerificarCodigoComponent from './components/VerificarCodigoComponent';
 import PageNotFound from './components/PageNotFound'; // Importar el componente 404
+import PageNotFoundShow from './components/PageNotFoundShow'; // Importar el componente 404
+
 
 import { useEffect, useState } from 'react';
 
@@ -32,7 +34,8 @@ function Layout({ children }) {
         location.pathname === '/recuperar-contrasena' ||
         location.pathname === '/verificar-codigo' ||
         location.pathname === '*' || // Esto asegura que captura cualquier ruta no válida
-        location.pathname === '/404'; // Página 404
+        location.pathname === '/404'||
+        location.pathname === '/show404'; // Página 404
 
     // Si estamos en una página especial, no renderizamos el Nav ni el Footer
     if (isSpecialPage) {
@@ -67,6 +70,7 @@ function App() {
                         <Route path="/" element={<BodyComponent />} />
                         <Route path="/unauthorized" element={<Unauthorized />} />
                         <Route path="*" element={<PageNotFound />} />
+                        <Route path="/show404" element={<PageNotFoundShow />} />
                         <Route path="/login" element={<LoginComponent />} />
                         <Route path="/recuperar-contrasena" element={<RecuperarContrasenaComponent />} />
                         <Route path="/verificar-codigo" element={<VerificarCodigoComponent />} />

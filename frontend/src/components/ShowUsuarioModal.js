@@ -279,7 +279,11 @@ const ShowUsuarioModal = () => {
                     setIdHistorial(historialId);
                 }
             } catch (error) {
-                console.error('Error fetching usuario:', error);
+                if (error.response && error.response.status === 404) {
+                    navigate('/show404'); // Redirigir a la página NotFound
+                } else {
+                    console.error('Error fetching usuario:', error);
+                }
             }finally{
                 setIsLoading(false);
             }

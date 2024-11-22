@@ -37,8 +37,11 @@ const ShowOdontologoModal = () => {
                 setUsuario(usuarioResponse.data);
                 setOdontologo(odontologoResponse.data);
             } catch (error) {
-                console.error('Error fetching usuario o odontólogo:', error);
-            } finally {
+                if (error.response && error.response.status === 404) {
+                    navigate('/show404'); // Redirigir a la página NotFound
+                } else {
+                    console.error('Error fetching usuario:', error);
+                }            } finally {
                 setIsLoading(false); // Finaliza la carga
             }
         };
