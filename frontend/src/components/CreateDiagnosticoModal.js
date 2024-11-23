@@ -87,7 +87,7 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                     <Button colorScheme="blue" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

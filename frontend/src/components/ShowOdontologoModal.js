@@ -50,7 +50,6 @@ const ShowOdontologoModal = () => {
     }, [id]);
     const [activeTab, setActiveTab] = useState(1);
     const loadUsuarioYOdontologo = async () => {
-        setIsLoading(true);
         try {
             const usuarioResponse = await usuarioService.getUsuario(id);
             const odontologoResponse = await odontologoService.getOdontologo(id);
@@ -58,9 +57,7 @@ const ShowOdontologoModal = () => {
             setOdontologo(odontologoResponse.data);
         } catch (error) {
             console.error('Error fetching usuario o odontólogo:', error);
-        } finally {
-            setIsLoading(false);
-        }
+        } 
     };
 
     const handleEditUsuario = () => {
@@ -123,7 +120,7 @@ const ShowOdontologoModal = () => {
           <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
             <Text fontSize="xl" mb={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
             <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
-            <Text><strong>Activo:</strong> {odontologo.activo ? 'Sí' : 'No'}</Text>
+            <Text><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
             <ConPermiso permiso='Editar Datos de Odontólogo'>
               <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>Editar Datos del Odontólogo</Button>
             </ConPermiso>

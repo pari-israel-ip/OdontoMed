@@ -658,6 +658,8 @@ def odontologo_detail(request, id_usuario):
             'ci': usuario.ci,
             'email': usuario.email,
             'telefono': usuario.telefono,
+            'direccion': usuario.direccion,
+            'fecha_nacimiento': usuario.fecha_nacimiento,
             'numero_licencia': odontologo.numero_licencia,
             'especializacion': odontologo.especializacion
         }
@@ -1103,29 +1105,12 @@ def prescripcion_detail(request, id_medicamento):
         nombre_medicamento = data.get('nombre_medicamento', prescripcion.nombre_medicamento).upper()
         dosis = data.get('dosis', prescripcion.dosis).upper()
         fecha_fin = data.get('fecha_fin', prescripcion.fecha_fin.strftime('%Y-%m-%d'))
-
-        if not (5 <= len(nombre_medicamento) <= 50):
-            errors['nombre_medicamento'] = 'EL NOMBRE DEL MEDICAMENTO DEBE TENER ENTRE 5 Y 50 CARACTERES.'
-        elif not nombre_pattern.match(nombre_medicamento):
-            errors['nombre_medicamento'] = 'EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'
-        if not (3 <= len(dosis) <= 200):
-            errors['dosis'] = 'LA DOSIS DEBE TENER ENTRE 5 Y 200 CARACTERES.'
-    
-        if fecha_fin:
-            try:
-                fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d')
-                if fecha_fin < datetime.now() or fecha_fin > datetime.now() + timedelta(days=30 * 1):
-                    errors['fecha_fin'] = 'La fecha de fin debe estar entre hoy y los próximos 30 días.'
-            except ValueError:
-                errors['fecha_fin'] = 'La fecha fin debe tener el formato correcto (YYYY-MM-DD).'
-
-        if errors:
-            return JsonResponse({'errors': errors}, status=400)
-
+        fecha_inicio = data.get('fecha_inicio', prescripcion.fecha_inicio.strftime('%Y-%m-%d'))
         # Actualizar los campos de la prescripción
         prescripcion.nombre_medicamento = nombre_medicamento.upper()
         prescripcion.dosis = dosis.upper()
         prescripcion.fecha_fin = fecha_fin
+        prescripcion.fecha_inicio = fecha_inicio
 
         # Guardar la prescripción
         prescripcion.save()

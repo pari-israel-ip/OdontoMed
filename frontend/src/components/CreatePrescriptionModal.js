@@ -155,7 +155,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                         />
                         <FormErrorMessage>{errorFechaFin}</FormErrorMessage>
                     </FormControl>
-                    <Button colorScheme="teal" onClick={addMedicamento} mb={4}>
+                    <Button isLoading={loading} colorScheme="teal" onClick={addMedicamento} mb={4}>
                         Añadir a la lista
                     </Button>
                     
@@ -164,6 +164,7 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                             <ListItem key={index} display="flex" alignItems="center">
                                 {`${med.nombre_medicamento} - ${med.dosis} - ${med.fecha_fin}`}
                                 <IconButton
+                                    isLoading={loading}
                                     icon={<DeleteIcon />}
                                     colorScheme="red"
                                     size="sm"

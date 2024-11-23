@@ -244,7 +244,7 @@ const CreateRoleModal = ({ onClose, onCreate }) => {
                     <Button colorScheme="teal" mr={3} isLoading={loading} onClick={handleSubmit}>
                         {loading ? 'Creando...' : 'Crear Rol'}
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

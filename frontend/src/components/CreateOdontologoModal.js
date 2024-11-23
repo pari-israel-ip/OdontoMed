@@ -252,7 +252,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.especializacion} mb={4}>
                             <FormLabel>Especialización</FormLabel>
                             <Input
-                                placeholder="Especialización (opcional)"
+                                placeholder="Especialización"
                                 value={especializacion}
                                 onChange={(e) => setEspecializacion(e.target.value)}
                             />
@@ -264,7 +264,7 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
                     <Button colorScheme="teal" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear Odontólogo
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button variant="ghost" isLoading={loading} onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

@@ -217,7 +217,7 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
                         <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
                             Guardar
                         </Button>
-                        <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
+                        <Button isLoading={loading} mt={4} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>
             </ModalContent>

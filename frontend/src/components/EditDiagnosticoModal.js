@@ -147,8 +147,10 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
                         </FormControl>
 
                         <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
-                            Guardar Cambios
+                            Guardar
                         </Button>
+                        <Button mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
+
                     </form>
                 </ModalBody>
             </ModalContent>

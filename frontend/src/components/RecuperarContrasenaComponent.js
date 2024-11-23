@@ -8,6 +8,8 @@ const RecuperarContrasenaComponent = () => {
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
 
     // Función para manejar el proceso de recuperación
     const handleRecovery = async () => {
@@ -20,6 +22,7 @@ const RecuperarContrasenaComponent = () => {
         }
 
         try {
+            setLoading(true)
             // Enviar solicitud al backend
             const { data } = await recoveryService.sendRecoveryCode(email); // Enviar email al servicio
 
@@ -34,6 +37,9 @@ const RecuperarContrasenaComponent = () => {
             const errorMessage = error.response?.data?.message || 'Error al enviar el código de recuperación';
             setMessage(errorMessage);
             setIsError(true);
+        }
+        finally{
+            setLoading(false)
         }
     };
 
@@ -58,7 +64,7 @@ const RecuperarContrasenaComponent = () => {
                         placeholder="Ingresa tu correo electrónico"
                     />
                 </FormControl>
-                <Button 
+                <Button isLoading={loading}
                     onClick={handleRecovery}  // Llamar la función de recuperación
                     sx={{ 
                         backgroundColor: '#319795',

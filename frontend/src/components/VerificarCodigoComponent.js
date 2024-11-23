@@ -11,6 +11,7 @@ const VerificarCodigoComponent = () => {
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
     const email = localStorage.getItem("email"); // asumiendo que guardaste el email en localStorage
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,6 +22,7 @@ const VerificarCodigoComponent = () => {
         }
 
         try {
+            setLoading(true)
             const response = await recoveryService.verifyCodeAndChangePassword(codigo, nuevaContrasena, confirmarContrasena, email);
             setMessage(response.data.message);
             setIsError(false);
@@ -32,6 +34,8 @@ const VerificarCodigoComponent = () => {
         } catch (error) {
             setMessage(error.response?.data?.message || 'Error en la verificación del código');
             setIsError(true);
+        }finally{
+            setLoading(false)  
         }
     };
 
@@ -73,7 +77,7 @@ const VerificarCodigoComponent = () => {
                             placeholder="Confirma la nueva contraseña"
                         />
                     </FormControl>
-                    <Button 
+                    <Button isLoading={loading}
                         type="submit" 
                         colorScheme="teal" 
                         width="full"

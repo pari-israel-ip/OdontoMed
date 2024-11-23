@@ -95,7 +95,7 @@ const EditPacienteModal = ({ paciente, onClose, onSave }) => {
                             <FormErrorMessage>{errors.antecedentes_medicos}</FormErrorMessage>
                         </FormControl>
                         <Button mt={4} isLoading={loading} colorScheme="blue" type="submit">Guardar</Button>
-                        <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
+                        <Button mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>
             </ModalContent>

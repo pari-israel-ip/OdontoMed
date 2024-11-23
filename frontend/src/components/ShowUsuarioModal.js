@@ -50,7 +50,7 @@ const ShowUsuarioModal = () => {
     const [isEditPrescripcionOpen, setIsEditPrescripcionOpen] = useState(false); // Estado para abrir el modal de editar diagnóstico
     const toast = useToast();
     const [currentPage, setCurrentPage] = useState(1);
-    const diagnosticosPerPage = 3;
+    const diagnosticosPerPage = 4;
     const [isLoading, setIsLoading] = useState(true); // Estado de carga inicializado en true
 
 
@@ -299,6 +299,7 @@ const ShowUsuarioModal = () => {
         } catch (error) {
             console.error('Error fetching usuarios:', error);
         }
+        
     };
     const [activeTab, setActiveTab] = useState(1);  // 0 es el índice de la primera pestaña
 
@@ -408,7 +409,7 @@ const ShowUsuarioModal = () => {
     };
 
     const handleDeleteTratamiento = async (id_tratamiento) => {
-        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este diagnostico?");
+        const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este tratamiento?");
         if (confirmDelete) {
             try {
                 
@@ -534,81 +535,113 @@ const ShowUsuarioModal = () => {
                   </Flex>
 
                   <Text fontSize="lg" mt={4}><strong>Diagnósticos:</strong></Text>
-                  {currentDiagnosticos.map(diagnostico => (
-                    <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
-                      <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
-                      <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
-                      <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
-                      <ConPermiso permiso='Editar Diagnostico'>
-                        <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
-                      </ConPermiso>
-                      <ConPermiso permiso='Eliminar Diagnostico'>
-                        <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
-                      </ConPermiso>
-                    </Box>
-                  ))}
+                  {currentDiagnosticos.length === 0 ? (
+                    <Text>No hay diagnósticos disponibles.</Text>
+                    ) : (
+                    currentDiagnosticos.map(diagnostico => (
+                        <Box key={diagnostico.id_diagnostico} border="1px solid teal" borderRadius="md" p={4} mt={2} bg="gray.50">
+                        <Text><strong>Nombre:</strong> {diagnostico.nombre_diagnostico}</Text>
+                        <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
+                        <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
+                        <ConPermiso permiso='Editar Diagnostico'>
+                            <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+                        </ConPermiso>
+                        <ConPermiso permiso='Eliminar Diagnostico'>
+                            <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                        </ConPermiso>
+                        </Box>
+                        
+                    ))
+                    )}
+                    {currentDiagnosticos.length > 0 && (
+                    <Flex justify="space-between" align="center" mt={6}>
+                        <Button colorScheme="teal" onClick={handlePreviousPage} disabled={currentPage === 1}>Anterior</Button>
+                        <Box>PAGINA {currentPage} DE {Math.ceil(diagnosticos.length / diagnosticosPerPage)}</Box>
+                        <Button colorScheme="teal" onClick={handleNextPage} disabled={currentPage === Math.ceil(diagnosticos.length / diagnosticosPerPage)}>Siguiente</Button>
+                    </Flex>
+                    )}
                 </Box>
               ))}
             </ConPermiso>
           )}
 
-          {activeTab === 3 && (
-            <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-              <ConPermiso permiso='Crear Tratamiento'>
-                <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
-              </ConPermiso>
-              <Text><strong>Tratamientos:</strong></Text>
-              {currentTratamientos.map(tratamiento => (
+        {activeTab === 3 && (
+        <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+            <ConPermiso permiso='Crear Tratamiento'>
+            <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
+            </ConPermiso>
+
+            <Text><strong>Tratamientos:</strong></Text>
+
+            {currentTratamientos.length === 0 ? (
+            <Text>No hay tratamientos disponibles.</Text>
+            ) : (
+            currentTratamientos.map(tratamiento => (
                 <Box key={tratamiento.id_tratamiento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
-                  <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
-                  <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
-                  <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
-                  <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
-                  <ConPermiso permiso='Editar Tratamiento'>
+                <Text><strong>Nombre:</strong> {tratamiento.nombre_tratamiento}</Text>
+                <Text><strong>Fecha:</strong> {tratamiento.fecha_tratamiento}</Text>
+                <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
+                <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
+                <ConPermiso permiso='Editar Tratamiento'>
                     <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
-                  </ConPermiso>
-                  <ConPermiso permiso='Eliminar Tratamiento'>
+                </ConPermiso>
+                <ConPermiso permiso='Eliminar Tratamiento'>
                     <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
-                  </ConPermiso>
+                </ConPermiso>
                 </Box>
-              ))}
-              {/* Paginación de Tratamientos */}
-              <Flex justify="space-between" align="center" mt={6}>
+            ))
+            )}
+
+            {/* Paginación de Tratamientos */}
+            {currentTratamientos.length > 0 && (
+            <Flex justify="space-between" align="center" mt={6}>
                 <Button colorScheme="teal" onClick={handlePreviousTratamientosPage} disabled={currentTratamientosPage === 1}>Anterior</Button>
                 <Box>PAGINA {currentTratamientosPage} DE {Math.ceil(tratamientos.length / itemsPerPage)}</Box>
                 <Button colorScheme="teal" onClick={handleNextTratamientosPage} disabled={currentTratamientosPage === Math.ceil(tratamientos.length / itemsPerPage)}>Siguiente</Button>
-              </Flex>
-            </Box>
-          )}
+            </Flex>
+            )}
+        </Box>
+        )}
 
-          {activeTab === 4 && (
-            <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-              <ConPermiso permiso='Crear Prescripcion'>
-                <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
-              </ConPermiso>
-              <Text><strong>Prescripciones:</strong></Text>
-              {currentPrescripciones.map(prescripcion => (
+
+        {activeTab === 4 && (
+        <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+            <ConPermiso permiso='Crear Prescripcion'>
+            <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
+            </ConPermiso>
+
+            <Text><strong>Prescripciones:</strong></Text>
+
+            {currentPrescripciones.length === 0 ? (
+            <Text>No hay prescripciones disponibles.</Text>
+            ) : (
+            currentPrescripciones.map(prescripcion => (
                 <Box key={prescripcion.id_medicamento} p={4} border="1px solid teal" borderRadius="md" mt={2} bg="gray.50">
-                  <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
-                  <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
-                  <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
-                  <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
-                  <ConPermiso permiso='Editar Prescripcion'>
+                <Text><strong>Medicamento:</strong> {prescripcion.nombre_medicamento}</Text>
+                <Text><strong>Dosis:</strong> {prescripcion.dosis}</Text>
+                <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
+                <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
+                <ConPermiso permiso='Editar Prescripcion'>
                     <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
-                  </ConPermiso>
-                  <ConPermiso permiso='Eliminar Prescripcion'>
+                </ConPermiso>
+                <ConPermiso permiso='Eliminar Prescripcion'>
                     <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
-                  </ConPermiso>
+                </ConPermiso>
                 </Box>
-              ))}
-              {/* Paginación de Prescripciones */}
-              <Flex justify="space-between" align="center" mt={6}>
+            ))
+            )}
+
+            {/* Paginación de Prescripciones */}
+            {currentPrescripciones.length > 0 && (
+            <Flex justify="space-between" align="center" mt={6}>
                 <Button colorScheme="teal" onClick={handlePreviousPrescripcionesPage} disabled={currentPrescripcionesPage === 1}>Anterior</Button>
                 <Box>PAGINA {currentPrescripcionesPage} DE {Math.ceil(prescripciones.length / itemsPerPage)}</Box>
                 <Button colorScheme="teal" onClick={handleNextPrescripcionesPage} disabled={currentPrescripcionesPage === Math.ceil(prescripciones.length / itemsPerPage)}>Siguiente</Button>
-              </Flex>
-            </Box>
-          )}
+            </Flex>
+            )}
+        </Box>
+        )}
+
 
           {activeTab === 5 && (
             <ConPermiso permiso='Descargar Historial'>

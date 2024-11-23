@@ -219,7 +219,7 @@ const CreateRecepcionistaModal = ({ onClose, onCreate }) => {
                     <Button colorScheme="teal" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear Recepcionista
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

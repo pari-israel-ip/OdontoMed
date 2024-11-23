@@ -39,6 +39,12 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
         if (!fechaTratamiento) {
             validationErrors.fecha_tratamiento = "LA FECHA DEL TRATAMIENTO ES OBLIGATORIA.";
         }
+        if (!nombreTratamiento) {
+            validationErrors.nombre_tratamiento = "EL NOMBRE DEL TRATAMIENTO ES OBLIGATORIO.";
+        }
+        if (!descripcion) {
+            validationErrors.descripcion = "LA DESCRIPCION DEL TRATAMIENTO ES OBLIGATORIA.";
+        }
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
@@ -130,7 +136,7 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                     <Button colorScheme="blue" mr={3} onClick={handleSubmit} isLoading={loading}>
                         Crear
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

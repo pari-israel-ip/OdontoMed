@@ -130,7 +130,7 @@ const RolesComponent = () => {
                 </Button>)}
             <Flex mb={4} justify="space-between">
                 <Input
-                    placeholder="Buscar rol"
+                    placeholder="BUSCAR ROL..."
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     ml={4}

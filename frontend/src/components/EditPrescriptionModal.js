@@ -90,7 +90,7 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
                 nombre_medicamento: nombreMedicamento,
                 dosis,
                 fecha_inicio: fechaInicio,
-                fecha_fin: fechaFin,
+                fecha_fin: fechaFin
             });
             console.log('Response:', response.data);
 
@@ -176,7 +176,7 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
                         <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
                             Guardar
                         </Button>
-                        <Button mt={4} ml={4} onClick={onClose}>Cancelar</Button>
+                        <Button mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>
             </ModalContent>

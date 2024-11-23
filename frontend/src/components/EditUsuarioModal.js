@@ -206,7 +206,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             <Button isLoading={loading} colorScheme="blue" mr={3} type="submit">
                                 Guardar
                             </Button>
-                            <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                            <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                         </ModalFooter>
                     </form>
                 </ModalBody>

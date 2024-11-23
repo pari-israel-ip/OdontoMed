@@ -132,7 +132,7 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                     <Button colorScheme="blue" onClick={handleSave} isLoading={loading}>
                         Guardar
                     </Button>
-                    <Button onClick={onClose} ml={3}>
+                    <Button isLoading={loading} onClick={onClose} ml={3}>
                         Cancelar
                     </Button>
                 </ModalFooter>

@@ -216,7 +216,7 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
                     <Button colorScheme="blue" onClick={handleSubmit} isLoading={loading}>
                         Guardar
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
