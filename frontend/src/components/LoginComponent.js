@@ -123,7 +123,7 @@ const LoginComponent = () => {
                
             </HStack>
 
-            <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">Login</Text>
+            <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">Inicio de Sesión</Text>
             <form onSubmit={handleLogin}>
                 <VStack spacing={4}>
                     <FormControl isRequired>
@@ -155,7 +155,7 @@ const LoginComponent = () => {
                         }}
                         width="full"
                     >
-                        Login
+                        Iniciar Sesión
                     </Button>
                     <Button
                         variant="link"

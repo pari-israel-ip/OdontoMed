@@ -120,7 +120,7 @@ const RolesComponent = () => {
             {message && message.type === 'error' && (
                 <Alert status="error" mb={4}>
                     <AlertIcon />
-                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertTitle>ADVERTENCIA:</AlertTitle>
                     <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
             )}
