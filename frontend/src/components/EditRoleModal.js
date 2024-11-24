@@ -176,7 +176,7 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
                         <Input
                             type="text"
                             value={nombre_rol}
-                            onChange={handleNombreRolChange}
+                            onChange={handleNombreRolChange} isDisabled 
                         />
                         {errors.nombre_rol && <Text color="red.500">{errors.nombre_rol}</Text>}
                     </FormControl>

@@ -131,6 +131,9 @@ def rol_detail(request, id_rol):
     if request.method == 'PUT':
         data = json.loads(request.body)
         errors = {}
+        if rol.nombre_rol == 'ADMINISTRADOR':
+            errors['permisos'] = 'No se puede editar el rol de ADMINISTRADOR.'
+
         # Validar y convertir nombre_rol a mayúsculas
         nombre_rol = data.get('nombre_rol', rol.nombre_rol).strip().upper()
         # Expresión regular para validar solo letras y espacios
