@@ -57,15 +57,16 @@ const CreateOdontologoModal = ({ onClose, onCreate }) => {
 
         // Validación de los campos requeridos para Usuario
         const validationErrors = {};
-        if (!nombres.trim()) validationErrors.nombres = 'LOS NOMBRES SON OBLIGATORIOS.';
-        if (!apellidos.trim()) validationErrors.apellidos = 'LOS APELLIDOS SON OBLIGATORIOS.';
-        if (!ci.trim()) validationErrors.ci = 'EL C.I. ES OBLIGATORIO.';
-        if (!email.trim()) validationErrors.email = 'EL EMAIL ES OBLIGATORIO.';
-        if (!telefono.trim()) validationErrors.telefono = 'EL TELEFONO ES OBLIGATORIO.';
-        if (!fechaNacimiento.trim()) validationErrors.fechaNacimiento = 'LA FECHA DE NACIMIENTO ES OBLIGATORIA.';
-        if (!direccion.trim()) validationErrors.direccion = 'LA DIRECCION ES OBLIGATORIA.';
-        if (!contrasenia.trim()) validationErrors.contrasenia = 'LA CONTRASEÑA ES OBLIGATORIA.';
-        if (!numeroLicencia.trim()) validationErrors.numeroLicencia = 'EL NÚMERO DE LICENCIA ES OBLIGATORIO.';
+        if (!nombres.trim()) validationErrors.nombres = 'Los nombres son obligatorios.';
+        if (!apellidos.trim()) validationErrors.apellidos = 'Los apellidos son obligatorios.';
+        if (!ci.trim()) validationErrors.ci = 'El C.I. es obligatorio.';
+        if (!email.trim()) validationErrors.email = 'El email es obligatorio.';
+        if (!telefono.trim()) validationErrors.telefono = 'El telefono es obligatorio.';
+        if (!fechaNacimiento.trim()) validationErrors.fechaNacimiento = 'La fecha de nacimiento es obligatoria.';
+        if (!direccion.trim()) validationErrors.direccion = 'La direccion es obligatoria.';
+        if (!contrasenia.trim()) validationErrors.contrasenia = 'La contrasena es obligatoria.';
+        if (!numeroLicencia.trim()) validationErrors.numeroLicencia = 'El número de licencia es obligatorio.';
+
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);

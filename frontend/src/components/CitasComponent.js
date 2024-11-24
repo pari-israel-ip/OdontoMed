@@ -88,7 +88,7 @@ const CitasComponent = () => {
                 });
             } catch (error) {
                 setMessage({ type: 'error', text: error.response?.data.error || 'Error al eliminar la cita' });
-                console.error('Error deleting cita:', error);
+                console.error('Error eliminando cita:', error);
             }
         }
     };
@@ -103,7 +103,7 @@ const CitasComponent = () => {
             await citaService.updateCita(updatedCita.id_cita, updatedCita);
             loadCitas();
         } catch (error) {
-            console.error('Error updating cita:', error);
+            console.error('Error actualizando cita:', error);
         }
     };
 
@@ -112,7 +112,7 @@ const CitasComponent = () => {
             await citaService.createCita(newCita);
             loadCitas();
         } catch (error) {
-            console.error('Error creating cita:', error);
+            console.error('Error creando cita:', error);
         }
     };
 

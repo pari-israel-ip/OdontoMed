@@ -33,18 +33,21 @@ const CreateTratamientoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
         let validationErrors = {};
 
         if (monto < 0) {
-            validationErrors.monto = "EL MONTO DEBE SER MAYOR O IGUAL A CERO.";
+            validationErrors.monto = "El monto debe ser mayor o igual a cero.";
         }
-
+        
         if (!fechaTratamiento) {
-            validationErrors.fecha_tratamiento = "LA FECHA DEL TRATAMIENTO ES OBLIGATORIA.";
+            validationErrors.fecha_tratamiento = "La fecha del tratamiento es obligatoria.";
         }
+        
         if (!nombreTratamiento) {
-            validationErrors.nombre_tratamiento = "EL NOMBRE DEL TRATAMIENTO ES OBLIGATORIO.";
+            validationErrors.nombre_tratamiento = "El nombre del tratamiento es obligatorio.";
         }
+        
         if (!descripcion) {
-            validationErrors.descripcion = "LA DESCRIPCION DEL TRATAMIENTO ES OBLIGATORIA.";
+            validationErrors.descripcion = "La descripcion del tratamiento es obligatoria.";
         }
+        
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);

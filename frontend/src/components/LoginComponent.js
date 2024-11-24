@@ -58,10 +58,12 @@ const LoginComponent = () => {
         52: 'Editar Recepcionista',
         53: 'Eliminar Recepcionista',
     };
-    
+    const [loading, setLoading] = useState(false);
+
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true)
             const response = await loginService.login(email, contrasenia);
             console.log("Respuesta del servidor:", response);
 
@@ -103,13 +105,15 @@ const LoginComponent = () => {
                 // Redirige a la ruta /usuarios
                 navigate('/usuarios');
             } else {
-                setMessage('Login fallido');
+                setMessage('Inicio de Sesión fallido');
                 setIsError(true);
             }
         } catch (error) {
             console.error(error);
-            setMessage(error.response?.data?.message || error.message || 'Error en el login');
+            setMessage(error.response?.data?.message || error.message || 'Error en el inciio de sesión');
             setIsError(true);
+        }finally{
+            setLoading(false)
         }
     };
 
@@ -144,7 +148,7 @@ const LoginComponent = () => {
                             placeholder="Ingresa tu contraseña"
                         />
                     </FormControl>
-                    <Button
+                    <Button isLoading={loading}
                         type="submit"
                         sx={{
                             backgroundColor: '#319795',

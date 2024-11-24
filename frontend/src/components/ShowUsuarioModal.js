@@ -512,7 +512,7 @@ const ShowUsuarioModal = () => {
                 <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
                 <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
                 <ConPermiso permiso='Editar Datos del Paciente'>
-                  <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos del Paciente</Button>
+                  <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos Clínicos</Button>
                 </ConPermiso>
               </Box>
             </Grid>

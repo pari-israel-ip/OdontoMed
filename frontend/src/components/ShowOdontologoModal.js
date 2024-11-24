@@ -106,7 +106,7 @@ const ShowOdontologoModal = () => {
       {activeTab === 1 && (
         <Grid templateColumns="1fr 1fr" gap={6}>
           <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
-            <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {odontologo.nombre_completo}</Text>
+            <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {odontologo.nombres} {odontologo.apellidos}</Text>
             <Text><strong>CI:</strong> {odontologo.ci}</Text>
             <Text><strong>Fecha de Nacimiento:</strong> {odontologo.fecha_nacimiento}</Text>
             <Text><strong>Correo Electrónico:</strong> {odontologo.email}</Text>
@@ -120,9 +120,8 @@ const ShowOdontologoModal = () => {
           <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
             <Text fontSize="xl" mb={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
             <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
-            <Text><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
             <ConPermiso permiso='Editar Datos de Odontólogo'>
-              <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>Editar Datos del Odontólogo</Button>
+              <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>Editar Datos Profesionales</Button>
             </ConPermiso>
           </Box>
         </Grid>

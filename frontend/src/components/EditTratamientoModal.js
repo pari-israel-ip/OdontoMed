@@ -77,28 +77,34 @@ const EditTratamientoModal = ({ tratamiento, onClose, onSave }) => {
     
         // Validaciones
         if (!nombreTratamiento || nombreTratamiento.length < 5 || nombreTratamiento.length > 50) {
-            newErrors.nombre_tratamiento = "EL NOMBRE DEL TRATAMIENTO DEBE TENER ENTRE 5 Y 50 CARACTERES.";
+            newErrors.nombre_tratamiento = 'El nombre del tratamiento debe tener entre 5 y 50 caracteres.';
         }
+        
         if (!fechaTratamiento) {
-            newErrors.fecha_tratamiento = "LA FECHA DEL TRATAMIENTO ES OBLIGATORIA.";
+            newErrors.fecha_tratamiento = 'La fecha del tratamiento es obligatoria.';
         } else {
             const selectedDate = new Date(fechaTratamiento);
             if (selectedDate < previousDate) {
-                newErrors.fecha_tratamiento = `LA FECHA NO PUEDE SER ANTERIOR A ${formattedPreviousDate}.`;
+                newErrors.fecha_tratamiento = `La fecha no puede ser anterior a ${formattedPreviousDate}.`;
             } else if (selectedDate > maxDate) {
-                newErrors.fecha_tratamiento = "LA FECHA NO PUEDE SER MAYOR A UN MES EN ADELANTE.";
+                newErrors.fecha_tratamiento = 'La fecha no puede ser mayor a un mes en adelante.';
             }
         }
+        
         if (!descripcion || descripcion.length < 5 || descripcion.length > 200) {
-            newErrors.descripcion = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES.";
+            newErrors.descripcion = 'La descripción debe tener entre 5 y 200 caracteres.';
         }
+        
         if (!monto || monto < 0) {
-            newErrors.monto = "EL MONTO DEBE SER UN NÚMERO MAYOR O IGUAL QUE CERO.";
+            newErrors.monto = 'El monto debe ser un número mayor o igual que cero.';
         }
+        
         if (!estadoTratamiento) {
-            newErrors.estado_tratamiento = "EL ESTADO DEL TRATAMIENTO ES OBLIGATORIO.";
+            newErrors.estado_tratamiento = 'El estado del tratamiento es obligatorio.';
         }
+        
         return newErrors;
+        
     };
     
 

@@ -59,20 +59,21 @@ const CreateUsuarioModal = ({ onClose, onCreate }) => {
         if (loading) return;
         // Validación simple de los campos requeridos
         const validationErrors = {};
-        if (!nombres.trim()) validationErrors.nombres = 'LOS NOMBRES SON OBLIGATORIOS.';
-        if (!apellidos.trim()) validationErrors.apellidos = 'LOS APELLIDOS SON OBLIGATORIOS.';
-        if (!ci.trim()) validationErrors.ci = 'EL C.I. ES OBLIGATORIO.';
-        if (!email.trim()) validationErrors.email = 'EL EMAIL ES OBLIGATORIO.';
-        if (!contrasenia.trim()) validationErrors.contrasenia = 'LA CONTRASEÑA ES OBLIGATORIA.';
-        if (!seguro_medico.trim()) validationErrors.seguro_medico = 'EL SEGURO MEDICO ES OBLIGATORIA.';
-        if (!telefono.trim()) validationErrors.telefono = 'EL TELEFONO ES OBLIGATORIO.';
-        if (!fecha_nacimiento.trim()) validationErrors.fecha_nacimiento = 'LA FECHA DE NACIMIENTO ES OBLIGATORIA.';
-        if (!direccion.trim()) validationErrors.direccion = 'LA DIRECCION ES OBLIGATORIA.';
-        if (!alergias.trim()) validationErrors.alergias = 'LAS ALERGIAS SON OBLIGATORIAS.';
-        if (!antecedentes_medicos.trim()) validationErrors.antecedentes_medicos = 'LOS ANTECEDENTES SON OBLIGATORIOS.';
-        //if (!rol) validationErrors.rol = 'EL ROL ES OBLIGATORIO.';
-        if (!id_odontologo) validationErrors.id_odontologo = 'EL ODONTÓLOGO ES OBLIGATORIO.';
-        if (!notas_generales.trim()) validationErrors.notas_generales = 'LAS NOTAS SON OBLIGATORIAS.';
+        if (!nombres.trim()) validationErrors.nombres = 'Los nombres son obligatorios.';
+        if (!apellidos.trim()) validationErrors.apellidos = 'Los apellidos son obligatorios.';
+        if (!ci.trim()) validationErrors.ci = 'El C.I. es obligatorio.';
+        if (!email.trim()) validationErrors.email = 'El email es obligatorio.';
+        if (!contrasenia.trim()) validationErrors.contrasenia = 'La contraseña es obligatoria.';
+        if (!seguro_medico.trim()) validationErrors.seguro_medico = 'El seguro médico es obligatorio.';
+        if (!telefono.trim()) validationErrors.telefono = 'El teléfono es obligatorio.';
+        if (!fecha_nacimiento.trim()) validationErrors.fecha_nacimiento = 'La fecha de nacimiento es obligatoria.';
+        if (!direccion.trim()) validationErrors.direccion = 'La dirección es obligatoria.';
+        if (!alergias.trim()) validationErrors.alergias = 'Las alergias son obligatorias.';
+        if (!antecedentes_medicos.trim()) validationErrors.antecedentes_medicos = 'Los antecedentes son obligatorios.';
+        // if (!rol) validationErrors.rol = 'El rol es obligatorio.';
+        if (!id_odontologo) validationErrors.id_odontologo = 'El odontólogo es obligatorio.';
+        if (!notas_generales.trim()) validationErrors.notas_generales = 'Las notas son obligatorias.';
+
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);

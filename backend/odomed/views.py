@@ -38,6 +38,7 @@ from django.contrib.auth.hashers import make_password
 from .models import Usuario
 import traceback
 
+
 @csrf_exempt
 def recuperar_contrasena(request):
     if request.method == 'GET':  # Cambiamos a GET
@@ -302,27 +303,32 @@ def usuario_detail(request, id_usuario):
         # Validación de nombres
         nombres = data.get('nombres', '').strip().upper()  # Convertir a mayúsculas
         nombres_regex = re.compile(r'^[A-Z\s]+$')  # Regex modificado para letras mayúsculas
-        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
-            errors['nombres'] = 'Los nombres deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
-
+        if not nombres or len(nombres) < 3 or len(nombres) > 100:
+            errors['nombres'] = 'Los nombres deben tener entre 3 y 100 caracteres.'
+        elif not nombres_regex.match(nombres):
+            errors['nombres'] = 'Los nombres deben contener solo letras y espacios.'
+           
         # Validación de apellidos
         apellidos = data.get('apellidos', '').strip().upper()  # Convertir a mayúsculas
         if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
-            errors['apellidos'] = 'Los apellidos deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
-
+            errors['apellidos'] = 'Los apellidos deben tener entre 3 y 100 caracteres.'
+        elif not nombres_regex.match(apellidos):
+            errors['nombres'] = 'Los apellidos deben contener solo letras y espacios.'
         # Validación de CI (Cédula de Identidad)
         ci = data.get('ci', '').strip()
-        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exclude(id_usuario=id_usuario).exists():
-            errors['ci'] = 'La cédula de identidad debe ser única y contener entre 6 y 12 dígitos.'
-
+        if not re.match(r'^\d{6,12}$', ci):
+            errors['ci'] = 'La cédula de identidad debe contener entre 6 y 12 dígitos.'
+        elif Usuario.objects.filter(ci=ci).exclude(id_usuario=id_usuario).exists():
+            errors['ci'] = 'La cédula de identidad ya esta registrada'
         # Validación de email
         email = data.get('email', '').strip().upper()  # Convertir a mayúsculas
         if email and Usuario.objects.filter(email=email).exclude(id_usuario=id_usuario).exists():
             errors['email'] = 'El email ya está en uso por otro usuario.'
         # Validación de teléfono
         telefono = data.get('telefono', '').strip()
-        if not re.match(r'^\d{8}$', telefono):
-            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+        if not re.match(r'^[726]\d{7}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos y comenzar con 7, 6 o 2.'
+
 
         # Validación de fecha de nacimiento
         fecha_nacimiento = data.get('fecha_nacimiento')
@@ -337,9 +343,10 @@ def usuario_detail(request, id_usuario):
         # Validación de dirección
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
-        if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
-            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
-
+        if not 5 <= len(direccion) <= 255:
+            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres.'
+        elif not direccion_regex.match(direccion):
+            errors['direccion'] = 'La dirección debe contener letras, números, espacios y puntos.'
        
         if errors:
             return JsonResponse({'errors': errors}, status=400)
@@ -353,7 +360,7 @@ def usuario_detail(request, id_usuario):
         usuario.direccion = data.get('direccion', usuario.direccion).upper()
         
         usuario.save()
-        return JsonResponse({'message': 'USUARIO ACTUALIZADO'})
+        return JsonResponse({'message': 'Paciente Actualizado Correctamente'})
 
     elif request.method == 'DELETE':
         # Extraer el id del usuario del request (asumiendo que el ID del usuario es pasado)
@@ -390,19 +397,22 @@ def usuario_create(request):
         # Validación de nombres
         nombres = data.get('nombres', '').strip().upper()  # Convertir a mayúsculas
         nombres_regex = re.compile(r'^[A-Z\s]+$')  # Regex modificado para letras mayúsculas
-        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
-            errors['nombres'] = 'Los nombres deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
-
+        if not nombres or len(nombres) < 3 or len(nombres) > 100:
+            errors['nombres'] = 'Los nombres deben tener entre 3 y 100 caracteres.'
+        elif not nombres_regex.match(nombres):
+            errors['nombres'] = 'Los nombres deben contener solo letras y espacios.'
         # Validación de apellidos
         apellidos = data.get('apellidos', '').strip().upper()  # Convertir a mayúsculas
-        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
-            errors['apellidos'] = 'Los apellidos deben contener solo letras y espacios, y tener entre 3 y 100 caracteres.'
-
+        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100:
+            errors['apellidos'] = 'Los apellidos deben tener entre 3 y 100 caracteres.'
+        elif not nombres_regex.match(apellidos):
+            errors['apellidos'] = 'Los apellidos deben contener solo letras y espacios.'
         # Validación de CI (Cédula de Identidad)
         ci = data.get('ci', '').strip()
-        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
-            errors['ci'] = 'La cédula de identidad debe ser única y contener entre 6 y 12 dígitos.'
-
+        if not re.match(r'^\d{6,12}$', ci):
+            errors['ci'] = 'La cédula de identidad debe contener entre 6 y 12 dígitos.'
+        elif Usuario.objects.filter(ci=ci).exists():
+            errors['ci'] = 'La cédula de identidad ya esta registrada.'
         # Validación de email
         email = data.get('email', '').strip().upper()  # Convertir a mayúsculas
         if Usuario.objects.filter(email=email).exists():
@@ -411,8 +421,8 @@ def usuario_create(request):
             errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
         # Validación de teléfono
         telefono = data.get('telefono', '').strip()
-        if not re.match(r'^\d{8}$', telefono):
-            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+        if not re.match(r'^[726]\d{7}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos y comenzar con 7, 6 o 2.'
 
         # Validación de fecha de nacimiento
         fecha_nacimiento = data.get('fecha_nacimiento')
@@ -427,9 +437,10 @@ def usuario_create(request):
         # Validación de dirección
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
-        if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
-            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
-
+        if not 5 <= len(direccion) <= 255 :
+            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres.'
+        elif not direccion_regex.match(direccion):
+            errors['direccion'] = 'La dirección solo debe contener letras, números, espacios y puntos.'
         if not Roles.objects.filter(activo=True, nombre_rol='PACIENTE').exists():
             return JsonResponse({'error': 'No existe un rol para este tipo de usuario, cree el rol PACIENTE'}, status=400)
 
@@ -442,9 +453,10 @@ def usuario_create(request):
 
         # Validación de seguro médico
         seguro_medico = data.get('seguro_medico', '').strip().upper()  # Convertir a mayúsculas
-        if not 8 <= len(seguro_medico) <= 15 or not re.match(r'^[A-Z0-9]+$', seguro_medico):  # Regex modificado para letras mayúsculas
-            errors['seguro_medico'] = 'El seguro médico debe tener entre 8 y 15 caracteres y contener solo letras y números.'
-
+        if not 8 <= len(seguro_medico) <= 15:  # Regex modificado para letras mayúsculas
+            errors['seguro_medico'] = 'El seguro médico debe tener entre 8 y 15 caracteres.'
+        elif not re.match(r'^[A-Z0-9]+$', seguro_medico):
+            errors['seguro_medico'] = 'El seguro médico debe contener solo letras y números.'
         # Validación de alergias y antecedentes médicos
         alergias = data.get('alergias', '').strip().upper()  # Convertir a mayúsculas
         antecedentes_medicos = data.get('antecedentes_medicos', '').strip().upper()  # Convertir a mayúsculas
@@ -510,7 +522,7 @@ def login(request):
             # Verifica la contraseña
             if check_password(contrasenia, usuario.contrasenia):
                 return JsonResponse({
-                    'message': 'Login exitoso', 
+                    'message': 'Inicio de sesión exitoso', 
                     'usuario_id': usuario.id_usuario,
                     'email': usuario.email,
                     'nombres': usuario.nombres,  
@@ -560,20 +572,23 @@ def odontologo_create(request):
         nombres = data.get('nombres', '').strip().upper()
         
         nombres_regex = re.compile(r'^[A-Z\s]+$')
-        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
+        if not nombres or len(nombres) < 3 or len(nombres) > 100:
             errors['nombres'] = 'El campo Nombres debe ser entre 3 a 100 caracteres.'
-        
+        elif not nombres_regex.match(nombres):
+            errors['nombres'] = 'Los nombres deben contener solo letras y espacios.'
         apellidos = data.get('apellidos', '').strip().upper()
         
-        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
+        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100:
             errors['apellidos'] = 'El campo Apellidos debe ser entre 3 a 100 caracteres.'
-
+        elif not nombres_regex.match(apellidos):
+            errors['apellidos'] = 'Los apellidos deben contener solo letras y espacios.'
         
         ci = data.get('ci', '').strip()
         
-        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
-            errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
-        
+        if not re.match(r'^\d{6,12}$', ci) :
+            errors['ci'] = 'La cédula de identidad debe ser entre 6 a 12 caracteres.'
+        elif Usuario.objects.filter(ci=ci).exists():
+            errors['ci'] = 'La cédula de identidad ya esta regsitrada.'
         email = data.get('email', '').strip().upper()
         if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
@@ -582,8 +597,8 @@ def odontologo_create(request):
             errors['email'] = 'El email ya está en uso.'
         
         telefono = data.get('telefono', '').strip()
-        if not re.match(r'^\d{8}$', telefono):
-            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+        if not re.match(r'^[726]\d{7}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos y comenzar con 7, 6 o 2.'
         
         fecha_nacimiento = data.get('fecha_nacimiento')
         if fecha_nacimiento:
@@ -599,14 +614,17 @@ def odontologo_create(request):
             errors['contrasenia'] = 'Contraseña insegura: debe tener minimamente 8 caracteres, letra, numeros y simbolos(@$!%*?&).'
         direccion = data.get('direccion', '').strip().upper()  # Convertir a mayúsculas
         direccion_regex = re.compile(r'^[A-Z0-9\s.]+$')  # Regex modificado para letras mayúsculas
-        if not 5 <= len(direccion) <= 255 or not direccion_regex.match(direccion):
-            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres y solo contener letras, números, espacios y puntos.'
-
+        if not 5 <= len(direccion) <= 255 :
+            errors['direccion'] = 'La dirección debe tener entre 5 y 255 caracteres.'
+        elif not direccion_regex.match(direccion):
+            errors['direccion'] = 'La dirección solo debe contener letras, números, espacios y puntos.'
 
         # Validaciones para datos específicos de Odontologo
         numero_licencia = data.get('numero_licencia', '').strip().upper()
-        if not numero_licencia or len(numero_licencia) < 5 or len(numero_licencia) > 50:
-            errors['numero_licencia'] = 'Número de licencia inválido de 5 a 50 caracteres.'
+        if not 5 <= len(numero_licencia) <= 15 :
+            errors['numero_licencia'] = 'El número de licencia debe tener entre 5 y 15 caracteres'
+        elif not re.match(r'^[A-Z0-9]+$', numero_licencia):
+            errors['numero_licencia'] = 'El número de licencia debe contener solo letras y números.'
 
         especializacion = data.get('especializacion', '').strip().upper()
         if not re.match(r'^[A-Z\s]+$', especializacion):  # Only uppercase letters and spaces
@@ -696,9 +714,10 @@ def odontologo_detail(request, id_usuario):
 
         # Validation for numero_licencia
         numero_licencia = data.get('numero_licencia', '').strip().upper()
-        if not 5 <= len(numero_licencia) <= 15 or not re.match(r'^[A-Z0-9]+$', numero_licencia):
-            errors['numero_licencia'] = 'El número de licencia debe tener entre 5 y 15 caracteres y contener solo letras y números.'
-
+        if not 5 <= len(numero_licencia) <= 15 :
+            errors['numero_licencia'] = 'El número de licencia debe tener entre 5 y 15 caracteres'
+        elif not re.match(r'^[A-Z0-9]+$', numero_licencia):
+            errors['numero_licencia'] = 'El número de licencia debe contener solo letras y números.'
         # Validation for especializacion
         especializacion = data.get('especializacion', '').strip().upper()
         if not re.match(r'^[A-Z\s]+$', especializacion):  # Only uppercase letters and spaces
@@ -706,7 +725,7 @@ def odontologo_detail(request, id_usuario):
 
         # Ensure at least numero_licencia is provided
         if not numero_licencia:
-            return JsonResponse({'error': 'EL NÚMERO DE LICENCIA ES REQUERIDO'}, status=400)
+            return JsonResponse({'error': 'El número de licencia es obligatorio'}, status=400)
 
         # Return errors if any validations fail
         if errors:
@@ -778,7 +797,7 @@ def paciente_detail(request, id_paciente):
         if not re.match(r'^[A-Z0-9\s]*$', antecedentes_medicos):  # Regex modificado para letras mayúsculas
             errors['antecedentes_medicos'] = 'Los antecedentes médicos solo pueden contener letras, números y espacios.'
         if not seguro_medico:
-            return JsonResponse({'error': 'EL SEGURO MÉDICO ES REQUERIDO'}, status=400)
+            return JsonResponse({'error': 'El codigo de seguro médico es requerido'}, status=400)
 
         if errors:
             return JsonResponse({'errors': errors}, status=400)
@@ -791,7 +810,7 @@ def paciente_detail(request, id_paciente):
         return JsonResponse({'message': 'Paciente actualizado correctamente'})
 
      
-    return JsonResponse({'error': 'MÉTODO NO PERMITIDO'}, status=405)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 @csrf_exempt
 def diagnostico_list(request, id_historial):
@@ -799,7 +818,7 @@ def diagnostico_list(request, id_historial):
         diagnosticos = list(Diagnosticos.objects.filter(id_historial=id_historial, activo=True).order_by('-fecha_diagnostico').values())
 
         if not diagnosticos:
-            return JsonResponse({'error': 'NO SE ENCONTRARON DIAGNOSTICOS PARA ESE ID_HISTORIAL'}, status=404)
+            return JsonResponse({'error': 'No se encontraron diagnosticos para el historial seleccionado'}, status=404)
 
         return JsonResponse(diagnosticos, safe=False)
 
@@ -820,20 +839,20 @@ def diagnostico_create(request):
 
         # Validar nombre_diagnostico
         if not (5 <= len(nombre_diagnostico) <= 50):
-            errors['nombre_diagnostico'] = "EL NOMBRE DEL DIAGNOSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES."
+            errors['nombre_diagnostico'] = "El nombre del diagnóstico debe tener entre 5 y 50 caracteres."
         elif not nombre_pattern.match(nombre_diagnostico):
-            errors['nombre_diagnostico'] = "EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+            errors['nombre_diagnostico'] = "El nombre solo puede contener letras, números y espacios."
 
         # Validar descripcion
         if not (5 <= len(descripcion) <= 200):
-            errors['descripcion'] = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES."
+            errors['descripcion'] = "La descripción debe tener entre 5 y 200 caracteres."
         elif not descripcion_pattern.match(descripcion):
-            errors['descripcion'] = "LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+            errors['descripcion'] = "La descripción solo puede contener letras, números y espacios."
 
         # Validar id_historial
         id_historial = data.get('id_historial')
         if not id_historial:
-            errors['id_historial'] = "EL ID DEL HISTORIAL ES OBLIGATORIO."
+            errors['id_historial'] = "El id del historial es obligatorio."
         else:
             # Obtener la instancia de HistorialesClinicos
             historial = get_object_or_404(HistorialesClinicos, id_historial=id_historial)
@@ -873,15 +892,16 @@ def diagnostico_detail(request, id_diagnostico):
 
         # Validar nombre_diagnostico
         if not (5 <= len(diagnostico.nombre_diagnostico) <= 50):
-            errors['nombre_diagnostico'] = "EL NOMBRE DEL DIAGNOSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES."
+            errors['nombre_diagnostico'] = "El nombre del diagnóstico debe tener entre 5 y 50 caracteres."
         elif not nombre_pattern.match(diagnostico.nombre_diagnostico):
-            errors['nombre_diagnostico'] = "EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+            errors['nombre_diagnostico'] = "El nombre solo puede contener letras, números y espacios."
 
         # Validar descripcion
         if not (5 <= len(diagnostico.descripcion) <= 200):
-            errors['descripcion'] = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES."
+            errors['descripcion'] = "La descripción debe tener entre 5 y 200 caracteres."
         elif not descripcion_pattern.match(diagnostico.descripcion):
-            errors['descripcion'] = "LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+            errors['descripcion'] = "La descripción solo puede contener letras, números y espacios."
+
         if errors:
             return JsonResponse({'errors': errors}, status=400)
 
@@ -907,22 +927,24 @@ def tratamiento_create(request):
 
         
         if not (5 <= len(nombre_tratamiento) <= 50):
-            errors['nombre_tratamiento'] = "EL NOMBRE DEL TRATAMIENTO DEBE TENER ENTRE 5 Y 50 CARACTERES."
+            errors['nombre_tratamiento'] = "El nombre del tratamiento debe tener entre 5 y 50 caracteres."
         elif not nombre_pattern.match(nombre_tratamiento):
-            errors['nombre_tratamiento'] = "EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
+            errors['nombre_tratamiento'] = "El nombre solo puede contener letras, números y espacios."
+
         if not (5 <= len(descripcion) <= 200):
-            errors['descripcion'] = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES."
+            errors['descripcion'] = "La descripción debe tener entre 5 y 200 caracteres."
         elif not descripcion_pattern.match(descripcion):
-            errors['descripcion'] = "LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS."
-        
+            errors['descripcion'] = "La descripción solo puede contener letras, números y espacios."
+
         # Validar campos y crear costo si es válido
         if not id_historial or not HistorialesClinicos.objects.filter(id_historial=id_historial).exists():
-            errors['id_historial'] = "ID HISTORIAL NO VÁLIDO."
+            errors['id_historial'] = "Id historial no válido."
+        
         if fecha_tratamiento:
             try:
                 fecha_tratamiento = datetime.strptime(fecha_tratamiento, '%Y-%m-%d')
-                if fecha_tratamiento < datetime.now() or fecha_tratamiento > datetime.now() + timedelta(days=30 * 1):
-                    errors['fecha_tratamiento'] = 'La fecha deL tratamiento debe iniciar entre hoy y un mes en adelante.'
+                if fecha_tratamiento < datetime.now() -timedelta(days=1) or fecha_tratamiento > datetime.now() + timedelta(days=30 * 1):
+                    errors['fecha_tratamiento'] = f'La fecha del tratamiento debe iniciar entre hoy ({datetime.now().strftime("%d-%m-%Y")}) y un mes en adelante .'
             except ValueError:
                 errors['fecha_tratamiento'] = 'La fecha de nacimiento debe tener el formato correcto (YYYY-MM-DD).'
         if errors:
@@ -946,7 +968,7 @@ def tratamiento_list(request, id_historial):
         tratamientos = list(Tratamientos.objects.filter(id_historial=id_historial, activo=True).order_by('-fecha_tratamiento').values())
 
         if not tratamientos:
-            return JsonResponse({'error': 'NO SE ENCONTRARON TRATAMIENTOS PARA ESE ID_HISTORIAL'}, status=404)
+            return JsonResponse({'error': 'No se encontraron tratamientos en este historial'}, status=404)
 
         return JsonResponse(tratamientos, safe=False)
     
@@ -989,7 +1011,6 @@ def tratamiento_detail(request, id_tratamiento):
         # Parsear los datos del cuerpo de la solicitud
         data = json.loads(request.body.decode('utf-8'))
         errors = {}
-        
         # Actualizar los campos del tratamiento con los datos recibidos
         nombre_tratamiento = data.get('nombre_tratamiento', tratamiento.nombre_tratamiento).upper()
         descripcion = data.get('descripcion', tratamiento.descripcion).upper()
@@ -997,18 +1018,20 @@ def tratamiento_detail(request, id_tratamiento):
         estado_tratamiento = data.get('estado_tratamiento', tratamiento.estado_tratamiento)
 
         if not (5 <= len(nombre_tratamiento) <= 50):
-            errors['nombre_tratamiento'] = 'EL NOMBRE DEL TRATAMIENTO DEBE TENER ENTRE 5 Y 50 CARACTERES.'
+            errors['nombre_tratamiento'] = 'El nombre del tratamiento debe tener entre 5 y 50 caracteres.'
         elif not nombre_pattern.match(nombre_tratamiento):
-            errors['nombre_tratamiento'] = 'EL NOMBRE SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'
+            errors['nombre_tratamiento'] = 'El nombre solo puede contener letras, números y espacios.'
+
         if not (5 <= len(descripcion) <= 200):
-            errors['descripcion'] = 'LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES.'
+            errors['descripcion'] = 'La descripción debe tener entre 5 y 200 caracteres.'
         elif not descripcion_pattern.match(descripcion):
-            errors['descripcion'] = 'LA DESCRIPCIÓN SOLO PUEDE CONTENER LETRAS, NÚMEROS Y ESPACIOS.'   
+            errors['descripcion'] = 'La descripción solo puede contener letras, números y espacios.'
+        
         if fecha_tratamiento:
             try:
                 fecha_tratamiento = datetime.strptime(fecha_tratamiento, '%Y-%m-%d')
-                if fecha_tratamiento < datetime.now() or fecha_tratamiento > datetime.now() + timedelta(days=30 * 1):
-                    errors['fecha_tratamiento'] = 'La fecha deL tratamiento debe iniciar entre la establecida previamente y un mes en adelante.'
+                if fecha_tratamiento < datetime.now() - timedelta(days=1) or fecha_tratamiento > datetime.now() + timedelta(days=30 * 1):
+                    errors['fecha_tratamiento'] = 'La fecha del tratamiento debe iniciar entre la establecida previamente y un mes en adelante.'
             except ValueError:
                 errors['fecha_tratamiento'] = 'La fecha de nacimiento debe tener el formato correcto (YYYY-MM-DD).'
         if errors:
@@ -1042,7 +1065,7 @@ def prescripcion_list(request, id_historial):
         tratamientos = list(Prescripciones.objects.filter(id_historial=id_historial, activo=True).order_by('-fecha_inicio').values())
 
         if not tratamientos:
-            return JsonResponse({'error': 'NO SE ENCONTRARON PRESCRIPCIONES PARA ESE ID_HISTORIAL'}, status=404)
+            return JsonResponse({'error': 'No se encontraron prescripciones en este historial'}, status=404)
 
         return JsonResponse(tratamientos, safe=False)
 
@@ -1160,22 +1183,29 @@ def recepcionista_create(request):
         # Validación y procesamiento de datos de usuario
         nombres = data.get('nombres', '').strip().upper()
         nombres_regex = re.compile(r'^[A-Z\s]+$')
-        if not nombres or len(nombres) < 3 or len(nombres) > 100 or not nombres_regex.match(nombres):
+        if not nombres or len(nombres) < 3 or len(nombres) > 100:
             errors['nombres'] = 'El campo Nombres debe ser entre 3 a 100 caracteres.'
+        elif  not nombres_regex.match(nombres):
+            errors['nombres'] = 'El campo Nombres solo debe tener letras y espacios.'
+
         apellidos = data.get('apellidos', '').strip().upper()
-        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100 or not nombres_regex.match(apellidos):
-            errors['apellidos'] = 'El campo Apellidos debe ser entre 3 a 100 caracteres.'        
+        if not apellidos or len(apellidos) < 3 or len(apellidos) > 100:
+            errors['apellidos'] = 'El campo Apellidos debe ser entre 3 a 100 caracteres.'
+        elif  not nombres_regex.match(apellidos):
+            errors['apellidos'] = 'El campo Apellidos solo debe tener letras y espacios.'        
         ci = data.get('ci', '').strip()
-        if not re.match(r'^\d{6,12}$', ci) or Usuario.objects.filter(ci=ci).exists():
-            errors['ci'] = 'Cédula de identidad debe ser entre 6 a 12 caracteres.'
+        if not re.match(r'^\d{6,12}$', ci):
+            errors['ci'] = 'La cédula de identidad debe ser entre 6 a 12 caracteres.'
+        elif Usuario.objects.filter(ci=ci).exists():
+            errors['ci'] = 'La cédula de identidad ya esta registrada.'
         email = data.get('email', '').strip().upper()
         if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             errors['email'] = 'El correo electrónico debe tener este fomato ejemplo@as.com'
         if Usuario.objects.filter(email=email).exists():
             errors['email'] = 'El email ya está en uso.'
         telefono = data.get('telefono', '').strip()
-        if not re.match(r'^\d{8}$', telefono):
-            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos.'
+        if not re.match(r'^[726]\d{7}$', telefono):
+            errors['telefono'] = 'El teléfono debe contener exactamente 8 dígitos y comenzar con 7, 6 o 2.'
         fecha_nacimiento = data.get('fecha_nacimiento')
         if fecha_nacimiento:
             try:
@@ -1311,7 +1341,7 @@ def crear_citas_automaticas(request):
     citas_omitidas = 0
 
     # Generar citas para los próximos 5 días
-    for dias in range(8):
+    for dias in range(15):
         fecha = fecha_actual + timedelta(days=dias)
 
         for odontologo in odontologos_activos:

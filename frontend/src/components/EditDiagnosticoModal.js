@@ -49,20 +49,22 @@ const EditDiagnosticoModal = ({ diagnostico, onClose, onSave }) => {
         const formattedPreviousDate = formatDate(previousDate);
 
         if (!nombreDiagnostico || nombreDiagnostico.length < 5 || nombreDiagnostico.length > 50) {
-            newErrors.nombre_diagnostico = "EL NOMBRE DEL DIAGNÓSTICO DEBE TENER ENTRE 5 Y 50 CARACTERES.";
+            newErrors.nombre_diagnostico = 'El nombre del diagnóstico debe tener entre 5 y 50 caracteres.';
         }
+        
         if (!fechaDiagnostico) {
-            newErrors.fecha_diagnostico = "LA FECHA DEL DIAGNÓSTICO ES OBLIGATORIA.";
+            newErrors.fecha_diagnostico = 'La fecha del diagnóstico es obligatoria.';
         } else {
             const selectedDate = new Date(fechaDiagnostico);
             if (selectedDate < previousDate) {
-                newErrors.fecha_diagnostico = `LA FECHA NO PUEDE SER ANTERIOR A ${formattedPreviousDate}.`;
+                newErrors.fecha_diagnostico = `La fecha no puede ser anterior a ${formattedPreviousDate}.`;
             } else if (selectedDate > maxDate) {
-                newErrors.fecha_diagnostico = "LA FECHA NO PUEDE SER MAYOR A UN MES EN ADELANTE.";
+                newErrors.fecha_diagnostico = 'La fecha no puede ser mayor a un mes en adelante.';
             }
         }
+        
         if (!descripcion || descripcion.length < 5 || descripcion.length > 200) {
-            newErrors.descripcion = "LA DESCRIPCIÓN DEBE TENER ENTRE 5 Y 200 CARACTERES.";
+            newErrors.descripcion = 'La descripción debe tener entre 5 y 200 caracteres.';
         }
         return newErrors;
     };
