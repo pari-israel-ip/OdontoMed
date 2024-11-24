@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    Select, useToast,Spinner,Center
+    Select, useToast,Spinner,Center, CloseButton,Badge
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import citaService from '../services/citaService';
@@ -134,8 +134,14 @@ const CitasComponent = () => {
             {message && message.type === 'error' && (
                 <Alert status="error" mb={4}>
                     <AlertIcon />
-                    <AlertTitle>ERROR:</AlertTitle>
+                    <AlertTitle>ADVERTENCIA:</AlertTitle>
                     <AlertDescription>{message.text}</AlertDescription>
+                    <CloseButton 
+                    position="absolute" 
+                    right="8px" 
+                    top="8px" 
+                    onClick={() => setMessage(null)} // Establece el estado a null para cerrar el alert
+                />
                 </Alert>
             )}
 
@@ -189,37 +195,47 @@ const CitasComponent = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {filterCitas().map(cita => (
-                        <Tr key={cita.id_cita}>
-                            <Td>{cita.fecha}</Td>
-                            <Td>{cita.horario}</Td>
-                            <Td>{cita.paciente === 'None None' ? 'NO ASIGNADO' : cita.paciente}</Td>
-                            <Td>{cita.odontologo}</Td>
-                            <Td>{cita.estado_cita.toUpperCase()}</Td>
-                            <Td>
-                                <Flex justify="space-between">
-                                    <ConPermiso permiso='Editar cita'>
-                                    <IconButton
-                                        icon={<EditIcon />}
-                                        colorScheme="blue"
-                                        size="sm"
-                                        onClick={() => handleEdit(cita)}
-                                        mr={2}
-                                    />
-                                    </ConPermiso>
-                                    <ConPermiso permiso='Eliminar cita'>
-                                    <IconButton
-                                        icon={<DeleteIcon />}
-                                        colorScheme="red"
-                                        size="sm"
-                                        onClick={() => handleDelete(cita.id_cita)}
-                                    />
-                                    </ConPermiso>
-                                </Flex>
-                            </Td>
-                        </Tr>
-                    ))}
-                </Tbody>
+    {filterCitas().map(cita => {
+        // Condición para resaltar la fila
+        const isHighlighted = cita.estado_cita === 'en espera' && cita.paciente !== 'None None';
+
+        return (
+            <Tr
+                key={cita.id_cita}
+                
+            >
+               
+                <Td>{cita.fecha}</Td>
+                <Td>{cita.horario}</Td>
+                <Td>{cita.paciente === 'None None' ? 'NO ASIGNADO' : cita.paciente}{isHighlighted && <Badge colorScheme="yellow">Solicitud</Badge>}</Td>
+                <Td>{cita.odontologo}</Td>
+                <Td>{cita.estado_cita.toUpperCase()}</Td>
+                <Td>
+                    <Flex justify="space-between">
+                        <ConPermiso permiso='Editar cita'>
+                            <IconButton
+                                icon={<EditIcon />}
+                                colorScheme="blue"
+                                size="sm"
+                                onClick={() => handleEdit(cita)}
+                                mr={2}
+                            />
+                        </ConPermiso>
+                        <ConPermiso permiso='Eliminar cita'>
+                            <IconButton
+                                icon={<DeleteIcon />}
+                                colorScheme="red"
+                                size="sm"
+                                onClick={() => handleDelete(cita.id_cita)}
+                            />
+                        </ConPermiso>
+                    </Flex>
+                </Td>
+            </Tr>
+        );
+    })}
+</Tbody>
+
             </Table>)}
 
             {isEditModalOpen && (

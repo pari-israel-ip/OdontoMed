@@ -16,7 +16,7 @@ import {
     AlertTitle,
     AlertDescription,
     Input,
-    useToast,Spinner,Center
+    useToast,Spinner,Center,CloseButton
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
@@ -105,6 +105,12 @@ const RecepcionistasComponent = () => {
                     <AlertIcon />
                     <AlertTitle>ERROR:</AlertTitle>
                     <AlertDescription>{message.text}</AlertDescription>
+                    <CloseButton 
+                    position="absolute" 
+                    right="8px" 
+                    top="8px" 
+                    onClick={() => setMessage(null)} // Establece el estado a null para cerrar el alert
+                />
                 </Alert>
             )}
             <ConPermiso permiso='Crear Recepcionista'>

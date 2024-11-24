@@ -27,6 +27,13 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        // Establece el paciente de la cita al abrir el modal
+        if (cita.id_paciente) {
+            setPaciente(cita.id_paciente);
+        }
+    }, [cita]);
+
+    useEffect(() => {
         const fetchPacientes = async () => {
             try {
                 const response = await usuarioService.getUsuarios();

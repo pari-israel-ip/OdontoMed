@@ -376,6 +376,7 @@ def usuario_detail(request, id_usuario):
             for paciente in pacientes:
                 # Desactivar todos los historiales clínicos asociados a este paciente
                 HistorialesClinicos.objects.filter(id_paciente=paciente).update(activo=False)
+                Citas.objects.filter(id_paciente = paciente).update(activo=False)
                 # Desactivar el paciente
                 paciente.activo = False
                 paciente.save()
@@ -1314,7 +1315,7 @@ def cita_list(request):
                 'id_cita': cita['id_cita'],
                 'fecha': cita['fecha'],
                 'estado_cita': cita['estado_cita'],
-                'paciente': f"{cita['id_paciente__id_paciente__nombres']} {cita['id_paciente__id_paciente__nombres']}",
+                'paciente': f"{cita['id_paciente__id_paciente__nombres']} {cita['id_paciente__id_paciente__apellidos']}",
                 'odontologo': f"{cita['id_odontologo__id_odontologo__nombres']} {cita['id_odontologo__id_odontologo__apellidos']}",
                 'recepcionista': f"{cita['id_recepcionista__id_recepcionista__nombres']} {cita['id_recepcionista__id_recepcionista__apellidos']}",
                 'monto': cita['id_costo__monto'],
