@@ -20,11 +20,15 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import { SettingsIcon } from '@chakra-ui/icons';
+
 import recepcionistaService from '../services/recepcionistaService';
 import CreateRecepcionistaModal from './CreateRecepcionistaModal';
 import EditUsuarioModal from './EditUsuarioModal';
 import ConPermiso from './ConPermiso';
 const RecepcionistasComponent = () => {
+
+
     const [recepcionistas, setRecepcionistas] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");  // Estado para la búsqueda
     const [message, setMessage] = useState(null);
@@ -154,9 +158,9 @@ const RecepcionistasComponent = () => {
                                 <Flex justify="space-between">
                                     <ConPermiso permiso='Editar Recepcionista'>
                                     <IconButton
-                                        icon={<EditIcon />}
-                                        colorScheme="cyan"
-                                        size="sm"
+                                          icon={<SettingsIcon />}
+                                          colorScheme="cyan"
+                                          size="sm"
                                         onClick={() => handleEdit(recepcionista)}
                                         mr={2}
                                     />

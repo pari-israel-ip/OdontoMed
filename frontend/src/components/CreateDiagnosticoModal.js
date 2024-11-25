@@ -84,10 +84,13 @@ const CreateDiagnosticoModal = ({ isOpen, onClose, idHistorial, onCreated }) => 
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="blue" mr={3} onClick={handleSubmit} isLoading={loading}>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleSubmit} isLoading={loading}>
                         Crear
                     </Button>
-                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} ml={3} mt={4} onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

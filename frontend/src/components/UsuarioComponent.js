@@ -218,7 +218,7 @@ const UsuariosComponent = () => {
 
                 </ConPermiso>
                 
-                <Button as="label" colorScheme="teal" >CARGAR HISTORIAL (JSON)
+                <Button as="label"  ml= {4}colorScheme="teal" >CARGAR HISTORIAL (JSON)
               <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
             </Button>
             <Flex justify="space-between" mb={4}>

@@ -213,10 +213,13 @@ const EditRoleModal = ({ role, onClose, onSave }) => {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={handleSubmit} isLoading={loading}>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleSubmit} isLoading={loading}>
                         Guardar
                     </Button>
-                    <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button isLoading={loading} ml = {3}mt={4} variant="ghost" onClick={onClose}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

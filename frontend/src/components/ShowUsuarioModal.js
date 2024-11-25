@@ -520,6 +520,8 @@ const ShowUsuarioModal = () => {
           <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
           <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
           <ConPermiso permiso='Editar Datos del Paciente'>
+          <Box height="78px" /> 
+
             <Button 
               bg="#319795" 
               color="white" 
@@ -541,6 +543,7 @@ const ShowUsuarioModal = () => {
             <option value="xml">XML</option>
             <option value="pdf">PDF</option>
           </Select>
+
           <Button 
             bg="#319795" 
             color="white" 
