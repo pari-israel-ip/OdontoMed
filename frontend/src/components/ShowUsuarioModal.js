@@ -114,6 +114,17 @@ const ShowUsuarioModal = () => {
     };
     const downloadHistorial = async (format) => {
         try {
+            // Validar que se haya seleccionado un formato
+            if (!['json', 'xml', 'pdf'].includes(format)) {
+                return toast({
+                    title: "Formato no soportado",
+                    description: "El formato seleccionado no es válido. Por favor, selecciona JSON, XML o PDF.",
+                    status: "warning",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+    
             // Construir los datos del usuario y del historial
             const data = {
                 usuario: {
@@ -132,7 +143,6 @@ const ShowUsuarioModal = () => {
                 historial_clinico: {
                     id_odontologo: usuario.historiales.id_odontologo || 1, // Valor ficticio si falta
                     notas_generales: usuario.historiales.notas_generales || 'No especificado',
-                   
                 },
                 diagnosticos: diagnosticos.map((d) => ({
                     id: d.id,
@@ -156,8 +166,8 @@ const ShowUsuarioModal = () => {
                 })),
             };
     
+            // Manejar descarga según el formato
             if (format === 'json') {
-                // Exportar como JSON
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -165,8 +175,16 @@ const ShowUsuarioModal = () => {
                 link.download = `historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.json`;
                 link.click();
                 URL.revokeObjectURL(url);
+    
+                toast({
+                    title: "Descarga exitosa",
+                    description: "El historial se descargó correctamente en formato JSON.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+    
             } else if (format === 'xml') {
-                // Construir y exportar como XML
                 const xmlData = `
                     <historial>
                         <usuario>
@@ -209,8 +227,16 @@ const ShowUsuarioModal = () => {
                 link.download = `historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.xml`;
                 link.click();
                 URL.revokeObjectURL(url);
+    
+                toast({
+                    title: "Descarga exitosa",
+                    description: "El historial se descargó correctamente en formato XML.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+    
             } else if (format === 'pdf') {
-                // Crear y exportar como PDF usando jsPDF
                 const doc = new jsPDF();
                 doc.text(`Historial Odontológico de ${usuario.nombre_completo.trim().toUpperCase()}`, 10, 10);
                 doc.text(`CI: ${usuario.ci.trim()}`, 10, 20);
@@ -218,46 +244,25 @@ const ShowUsuarioModal = () => {
                 doc.text(`Email: ${usuario.email.trim().toUpperCase()}`, 10, 40);
                 doc.text(`Dirección: ${usuario.direccion.trim().toUpperCase()}`, 10, 50);
                 doc.text(`Teléfono: ${usuario.telefono.trim()}`, 10, 60);
-                doc.text(`Seguro Médico: ${usuario.seguro_medico.trim().toUpperCase()}`, 10, 70);
-                doc.text(`Alergias: ${usuario.alergias.trim().toUpperCase()}`, 10, 80);
-                doc.text(`Antecedentes Médicos: ${usuario.antecedentes_medicos.trim().toUpperCase()}`, 10, 90);
-    
-                // Agregar diagnósticos
-                let yOffset = 100;
-                if (data.diagnosticos.length > 0) {
-                    doc.text('Diagnósticos:', 10, yOffset);
-                    data.diagnosticos.forEach((d, i) => {
-                        yOffset += 10;
-                        doc.text(`${i + 1}. ${d.descripcion} (Fecha: ${d.fecha})`, 10, yOffset);
-                    });
-                }
-    
-                // Agregar tratamientos
-                if (data.tratamientos.length > 0) {
-                    yOffset += 20;
-                    doc.text('Tratamientos:', 10, yOffset);
-                    data.tratamientos.forEach((t, i) => {
-                        yOffset += 10;
-                        doc.text(`${i + 1}. ${t.nombre}: ${t.descripcion} (Inicio: ${t.fecha_inicio}, Fin: ${t.fecha_fin})`, 10, yOffset);
-                    });
-                }
-    
-                // Agregar prescripciones
-                if (data.prescripciones.length > 0) {
-                    yOffset += 20;
-                    doc.text('Prescripciones:', 10, yOffset);
-                    data.prescripciones.forEach((p, i) => {
-                        yOffset += 10;
-                        doc.text(`${i + 1}. ${p.medicamento} (${p.dosis}, ${p.frecuencia}, ${p.duracion})`, 10, yOffset);
-                    });
-                }
     
                 doc.save(`historial_${usuario.nombre_completo.trim().toLowerCase().replace(/\s+/g, '_')}.pdf`);
-            } else {
-                console.error('Formato no soportado:', format);
+    
+                toast({
+                    title: "Descarga exitosa",
+                    description: "El historial se descargó correctamente en formato PDF.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
             }
         } catch (error) {
-            console.error('Error al descargar el historial:', error);
+            toast({
+                title: "Error al descargar",
+                description: `Ocurrió un error al intentar descargar el historial: ${error.message}`,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
     
