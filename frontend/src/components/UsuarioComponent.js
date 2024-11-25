@@ -108,98 +108,167 @@ const UsuariosComponent = () => {
         setFilteredUsuarios(filtered);
         setCurrentPage(1); // Resetear a la primera página tras filtrar
     };
+  
+
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
+    
         if (file) {
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
     
-                    // Datos del usuario, paciente y historial clínico
+                    // Validación del objeto JSON antes de procesar
+                    if (!data.usuario || !data.historial_clinico) {
+                        return toast({
+                            title: "Error en el archivo",
+                            description: "Faltan datos del usuario o historial clínico en el archivo JSON.",
+                            status: "error",
+                            duration: 5000,
+                            isClosable: true,
+                        });
+                    }
+    
+                    // Preparar datos del usuario
                     const usuarioData = {
-                        nombres: data.usuario.nombres.trim().toUpperCase(),
-                        apellidos: data.usuario.apellidos.trim().toUpperCase(),
-                        ci: data.usuario.ci.trim(),
+                        nombres: data.usuario.nombres?.trim().toUpperCase() || "SIN NOMBRE",
+                        apellidos: data.usuario.apellidos?.trim().toUpperCase() || "SIN APELLIDO",
+                        ci: data.usuario.ci?.trim(),
                         fecha_nacimiento: data.usuario.fecha_nacimiento,
-                        email: data.usuario.email.trim().toUpperCase(),
-                        direccion: data.usuario.direccion.trim().toUpperCase(),
-                        telefono: data.usuario.telefono.trim(),
+                        email: data.usuario.email?.trim().toUpperCase(),
+                        direccion: data.usuario.direccion?.trim().toUpperCase(),
+                        telefono: data.usuario.telefono?.trim(),
                         contrasenia: data.usuario.contrasenia,
-                        seguro_medico: data.usuario.seguro_medico.trim().toUpperCase(),
-
-                        alergias: data.usuario.alergias.trim().toUpperCase(),
-                        antecedentes_medicos: data.usuario.antecedentes_medicos.trim().toUpperCase(),
-                        id_odontologo: data.historial_clinico.id_odontologo, // ID del odontólogo
-                        notas_generales: data.historial_clinico.notas_generales.trim().toUpperCase()
+                        seguro_medico: data.usuario.seguro_medico?.trim().toUpperCase(),
+                        alergias: data.usuario.alergias?.trim().toUpperCase(),
+                        antecedentes_medicos: data.usuario.antecedentes_medicos?.trim().toUpperCase(),
+                        id_odontologo: data.historial_clinico.id_odontologo,
+                        notas_generales: data.historial_clinico.notas_generales?.trim().toUpperCase(),
                     };
     
-                    // Realizar la solicitud de creación al backend
+                    // Crear usuario e historial clínico
                     try {
-                        
                         const response = await usuarioService.createUsuario(usuarioData);
-                        console.log('Paciente creado correctamente:', response.data);
-                
-                        // Obtener el id_historial utilizando el email del usuario recién creado
-                        const userResponse = await usuarioService.getIDPorEmail(data.usuario.email);
-                        console.log('ID USUARIO:', userResponse.data.id_usuario);
-                
-                        // Asumimos que el backend devuelve el id_historial asociado al usuario creado
-                        const historialId = userResponse.data.id_historial; // ID del historial clínico
-                
-                        // Ahora puedes usar historialId para asociarlo con otros objetos o realizar más operaciones
-                        console.log('ID Historial:', historialId);
+                        console.log("Paciente creado correctamente:", response.data);
     
-                        // Crear diagnósticos
+                        const userResponse = await usuarioService.getIDPorEmail(data.usuario.email);
+                        console.log("ID USUARIO:", userResponse.data.id_usuario);
+    
+                        const historialId = userResponse.data.id_historial;
+                        console.log("ID Historial:", historialId);
+    
+                        // Validación y creación de diagnósticos
                         if (data.diagnosticos && data.diagnosticos.length > 0) {
                             for (const diagnostico of data.diagnosticos) {
+                                if (!diagnostico.nombre || !diagnostico.descripcion) {
+                                    toast({
+                                        title: "Error en diagnóstico",
+                                        description: "Faltan campos obligatorios en los diagnósticos. Revisa el archivo JSON.",
+                                        status: "error",
+                                        duration: 5000,
+                                        isClosable: true,
+                                    });
+                                    continue;
+                                }
                                 const diagnosticoData = {
                                     ...diagnostico,
-                                    id_historial: historialId // Asociar al historial clínico creado
+                                    id_historial: historialId,
                                 };
                                 await diagnosticoService.createDiagnostico(diagnosticoData);
                             }
                         }
     
-                        // Crear tratamientos
+                        // Validación y creación de tratamientos
                         if (data.tratamientos && data.tratamientos.length > 0) {
                             for (const tratamiento of data.tratamientos) {
+                                if (!tratamiento.nombre || !tratamiento.duracion) {
+                                    toast({
+                                        title: "Error en tratamiento",
+                                        description: `Faltan campos obligatorios en el tratamiento ${tratamiento.nombre || "sin nombre"}.`,
+                                        status: "error",
+                                        duration: 5000,
+                                        isClosable: true,
+                                    });
+                                    continue;
+                                }
                                 const tratamientoData = {
                                     ...tratamiento,
-                                    id_historial: historialId // Asociar al historial clínico creado
+                                    id_historial: historialId,
                                 };
                                 await tratamientoService.createTratamiento(tratamientoData);
                             }
                         }
     
-                        // Crear prescripciones
+                        // Validación y creación de prescripciones
                         if (data.prescripciones && data.prescripciones.length > 0) {
                             for (const prescripcion of data.prescripciones) {
+                                if (!prescripcion.medicamento || !prescripcion.dosis) {
+                                    toast({
+                                        title: "Error en prescripción",
+                                        description: `Faltan campos obligatorios en la prescripción del medicamento ${prescripcion.medicamento || "sin nombre"}.`,
+                                        status: "error",
+                                        duration: 5000,
+                                        isClosable: true,
+                                    });
+                                    continue;
+                                }
                                 const prescripcionData = {
                                     ...prescripcion,
-                                    id_historial: historialId // Asociar al historial clínico creado
+                                    id_historial: historialId,
                                 };
                                 await prescripcionService.createPrescripcion(prescripcionData);
                             }
                         }
     
-                        console.log('Usuario, historial clínico y registros asociados subidos exitosamente');
+                        toast({
+                            title: "Importación exitosa",
+                            description: "El usuario, historial clínico y sus registros asociados fueron creados correctamente.",
+                            status: "success",
+                            duration: 5000,
+                            isClosable: true,
+                        });
                     } catch (error) {
                         if (error.response && error.response.data.errors) {
-                            // Si el backend devuelve errores de validación, los mostramos en consola
-                            console.error('Errores de validación:', error.response.data.errors);
+                            toast({
+                                title: "Error al importar datos",
+                                description: "Ocurrieron errores en la validación del servidor. Por favor, revisa los datos.",
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                            });
                         } else {
-                            console.error('Error al crear el usuario:', error);
+                            toast({
+                                title: "Error en el servidor",
+                                description: "Hubo un problema al procesar la solicitud. Inténtalo de nuevo más tarde.",
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                            });
                         }
                     }
                 } catch (error) {
-                    console.error('Error al procesar el archivo JSON:', error);
+                    toast({
+                        title: "Archivo no válido",
+                        description: "El archivo seleccionado no es un JSON válido. Por favor, revisa su formato.",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                    });
                 }
-              
             };
             reader.readAsText(file);
+        } else {
+            toast({
+                title: "Archivo no seleccionado",
+                description: "Por favor, selecciona un archivo JSON para continuar.",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
+    
     
     // Calcular el rango de datos a mostrar en la página actual
     const startIndex = (currentPage - 1) * itemsPerPage;
