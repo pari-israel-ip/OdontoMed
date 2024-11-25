@@ -112,6 +112,7 @@ const UsuariosComponent = () => {
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
+        setIsLoading(true); // Inicia el indicador de carga
     
         if (file) {
             const reader = new FileReader();
@@ -121,6 +122,7 @@ const UsuariosComponent = () => {
     
                     // Validación del objeto JSON antes de procesar
                     if (!data.usuario || !data.historial_clinico) {
+                        setIsLoading(false); // Finaliza el indicador de carga
                         return toast({
                             title: "Error en el archivo",
                             description: "Faltan datos del usuario o historial clínico en el archivo JSON.",
@@ -255,6 +257,8 @@ const UsuariosComponent = () => {
                         duration: 5000,
                         isClosable: true,
                     });
+                } finally {
+                    setIsLoading(false); // Finaliza el indicador de carga
                 }
             };
             reader.readAsText(file);
@@ -266,8 +270,10 @@ const UsuariosComponent = () => {
                 duration: 5000,
                 isClosable: true,
             });
+            setIsLoading(false); // Finaliza el indicador de carga
         }
     };
+    
     
     
     // Calcular el rango de datos a mostrar en la página actual
@@ -287,9 +293,9 @@ const UsuariosComponent = () => {
 
                 </ConPermiso>
                 
-                <Button as="label"  ml= {4}colorScheme="teal" >CARGAR HISTORIAL (JSON)
-              <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
-            </Button>
+                <Button as="label" ml={4} colorScheme="teal" isDisabled={isLoading}> CARGAR HISTORIAL (JSON)
+                    <input type="file" accept="application/json" hidden onChange={handleFileUpload} disabled={isLoading} />
+                </Button>
             <Flex justify="space-between" mb={4}>
                 
                 <Input
