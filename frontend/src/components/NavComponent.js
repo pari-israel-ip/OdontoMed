@@ -40,7 +40,7 @@ const NavComponent = () => {
                 <Box flex="1" display="flex" justifyContent={{ base: 'center', md: 'flex-start' }}>
                     <Link href="/">
                         <Image
-                            src="https://i.ibb.co/FKcjVZX/Screenshot-2024-11-18-at-14-17-24.png"
+                            src="https://i.ibb.co/m6mt82H/Screenshot-2024-11-18-at-14-17-24-removebg-preview.png"
                             alt="OdontoMed Logo"
                             width="150px"
                             height="50px"

@@ -17,6 +17,8 @@ import {
 } from '@chakra-ui/react';
 import {  DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import { EditIcon } from '@chakra-ui/icons';
+import { SettingsIcon } from '@chakra-ui/icons';
 import usuarioService from '../services/usuarioService';
 import diagnosticoService from '../services/diagnosticoService';
 import tratamientoService from '../services/tratamientoService';
@@ -216,7 +218,7 @@ const UsuariosComponent = () => {
 
                 </ConPermiso>
                 
-                <Button as="label" colorScheme="teal" >Cargar Historial (JSON)
+                <Button as="label" colorScheme="teal" >CARGAR HISTORIAL (JSON)
               <input type="file" accept="application/json" hidden onChange={handleFileUpload} />
             </Button>
             <Flex justify="space-between" mb={4}>
@@ -256,13 +258,15 @@ const UsuariosComponent = () => {
                             <Td>
                                 <Flex justify="space-between">
                                 
-                                    <IconButton
-                                        icon={<InfoIcon />}
-                                        colorScheme="cyan"
-                                        size="sm"
-                                        onClick={() => handleShow(usuario.id_paciente)}
-                                        mr={2}
-                                    />
+                                <IconButton
+    icon={<SettingsIcon />}
+    colorScheme="cyan"
+    size="sm"
+    onClick={() => handleShow(usuario.id_paciente)}
+    mr={2}
+/>
+
+
                                      <ConPermiso permiso="Eliminar Paciente">
                                     <IconButton
                                         icon={<DeleteIcon />}

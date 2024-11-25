@@ -485,39 +485,75 @@ const ShowUsuarioModal = () => {
         <ModalBody>
           {/* Barra de pestañas */}
           <Flex justify="center" mb={4}>
-            <Button colorScheme={activeTab === 1 ? "teal" : "gray"} onClick={() => setActiveTab(1)}>Datos Personales</Button>
-            <Button colorScheme={activeTab === 2 ? "teal" : "gray"} onClick={() => setActiveTab(2)}>Historial Clínico</Button>
-            <Button colorScheme={activeTab === 3 ? "teal" : "gray"} onClick={() => setActiveTab(3)}>Tratamientos</Button>
-            <Button colorScheme={activeTab === 4 ? "teal" : "gray"} onClick={() => setActiveTab(4)}>Prescripciones</Button>
-            <Button colorScheme={activeTab === 5 ? "teal" : "gray"} onClick={() => setActiveTab(5)}>Descargar Historial</Button>
+            <Button colorScheme={activeTab === 1 ? "teal" : "gray"} onClick={() => setActiveTab(1)}>DATOS PERSONALES</Button>
+            <Button colorScheme={activeTab === 2 ? "teal" : "gray"} onClick={() => setActiveTab(2)}>HISTORIAL CLINICO</Button>
+            <Button colorScheme={activeTab === 3 ? "teal" : "gray"} onClick={() => setActiveTab(3)}>TRATAMIENTOS</Button>
+            <Button colorScheme={activeTab === 4 ? "teal" : "gray"} onClick={() => setActiveTab(4)}>PRESCRIPCIÓNES</Button>
           </Flex>
 
-          {/* Contenido de las pestañas */}
-          {activeTab === 1 && (
-            <Grid templateColumns="1fr 1fr" gap={6}>
-              <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
-                <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
-                <Text><strong>CI:</strong> {usuario.ci}</Text>
-                <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
-                <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
-                <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
-                <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
-                <ConPermiso permiso='Editar Datos Personales'>
-                  <Button colorScheme="blue" mt={4} onClick={handleEdit}>Editar Datos Personales</Button>
-                </ConPermiso>
-              </Box>
+           {/* Contenido de las pestañas */}
+  {activeTab === 1 && (
+    <>
+      <Grid templateColumns="1fr 1fr" gap={6}>
+        <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+          <Text fontSize="xl" mb={4}><strong>Nombre Completo:</strong> {usuario.nombre_completo}</Text>
+          <Text><strong>CI:</strong> {usuario.ci}</Text>
+          <Text><strong>Fecha de Nacimiento:</strong> {usuario.fecha_nacimiento}</Text>
+          <Text><strong>Correo Electrónico:</strong> {usuario.email}</Text>
+          <Text><strong>Dirección:</strong> {usuario.direccion}</Text>
+          <Text><strong>Teléfono:</strong> {usuario.telefono}</Text>
+          <ConPermiso permiso='Editar Datos Personales'>
+            <Button 
+              bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} 
+              onClick={handleEdit}
+            >
+              EDITAR DATOS PERSONALES
+            </Button>
+          </ConPermiso>
+        </Box>
 
-              <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
-                <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
-                <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
-                <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
-                <ConPermiso permiso='Editar Datos del Paciente'>
-                  <Button colorScheme="green" mt={4} onClick={handleEditPaciente}>Editar Datos Clínicos</Button>
-                </ConPermiso>
-              </Box>
-            </Grid>
-          )}
+        <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
+          <Text fontSize="xl" mb={4}><strong>Seguro Médico:</strong> {usuario.seguro_medico}</Text>
+          <Text><strong>Alergias:</strong> {usuario.alergias}</Text>
+          <Text><strong>Antecedentes Médicos:</strong> {usuario.antecedentes_medicos}</Text>
+          <ConPermiso permiso='Editar Datos del Paciente'>
+            <Button 
+              bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} 
+              onClick={handleEditPaciente}
+            >
+              EDITAR DATOS CLÍNICOS
+            </Button>
+          </ConPermiso>
+        </Box>
+      </Grid>
 
+      {/* Bloque de Descargar Historial */}
+      <ConPermiso permiso='Descargar Historial'>
+        <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
+          <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
+            <option value="json">JSON</option>
+            <option value="xml">XML</option>
+            <option value="pdf">PDF</option>
+          </Select>
+          <Button 
+            bg="#319795" 
+            color="white" 
+            _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+            mt={4} 
+            onClick={() => downloadHistorial(selectedFormat)}
+          >
+            DESCARGAR HISTORIAL
+          </Button>
+        </Box>
+      </ConPermiso>
+    </>
+  )}
           {activeTab === 2 && (
             <ConPermiso permiso="Ver Historial de Paciente">
               <Text fontSize="2xl" mt={6}><strong>Historial Clínico:</strong></Text>
@@ -527,10 +563,16 @@ const ShowUsuarioModal = () => {
                   <Text><strong>Notas:</strong> {historial.notas_generales}</Text>
                   <Flex justify="space-between" mt={4}>
                     <ConPermiso permiso='Editar Datos del Historial'>
-                      <Button colorScheme="yellow" onClick={() => handleEditHistorial(historial)}>Editar Datos del Historial</Button>
+                      <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => handleEditHistorial(historial)}>EDITAR DATOS DEL HISTORIAL</Button>
                     </ConPermiso>
                     <ConPermiso permiso='Crear Diagnostico'>
-                      <Button colorScheme="teal" onClick={() => handleCreate(historial.id_historial)}>Crear Nuevo Diagnóstico</Button>
+                      <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => handleCreate(historial.id_historial)}>CREAR NUEVO DIAGNOSTICO</Button>
                     </ConPermiso>
                   </Flex>
 
@@ -544,10 +586,13 @@ const ShowUsuarioModal = () => {
                         <Text><strong>Fecha:</strong> {diagnostico.fecha_diagnostico}</Text>
                         <Text><strong>Descripción:</strong> {diagnostico.descripcion}</Text>
                         <ConPermiso permiso='Editar Diagnostico'>
-                            <Button colorScheme="purple" onClick={() => handleEditDiagnostico(diagnostico)} mr={2}>Editar Diagnóstico</Button>
+                            <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => handleEditDiagnostico(diagnostico)} mr={4}>EDITAR DIAGNOSTICO</Button>
                         </ConPermiso>
                         <ConPermiso permiso='Eliminar Diagnostico'>
-                            <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
+                            <IconButton icon={<DeleteIcon />} colorScheme="red"  mt={4}  onClick={() => handleDeleteDiagnostico(diagnostico.id_diagnostico)} />
                         </ConPermiso>
                         </Box>
                         
@@ -568,7 +613,10 @@ const ShowUsuarioModal = () => {
         {activeTab === 3 && (
         <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
             <ConPermiso permiso='Crear Tratamiento'>
-            <Button colorScheme="green" mt={4} onClick={() => setIsCreateTratamientoOpen(true)}>Crear Nuevo Tratamiento</Button>
+            <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => setIsCreateTratamientoOpen(true)}>CREAR NUEVO TRATAMIENTO</Button>
             </ConPermiso>
 
             <Text><strong>Tratamientos:</strong></Text>
@@ -583,10 +631,13 @@ const ShowUsuarioModal = () => {
                 <Text><strong>Descripción:</strong> {tratamiento.descripcion}</Text>
                 <Text><strong>Estado:</strong> {tratamiento.estado_tratamiento.toUpperCase()}</Text>
                 <ConPermiso permiso='Editar Tratamiento'>
-                    <Button colorScheme="cyan" onClick={() => handleEditTratamiento(tratamiento)} mr={2}>Editar Tratamiento</Button>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => handleEditTratamiento(tratamiento)} mr={4}>EDITAR TRATAMIENTO</Button>
                 </ConPermiso>
                 <ConPermiso permiso='Eliminar Tratamiento'>
-                    <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
+                    <IconButton icon={<DeleteIcon />} colorScheme="red"  mt={4}  onClick={() => handleDeleteTratamiento(tratamiento.id_tratamiento)} />
                 </ConPermiso>
                 </Box>
             ))
@@ -607,7 +658,10 @@ const ShowUsuarioModal = () => {
         {activeTab === 4 && (
         <Box flex="1" border="1px solid #319795" borderRadius="lg" p={5} bg="white">
             <ConPermiso permiso='Crear Prescripcion'>
-            <Button colorScheme="blue" mt={4} onClick={handleCreatePrescription}>Crear Nueva Prescripción</Button>
+            <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={handleCreatePrescription}>CREAR NUEVA PRESCRIPCIÓN</Button>
             </ConPermiso>
 
             <Text><strong>Prescripciones:</strong></Text>
@@ -622,10 +676,13 @@ const ShowUsuarioModal = () => {
                 <Text><strong>Inicio:</strong> {prescripcion.fecha_inicio}</Text>
                 <Text><strong>Fin:</strong> {prescripcion.fecha_fin}</Text>
                 <ConPermiso permiso='Editar Prescripcion'>
-                    <Button colorScheme="cyan" onClick={() => handleEditPrescripcion(prescripcion)} mr={2}>Editar Prescripción</Button>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4}  onClick={() => handleEditPrescripcion(prescripcion)} mr={4}>EDITAR PRESCRIPCIÓN</Button>
                 </ConPermiso>
                 <ConPermiso permiso='Eliminar Prescripcion'>
-                    <IconButton icon={<DeleteIcon />} colorScheme="red" size="sm" onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
+                    <IconButton icon={<DeleteIcon />} colorScheme="red" mt={4} onClick={() => handleDeletePrescripcion(prescripcion.id_medicamento)} />
                 </ConPermiso>
                 </Box>
             ))
@@ -643,18 +700,7 @@ const ShowUsuarioModal = () => {
         )}
 
 
-          {activeTab === 5 && (
-            <ConPermiso permiso='Descargar Historial'>
-              <Box mt={6} border="1px solid #319795" borderRadius="lg" p={5} bg="white">
-                <Select onChange={(e) => setSelectedFormat(e.target.value)} value={selectedFormat}>
-                  <option value="json">JSON</option>
-                  <option value="xml">XML</option>
-                  <option value="pdf">PDF</option>
-                </Select>
-                <Button colorScheme="blue" mt={4} onClick={() => downloadHistorial(selectedFormat)}>Descargar Historial</Button>
-              </Box>
-            </ConPermiso>
-          )}
+          
         </ModalBody>
       </ModalContent>
     </Modal>

@@ -86,27 +86,34 @@ const NavComponentLogin = () => {
                     />
                 </Box>
 
-                {/* Contenedor del logo */}
                 <Box flex="1" display="flex" justifyContent={{ base: 'center', md: 'flex-start' }}>
-                    <Image src="/path-to-logo/odomed-logo.png" alt="OdontoMed Logo" boxSize="50px" />
+                    <Link href="/">
+                        <Image
+                            src="https://i.ibb.co/m6mt82H/Screenshot-2024-11-18-at-14-17-24-removebg-preview.png"
+                            alt="OdontoMed Logo"
+                            width="150px"
+                            height="50px"
+                            cursor="pointer"
+                        />
+                    </Link>
                 </Box>
 
                 {/* Enlaces de navegación */}
                 <Flex display={{ base: 'none', md: 'flex' }} alignItems="center" gap={6} flex="2" justifyContent="center">
                     <ConPermiso permiso='Ver Pacientes'>
-                    <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Pacientes</Text></Link>
+                    <Link href="/usuarios" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>PACIENTES</Text></Link>
                     </ConPermiso>
                     <ConPermiso permiso='Ver Odontólogos'>
-                    <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Odontologos</Text></Link>
+                    <Link href="/odontologos" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>ODONTOLOGOS</Text></Link>
                     </ConPermiso>
                     <ConPermiso permiso='Ver roles'>
-                    <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Roles</Text></Link>
+                    <Link href="/roles" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>ROLES</Text></Link>
                     </ConPermiso>
                     <ConPermiso permiso='Ver Recepcionistas'>
-                   <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Recepcionistas</Text></Link>
+                   <Link href="/recepcionistas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>RECEPCIONISTAS</Text></Link>
                    </ConPermiso>
                    <ConPermiso permiso='Ver citas'>
-                   <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>Citas</Text></Link>
+                   <Link href="/citas" _hover={{ textDecoration: 'none', color: '#319795' }}><Text>CITAS</Text></Link>
                    </ConPermiso>
                 </Flex>
 

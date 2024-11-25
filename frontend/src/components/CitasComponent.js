@@ -19,6 +19,8 @@ import {
     Select, useToast,Spinner,Center, CloseButton,Badge
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { SettingsIcon } from '@chakra-ui/icons';
+
 import citaService from '../services/citaService';
 import EditCitaModal from './EditCitaModal';
 import CreateCitaModal from './CreateCitaModal';
@@ -214,8 +216,8 @@ const CitasComponent = () => {
                     <Flex justify="space-between">
                         <ConPermiso permiso='Editar cita'>
                             <IconButton
-                                icon={<EditIcon />}
-                                colorScheme="blue"
+                                icon={<SettingsIcon />}
+                                colorScheme="cyan"
                                 size="sm"
                                 onClick={() => handleEdit(cita)}
                                 mr={2}

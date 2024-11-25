@@ -19,6 +19,8 @@ import {
     useToast,Spinner,Center,CloseButton
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { SettingsIcon } from '@chakra-ui/icons';
+
 import roleService from '../services/roleService';
 import EditRoleModal from './EditRoleModal';
 import CreateRoleModal from './CreateRoleModal';
@@ -164,9 +166,9 @@ const RolesComponent = () => {
                                 <Flex justify="space-between">
                                 {tienePermiso('Editar rol') && (
                                     <IconButton
-                                        icon={<EditIcon />}
-                                        colorScheme="blue"
-                                        size="sm"
+                                    icon={<SettingsIcon />}
+                                    colorScheme="cyan"
+                                    size="sm"
                                         onClick={() => handleEdit(role)}
                                         mr={2}
                                     />)}

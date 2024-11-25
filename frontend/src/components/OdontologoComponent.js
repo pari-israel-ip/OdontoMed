@@ -22,6 +22,8 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon, InfoIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import { SettingsIcon } from '@chakra-ui/icons';
+
 import odontologoService from '../services/odontologoService';
 import CreateOdontologoModal from './CreateOdontologoModal';
 import ConPermiso from './ConPermiso'
@@ -167,7 +169,7 @@ const OdontologosComponent = () => {
                                 <Td>
                                     <Flex justify="space-between">
                                         <IconButton
-                                            icon={<InfoIcon />}
+                                            icon={<SettingsIcon />}
                                             colorScheme="cyan"
                                             size="sm"
                                             onClick={() => handleShow(odontologo.id_odontologo)}
