@@ -8,6 +8,7 @@ import {
     ModalBody,
     ModalCloseButton,
     Button,
+    ModalFooter,
     FormControl,
     FormLabel,
     Input,
@@ -175,10 +176,16 @@ function CreatePrescriptionModal({ isOpen, onClose, idHistorial, onPrescriptionC
                         ))}
                     </List>
                 </ModalBody>
-                <ModalCloseButton />
-                <Button colorScheme="blue" onClick={handleSavePrescriptions} isLoading={loading} mt={4}>
-                    Crear Prescripción
-                </Button>
+                <ModalFooter>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleSavePrescriptions} isLoading={loading}>
+                        Crear
+                    </Button>
+                    <Button isLoading={loading} ml={3} mt={4} onClick={onClose}>Cancelar</Button>
+                </ModalFooter>
+                
             </ModalContent>
         </Modal>
     );

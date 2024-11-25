@@ -20,7 +20,7 @@ import axios from 'axios';
 const EditHistorialModal = ({ historial, onClose, onSave }) => {
     const [notasGenerales, setNotasGenerales] = useState(historial.notas_generales || '');
     const [odontologos, setOdontologos] = useState([]);
-    const [selectedOdontologo, setSelectedOdontologo] = useState(historial.id_odontologo?.id_odontologo || '');
+    const [selectedOdontologo, setSelectedOdontologo] = useState(historial.id_odontologo || '');
     const [errors, setErrors] = useState({});
     const toast = useToast();
     const [loading, setLoading] = useState(false);
@@ -110,7 +110,10 @@ const EditHistorialModal = ({ historial, onClose, onSave }) => {
                             <FormErrorMessage>{errors.id_odontologo}</FormErrorMessage>
                         </FormControl>
 
-                        <Button mt={4} isLoading={loading} colorScheme="blue" type="submit">Guardar</Button>
+                        <Button  isLoading={loading} bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} type="submit">Guardar</Button>
                         <Button mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>

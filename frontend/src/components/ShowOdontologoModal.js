@@ -113,15 +113,25 @@ const ShowOdontologoModal = () => {
             <Text><strong>Dirección:</strong> {odontologo.direccion}</Text>
             <Text><strong>Teléfono:</strong> {odontologo.telefono}</Text>
             <ConPermiso permiso='Editar Datos Personales'>
-              <Button colorScheme="blue" mt={4} onClick={handleEditUsuario}>Editar Datos Personales</Button>
+              <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleEditUsuario}>Editar Datos Personales</Button>
             </ConPermiso>
           </Box>
 
           <Box border="1px solid #319795" borderRadius="lg" p={5} boxShadow="sm" bg="white">
             <Text fontSize="xl" mb={4}><strong>Número de Licencia:</strong> {odontologo.numero_licencia}</Text>
             <Text><strong>Especialización:</strong> {odontologo.especializacion}</Text>
+            <Text></Text>
+            <Text></Text>
+            <Text></Text>
+            <Box height="98px" /> 
             <ConPermiso permiso='Editar Datos de Odontólogo'>
-              <Button colorScheme="green" mt={4} onClick={handleEditOdontologo}>Editar Datos Profesionales</Button>
+              <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleEditOdontologo}>Editar Datos Profesionales</Button>
             </ConPermiso>
           </Box>
         </Grid>

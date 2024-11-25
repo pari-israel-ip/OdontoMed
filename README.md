@@ -19,7 +19,7 @@ pip install tools from Back End
 + pip install mysqlclient
 + pip install djangorestframework   
 + pip install django-cors-headers 
-+ pip install djangop  
++ pip install django
 
 
 npm install tools form Front End

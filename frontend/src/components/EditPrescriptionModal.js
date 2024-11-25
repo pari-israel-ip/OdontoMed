@@ -173,10 +173,16 @@ const EditPrescriptionModal = ({ prescripcion, onClose, onSave }) => {
                             <FormErrorMessage mb={4}>{errors.general}</FormErrorMessage>
                         )}
 
-                        <Button isLoading={loading} mt={4} colorScheme="blue" type="submit">
+                        <Button isLoading={loading} bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} type="submit">
                             Guardar
                         </Button>
-                        <Button mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
+                        <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} isLoading={loading} ml={4} onClick={onClose}>Cancelar</Button>
                     </form>
                 </ModalBody>
             </ModalContent>

@@ -203,10 +203,13 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                         </Grid>
 
                         <ModalFooter>
-                            <Button isLoading={loading} colorScheme="blue" mr={3} type="submit">
+                            <Button isLoading={loading} bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} type="submit">
                                 Guardar
                             </Button>
-                            <Button isLoading={loading} variant="ghost" onClick={onClose}>Cancelar</Button>
+                            <Button isLoading={loading} ml = {3}mt={4}variant="ghost" onClick={onClose}>Cancelar</Button>
                         </ModalFooter>
                     </form>
                 </ModalBody>

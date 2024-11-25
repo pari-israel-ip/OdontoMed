@@ -136,10 +136,13 @@ const EditCitaModal = ({ cita, onClose, onSave }) => {
                     </FormControl>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={handleSave} isLoading={loading}>
+                    <Button bg="#319795" 
+              color="white" 
+              _hover={{ bg: "#287f75" }} // Color más oscuro al pasar el cursor
+              mt={4} onClick={handleSave} isLoading={loading}>
                         Guardar
                     </Button>
-                    <Button isLoading={loading} onClick={onClose} ml={3}>
+                    <Button isLoading={loading} onClick={onClose} ml = {3}mt={4}>
                         Cancelar
                     </Button>
                 </ModalFooter>
