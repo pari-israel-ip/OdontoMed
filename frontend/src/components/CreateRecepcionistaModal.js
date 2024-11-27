@@ -148,6 +148,7 @@ const CreateRecepcionistaModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.ci} mb={4}>
                             <FormLabel>C.I.</FormLabel>
                             <Input
+                                type="number"
                                 placeholder="C.I."
                                 value={ci}
                                 onChange={(e) => setCi(e.target.value)}
@@ -171,6 +172,7 @@ const CreateRecepcionistaModal = ({ onClose, onCreate }) => {
                         <FormControl isInvalid={!!errors.telefono} mb={4}>
                             <FormLabel>Teléfono</FormLabel>
                             <Input
+                            type="number"
                                 placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}

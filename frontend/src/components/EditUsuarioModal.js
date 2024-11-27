@@ -131,7 +131,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                 <FormControl isRequired isInvalid={!!errors.ci}>
                                     <FormLabel>C.I.</FormLabel>
                                     <Input
-                                        type="text"
+                                        type="number"
                                         value={ci}
                                         onChange={(e) => setCi(e.target.value)}
                                     />
@@ -155,7 +155,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                                 <FormControl isInvalid={!!errors.telefono}>
                                     <FormLabel>Teléfono</FormLabel>
                                     <Input
-                                        type="text"
+                                        type="number"
                                         value={telefono}
                                         onChange={(e) => setTelefono(e.target.value)}
                                     />
@@ -164,7 +164,7 @@ const EditUsuarioModal = ({ usuario, onClose, onSave }) => {
                             </GridItem>
 
                             <GridItem>
-                                <FormControl>
+                                <FormControl isInvalid={!!errors.fecha_nacimiento}>
                                     <FormLabel>Fecha de Nacimiento</FormLabel>
                                     <Input
                                         type="date"

@@ -41,7 +41,7 @@ const NavComponent = () => {
                     <Link href="/">
                         <Image
                             src="https://i.ibb.co/m6mt82H/Screenshot-2024-11-18-at-14-17-24-removebg-preview.png"
-                            alt="OdontoMed Logo"
+                            alt="Odomed Logo"
                             width="150px"
                             height="50px"
                             cursor="pointer"
@@ -79,7 +79,7 @@ const NavComponent = () => {
                     >
                         Contacto
                     </Text>
-                    <Text>951-79585650</Text>
+                    <Text>591-79585650</Text>
                 </Flex>
 
                 <Box flex="1" display="flex" justifyContent="flex-end">
@@ -131,7 +131,7 @@ const NavComponent = () => {
                     >
                         Contacto
                     </Text>
-                    <Text width="100%" textAlign="left">951-79585650</Text>
+                    <Text width="100%" textAlign="center">591-79585650</Text>
                 </VStack>
             </Collapse>
 
@@ -139,22 +139,22 @@ const NavComponent = () => {
             <Modal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} size="xl">
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Acerca de OdontoMed</ModalHeader>
+                    <ModalHeader>Acerca de Odomed</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
                             <Box>
                                 <Text mb={4}>
-                                    OdontoMed es una clínica odontológica de alta calidad, especializada en la atención personalizada para cada paciente. Ofrecemos una amplia gama de servicios, que incluyen tratamientos preventivos, estéticos y reconstructivos. Nuestro equipo de profesionales está comprometido con la salud dental, utilizando las últimas tecnologías para garantizar un tratamiento eficaz y seguro.
+                                    Odomed es una clínica odontológica de alta calidad, especializada en la atención personalizada para cada paciente. Ofrecemos una amplia gama de servicios, que incluyen tratamientos preventivos, estéticos y reconstructivos. Nuestro equipo de profesionales está comprometido con la salud dental, utilizando las últimas tecnologías para garantizar un tratamiento eficaz y seguro.
                                 </Text>
                                 <Text>
-                                    Nuestro enfoque se basa en la confianza, la calidad y el confort de cada paciente, trabajando con las tecnologías más avanzadas y manteniendo un ambiente cálido y amigable. Desde tratamientos de ortodoncia hasta procedimientos más complejos, OdontoMed es el lugar ideal para cuidar tu sonrisa.
+                                    Nuestro enfoque se basa en la confianza, la calidad y el confort de cada paciente, trabajando con las tecnologías más avanzadas y manteniendo un ambiente cálido y amigable. Desde tratamientos de ortodoncia hasta procedimientos más complejos, Odomed es el lugar ideal para cuidar tu sonrisa.
                                 </Text>
                             </Box>
                             <Box display="flex" justifyContent="center">
                                 <Image
                                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1hCWgVsuTBLS7J7WFgxR7bPUOd_VVV4rQkw&s"
-                                    alt="OdontoMed Clinic"
+                                    alt="Odomed Clinic"
                                     maxWidth="100%"
                                     height="auto"
                                     borderRadius="md"
@@ -178,7 +178,7 @@ const NavComponent = () => {
                             Dirección: Av. Brasil, La Paz
                         </Text>
                         <Text>
-                           Horarios de atención: Lunes a Sabado de 9:00 AM a 6:00 PM.
+                           Horarios de atención: Lunes a Sábado de 9:00 AM a 6:00 PM.
                         </Text>
                     </ModalBody>
                 </ModalContent>

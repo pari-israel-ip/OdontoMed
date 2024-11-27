@@ -51,7 +51,7 @@ function InfoCollection() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 1 }}
                     >
-                        BIENVENIDO A ODONTOMED
+                        BIENVENIDO A ODOMED
                     </MotionText>
                     <MotionText
                         fontSize={{ base: 'md', md: 'lg' }}
@@ -127,7 +127,7 @@ function ServicesCollection() {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1, delay: 0.3 }}
                             >
-                                En OdontoMed, ofrecemos una amplia gama de servicios dentales para satisfacer todas tus necesidades de salud bucal.
+                                En Odomed, ofrecemos una amplia gama de servicios dentales para satisfacer todas tus necesidades de salud bucal.
                             </MotionText>
                         </VStack>
 

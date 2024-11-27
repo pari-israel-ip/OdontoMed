@@ -9,14 +9,18 @@ import {
     VStack,
     Alert,
     AlertIcon,
-    HStack,
-} from '@chakra-ui/react';
+    HStack,mControl, InputGroup, InputRightElement} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import loginService from '../services/loginService';
 import usuarioService from '../services/usuarioService';
 import roleService from '../services/roleService';
 
 const LoginComponent = () => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev);
+    };
     const [email, setEmail] = useState('');
     const [contrasenia, setContrasenia] = useState('');
     const [message, setMessage] = useState('');
@@ -140,14 +144,21 @@ const LoginComponent = () => {
                         />
                     </FormControl>
                     <FormControl isRequired>
-                        <FormLabel>Contraseña:</FormLabel>
-                        <Input
-                            type="password"
-                            value={contrasenia}
-                            onChange={(e) => setContrasenia(e.target.value)}
-                            placeholder="Ingresa tu contraseña"
-                        />
-                    </FormControl>
+            <FormLabel>Contraseña:</FormLabel>
+            <InputGroup>
+                <Input
+                    type={showPassword ? 'text' : 'password'}
+                    value={contrasenia}
+                    onChange={(e) => setContrasenia(e.target.value)}
+                    placeholder="Ingresa tu contraseña"
+                />
+                <InputRightElement width="4.5rem">
+                    <Button h="1.75rem" size="sm" onClick={togglePasswordVisibility}>
+                        {showPassword ? 'Ocultar' : 'Ver'}
+                    </Button>
+                </InputRightElement>
+            </InputGroup>
+        </FormControl> 
                     <Button isLoading={loading}
                         type="submit"
                         sx={{
